@@ -16,7 +16,6 @@ var Geocoder = React.createClass({
       inputPlaceholder: 'Search',
       showLoader: false,
       source: 'mapbox.places',
-      proximity: '',
       bbox: '',
       types: '',
       onSuggest: function() {},
@@ -197,7 +196,8 @@ function formatPlaceName(result, source) {
 
 const mapStateToProps = (state) => {
   return {
-    searchString: state.searchString
+    accessToken: state.mapboxAccessToken,
+    proximity: state.mapCenter.join(',')
   };
 };
 

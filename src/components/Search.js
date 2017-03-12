@@ -11,9 +11,7 @@ class Search extends Component {
           <svg className='icon color-darken25'><use href='#icon-search'></use></svg>
         </div>
         <Geocoder
-          accessToken={this.props.accessToken}
-          onSelect={function(res) { console.log(res); }}
-          proximity={this.props.proximity}
+          onSelect={function(res) { console.log(res); }} // TODO move that in Geocoder props
         />
       </div>
     );
@@ -22,8 +20,6 @@ class Search extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    accessToken: state.mapboxAccessToken,
-    proximity: state.mapCenter.join(',')
   };
 };
 
