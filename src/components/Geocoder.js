@@ -18,8 +18,7 @@ var Geocoder = React.createClass({
       source: 'mapbox.places',
       bbox: '',
       types: '',
-      onSuggest: function() {},
-      focusOnMount: true
+      onSuggest: function() {}
     };
   },
   getInitialState() {
@@ -42,10 +41,8 @@ var Geocoder = React.createClass({
     bbox: React.PropTypes.string,
     showLoader: React.PropTypes.bool,
     focusOnMount: React.PropTypes.bool,
-    types: React.PropTypes.string
-  },
-  componentDidMount() {
-    if (this.props.focusOnMount) ReactDOM.findDOMNode(this.refs.input).focus();
+    types: React.PropTypes.string,
+    writeSearch: React.PropTypes.func
   },
   onInput(e) {
     this.setState({loading:true});
@@ -126,7 +123,7 @@ var Geocoder = React.createClass({
     this.props.onSelect(place);
     this.setState({focus:listLocation});
     // focus on the input after click to maintain key traversal
-    ReactDOM.findDOMNode(this.refs.input).focus();
+    ReactDOM.findDOMNode(this.refs.input).focus(); // eslint-disable-line
     return false;
   },
   render() {
@@ -178,7 +175,7 @@ function search(endpoint, source, accessToken, proximity, bbox, types, query, ca
   });
 }
 
-function formatPlaceName(result, source) {
+function formatPlaceName(result) {
   var parts = result.place_name.split(', ');
   if (parts.length < 1) return;
   var main = parts[0];

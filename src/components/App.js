@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import Map from './Map';
+import MapComponent from './Map';
 import Search from './Search';
 
 class App extends Component {
   render() {
     return (
       <div>
-        <Map/>
+        <MapComponent/>
         <Search/>
       </div>
     );

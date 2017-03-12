@@ -20,6 +20,7 @@ class Search extends Component {
 
 const mapStateToProps = (state) => {
   return {
+    searchString: state.searchString
   };
 };
 
