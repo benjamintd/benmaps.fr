@@ -2,13 +2,12 @@ const defaultState = {
   // Mapbox Access Token
   mapboxAccessToken: 'pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng',
   // Map
-  map: null,
   mapStyle: 'mapbox://styles/benjamintd/cj06a6mi5004p2sroifies8t9',
   mapCenter: [-122.4, 37.8],
   mapZoom: 10,
   // Search
   searchString: '',
-  searchSubmitted: false,
+  searchPlace: null,
   // Directions
   directionsFrom: null,
   directionsTo: null
@@ -25,6 +24,11 @@ const reducer = (state = defaultState, action) => {
   case 'SET_ZOOM':
     return Object.assign({}, state, {
       mapZoom: action.zoom
+    });
+
+  case 'WRITE_SEARCH':
+    return Object.assign({}, state, {
+      searchString: action.searchString
     });
 
   default:

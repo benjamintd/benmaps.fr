@@ -12,7 +12,7 @@ class Search extends Component {
         </div>
         <Geocoder
           accessToken={this.props.accessToken}
-          onSelect={function(res) {console.log(res);}}
+          onSelect={function(res) { console.log(res); }}
           proximity={this.props.proximity}
         />
       </div>

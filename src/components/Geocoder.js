@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {connect} from 'react-redux';
+import {writeSearch} from '../actions/index'
 import xhr from 'xhr';
 
 /**
@@ -10,7 +12,6 @@ var Geocoder = React.createClass({
   getDefaultProps() {
     return {
       endpoint: 'https://api.tiles.mapbox.com',
-      inputClass: '',
       inputPosition: 'top',
       inputPlaceholder: 'Search',
       showLoader: false,
@@ -33,7 +34,6 @@ var Geocoder = React.createClass({
   propTypes: {
     endpoint: React.PropTypes.string,
     source: React.PropTypes.string,
-    inputClass: React.PropTypes.string,
     inputPosition: React.PropTypes.string,
     inputPlaceholder: React.PropTypes.string,
     onSelect: React.PropTypes.func.isRequired,
@@ -67,6 +67,8 @@ var Geocoder = React.createClass({
         this.props.types,
         value,
         this.onResult);
+
+      this.props.writeSearch(value);
     }
   },
   moveFocus(dir) {
@@ -193,4 +195,19 @@ function formatPlaceName(result, source) {
   )
 }
 
-module.exports = Geocoder;
+const mapStateToProps = (state) => {
+  return {
+    searchString: state.searchString
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    writeSearch: (searchString) => dispatch(writeSearch(searchString)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Geocoder);
