@@ -42,6 +42,7 @@ var Geocoder = React.createClass({
     showLoader: React.PropTypes.bool,
     focusOnMount: React.PropTypes.bool,
     types: React.PropTypes.string,
+    searchString: React.PropTypes.string,
     writeSearch: React.PropTypes.func
   },
   onInput(e) {
@@ -63,9 +64,8 @@ var Geocoder = React.createClass({
         this.props.types,
         value,
         this.onResult);
-
-      this.props.writeSearch(value);
     }
+    this.props.writeSearch(value);
   },
   moveFocus(dir) {
     if(this.state.loading) return;
@@ -132,12 +132,14 @@ var Geocoder = React.createClass({
       className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5'
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
+      value={this.props.searchString}
       placeholder={this.props.inputPlaceholder}
       type='text' />;
+
     return (
       <div>
         {this.props.inputPosition === 'top' && input}
-        {this.state.results.length > 0 && (
+        {this.state.results.length > 0 && this.props.searchString !== '' && (
           <ul className={`${this.props.showLoader && this.state.loading ? 'loading' : ''} bg-white shadow-darken5 mt12 border-darken10`}>
             {this.state.results.map((result, i) => (
               <li
@@ -193,6 +195,7 @@ function formatPlaceName(result) {
 
 const mapStateToProps = (state) => {
   return {
+    searchString: state.searchString,
     accessToken: state.mapboxAccessToken,
     proximity: state.mapCenter.join(',')
   };
@@ -200,7 +203,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    writeSearch: (searchString) => dispatch(writeSearch(searchString)),
+    writeSearch: (searchString) => {
+      dispatch(writeSearch(searchString))
+    },
   };
 };
 
