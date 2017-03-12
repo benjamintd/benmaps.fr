@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
-import {writeSearch} from '../actions/index'
+import PlaceName from './PlaceName';
+import {writeSearch} from '../actions/index';
 import xhr from 'xhr';
 
 /**
@@ -150,7 +151,9 @@ var Geocoder = React.createClass({
                 <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>
                   <svg className='icon color-darken25'><use href='#icon-marker'></use></svg>
                 </div>
-                {formatPlaceName(result, this.props.source)}
+                <div className='pl42 w420 txt-truncate' key={result.id}>
+                  <PlaceName location={result}/>
+                </div>
               </li>
             ))}
           </ul>
@@ -175,22 +178,6 @@ function search(endpoint, source, accessToken, proximity, bbox, types, query, ca
   }, function(err, res, body) {
     callback(err, res, body, searchTime);
   });
-}
-
-function formatPlaceName(result) {
-  var parts = result.place_name.split(', ');
-  if (parts.length < 1) return;
-  var main = parts[0];
-  var rest = parts.slice(1).join(', ');
-  return (
-    <div
-      className='pl42 w420 txt-truncate'
-      key={result.id}
-    >
-      <div className='inline pr6'>{main}</div>
-      <div className='inline txt-s color-darken50'>{rest}</div>
-    </div>
-  )
 }
 
 const mapStateToProps = (state) => {

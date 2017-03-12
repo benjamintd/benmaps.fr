@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
-import {writeSearch} from '../actions/index';
+import PlaceName from './PlaceName';
+import {writeSearch, setSearchLocation} from '../actions/index';
 
 class Search extends Component {
   render() {
@@ -10,16 +11,28 @@ class Search extends Component {
         <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>
           <svg className='icon color-darken25'><use href='#icon-search'></use></svg>
         </div>
-        <Geocoder
-          onSelect={function(res) { console.log(res); }} // TODO move that in Geocoder props
-        />
-
         {
-          this.props.searchString !== ''
+          (this.props.searchLocation === null)
+          ?
+          <Geocoder
+            onSelect={this.props.setSearchLocation}
+          />
+          :
+          <div className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5 flex-parent flex-parent--center-cross flex-parent--center-main'>
+            <div className='w420 txt-truncate'>
+              <PlaceName location={this.props.searchLocation}/>
+            </div>
+          </div>
+        }
+        {
+          (this.props.searchString !== '' || this.props.searchLocation !== null)
           ?
           <div
             className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer'
-            onClick={() => this.props.writeSearch('')}
+            onClick={() => {
+              this.props.writeSearch('');
+              this.props.setSearchLocation(null);
+            }}
           >
             <svg className='icon color-darken25'><use href='#icon-close'></use></svg>
           </div>
@@ -34,18 +47,23 @@ class Search extends Component {
 }
 
 Search.propTypes = {
-  searchString: React.PropTypes.string
+  searchString: React.PropTypes.string,
+  searchLocation: React.PropTypes.object,
+  writeSearch: React.PropTypes.func,
+  setSearchLocation: React.PropTypes.func,
 }
 
 const mapStateToProps = (state) => {
   return {
-    searchString: state.searchString
+    searchString: state.searchString,
+    searchLocation: state.searchLocation
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     writeSearch: (input) => dispatch(writeSearch(input)),
+    setSearchLocation: (location) => dispatch(setSearchLocation(location))
   };
 };
 

@@ -12,3 +12,8 @@ export const writeSearch = (searchString) => ({
   type: 'WRITE_SEARCH',
   searchString
 });
+
+export const setSearchLocation = (location) => ({
+  type: 'SET_SEARCH_LOCATION',
+  location
+});

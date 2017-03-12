@@ -7,7 +7,7 @@ const defaultState = {
   mapZoom: 10,
   // Search
   searchString: '',
-  searchPlace: null,
+  searchLocation: null,
   // Directions
   directionsFrom: null,
   directionsTo: null
@@ -29,6 +29,11 @@ const reducer = (state = defaultState, action) => {
   case 'WRITE_SEARCH':
     return Object.assign({}, state, {
       searchString: action.searchString
+    });
+
+  case 'SET_SEARCH_LOCATION':
+    return Object.assign({}, state, {
+      searchLocation: action.location
     });
 
   default:
