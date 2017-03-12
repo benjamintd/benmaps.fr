@@ -16,21 +16,16 @@ const defaultState = {
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
-  case 'WRITE_SEARCH':
+
+  case 'SET_CENTER':
     return Object.assign({}, state, {
-      searchString: action.input
+      mapCenter: action.coordinates
     });
 
-  case 'SUBMIT_SEARCH':
+  case 'SET_ZOOM':
     return Object.assign({}, state, {
-      searchSubmitted: action.submitted
+      mapZoom: action.zoom
     });
-
-  case 'SET_MAP':
-    return Object.assign({}, state, {
-      map: action.map
-    });
-
 
   default:
     return state;

@@ -1,13 +1,9 @@
-export const writeSearch = (input) => ({
-  type: 'WRITE_SEARCH',
-  input
+export const setCenter = (coordinates) => ({
+  type: 'SET_CENTER',
+  coordinates
 });
 
-export const submitSearch = (submitted) => ({
-  type: 'SUBMIT_SEARCH',
-  submitted
-});
-export const setMap = (map) => ({
-  type: 'SET_MAP',
-  map
+export const setZoom = (zoom) => ({
+  type: 'SET_ZOOM',
+  zoom
 });

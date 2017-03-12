@@ -5,7 +5,6 @@ import {createStore} from 'redux';
 import reducer from './reducers/index';
 
 import App from './components/App';
-import Search from './components/Search';
 
 import './index.css';
 

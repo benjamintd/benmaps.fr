@@ -12,8 +12,8 @@ class Search extends Component {
         </div>
         <Geocoder
           accessToken={this.props.accessToken}
-          onSelect={function() {}}
-          proximity=''
+          onSelect={function(res) {console.log(res);}}
+          proximity={this.props.proximity}
         />
       </div>
     );
@@ -23,6 +23,7 @@ class Search extends Component {
 const mapStateToProps = (state) => {
   return {
     accessToken: state.mapboxAccessToken,
+    proximity: state.mapCenter.join(',')
   };
 };
 

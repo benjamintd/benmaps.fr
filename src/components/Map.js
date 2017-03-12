@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
-import {setMap} from '../actions/index';
+import {setZoom, setCenter} from '../actions/index'
 
 class Map extends Component {
   render() {
@@ -21,7 +21,12 @@ class Map extends Component {
         zoom: this.props.zoom
     });
 
-    this.props.setMap(map);
+    map.on('moveend', (event) => {
+      const center = map.getCenter();
+      this.props.setCenter([center.lng, center.lat]);
+      this.props.setZoom(map.getZoom());
+    });
+
   }
 }
 
@@ -36,7 +41,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setMap: (map) => dispatch(setMap(map)),
+    setCenter: (coordinates) => dispatch(setCenter(coordinates)),
+    setZoom: (zoom) => dispatch(setZoom(zoom))
   };
 };
 
