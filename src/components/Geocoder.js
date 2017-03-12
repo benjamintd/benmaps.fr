@@ -2,22 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import xhr from 'xhr';
 
-function search(endpoint, source, accessToken, proximity, bbox, types, query, callback) {
-  var searchTime = new Date();
-  var uri = endpoint + '/geocoding/v5/' +
-    source + '/' + encodeURIComponent(query) + '.json' +
-    '?access_token=' + accessToken +
-    (proximity ? '&proximity=' + proximity : '') +
-    (bbox ? '&bbox=' + bbox : '') +
-    (types ? '&types=' + encodeURIComponent(types) : '');
-  xhr({
-    uri: uri,
-    json: true
-  }, function(err, res, body) {
-    callback(err, res, body, searchTime);
-  });
-}
-
 /**
  * Geocoder component: connects to Mapbox.com Geocoding API
  * and provides an autocompleting interface for finding locations.
@@ -27,9 +11,6 @@ var Geocoder = React.createClass({
     return {
       endpoint: 'https://api.tiles.mapbox.com',
       inputClass: '',
-      resultClass: '',
-      resultsClass: '',
-      resultFocusClass: 'strong',
       inputPosition: 'top',
       inputPlaceholder: 'Search',
       showLoader: false,
@@ -53,11 +34,8 @@ var Geocoder = React.createClass({
     endpoint: React.PropTypes.string,
     source: React.PropTypes.string,
     inputClass: React.PropTypes.string,
-    resultClass: React.PropTypes.string,
-    resultsClass: React.PropTypes.string,
     inputPosition: React.PropTypes.string,
     inputPlaceholder: React.PropTypes.string,
-    resultFocusClass: React.PropTypes.string,
     onSelect: React.PropTypes.func.isRequired,
     onSuggest: React.PropTypes.func,
     accessToken: React.PropTypes.string.isRequired,
@@ -153,7 +131,7 @@ var Geocoder = React.createClass({
   render() {
     var input = <input
       ref='input'
-      className={this.props.inputClass}
+      className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5'
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
       placeholder={this.props.inputPlaceholder}
@@ -162,16 +140,17 @@ var Geocoder = React.createClass({
       <div>
         {this.props.inputPosition === 'top' && input}
         {this.state.results.length > 0 && (
-          <ul className={`${this.props.showLoader && this.state.loading ? 'loading' : ''} ${this.props.resultsClass}`}>
+          <ul className={`${this.props.showLoader && this.state.loading ? 'loading' : ''} bg-white shadow-darken5 mt12 border-darken10`}>
             {this.state.results.map((result, i) => (
-              <li key={result.id} className={this.props.resultClass}>
-                <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w36 h36'>
-                  <svg className='icon'><use href='#icon-marker'></use></svg>
+              <li
+                key={result.id}
+                className={(i === this.state.focus ? 'bg-blue-faint' : 'bg-darken5-on-hover') + ' search-result h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'}
+                onClick={this.clickOption.bind(this, result, i)}
+              >
+                <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>
+                  <svg className='icon color-darken25'><use href='#icon-marker'></use></svg>
                 </div>
-                <a href='#'
-                  onClick={this.clickOption.bind(this, result, i)}
-                  className={'pl36 inline-block' + (i === this.state.focus ? this.props.resultFocusClass : '')}
-                  key={result.id}>{result.place_name}</a>
+                {formatPlaceName(result, this.props.source)}
               </li>
             ))}
           </ul>
@@ -181,5 +160,37 @@ var Geocoder = React.createClass({
     );
   }
 });
+
+function search(endpoint, source, accessToken, proximity, bbox, types, query, callback) {
+  var searchTime = new Date();
+  var uri = endpoint + '/geocoding/v5/' +
+    source + '/' + encodeURIComponent(query) + '.json' +
+    '?access_token=' + accessToken +
+    (proximity ? '&proximity=' + proximity : '') +
+    (bbox ? '&bbox=' + bbox : '') +
+    (types ? '&types=' + encodeURIComponent(types) : '');
+  xhr({
+    uri: uri,
+    json: true
+  }, function(err, res, body) {
+    callback(err, res, body, searchTime);
+  });
+}
+
+function formatPlaceName(result, source) {
+  var parts = result.place_name.split(', ');
+  if (parts.length < 1) return;
+  var main = parts[0];
+  var rest = parts.slice(1).join(', ');
+  return (
+    <div
+      className='pl42 w420 txt-truncate'
+      key={result.id}
+    >
+      <div className='inline pr6'>{main}</div>
+      <div className='inline txt-s color-darken50'>{rest}</div>
+    </div>
+  )
+}
 
 module.exports = Geocoder;
