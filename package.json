@@ -8,11 +8,13 @@
     "react-scripts": "0.9.5"
   },
   "dependencies": {
+    "@mapbox/react-geocoder": "^2.5.0",
     "mapbox-gl": "^0.33.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.3",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "xhr": "^2.4.0"
   },
   "scripts": {
     "start": "react-scripts start",

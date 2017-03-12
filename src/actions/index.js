@@ -4,6 +4,10 @@ export const writeSearch = (input) => ({
 });
 
 export const submitSearch = (submitted) => ({
-  type: 'submitSearch',
+  type: 'SUBMIT_SEARCH',
   submitted
+});
+export const setMap = (map) => ({
+  type: 'SET_MAP',
+  map
 });
