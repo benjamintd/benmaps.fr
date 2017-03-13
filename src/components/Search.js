@@ -12,20 +12,28 @@ class Search extends Component {
           <svg className='icon color-darken25'><use href='#icon-search'></use></svg>
         </div>
         {
-          (this.props.searchLocation === null)
+          (this.props.searchLocation === null) // no place was selected yet
           ?
           <Geocoder
             onSelect={this.props.setSearchLocation}
           />
           :
           <div className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5 flex-parent flex-parent--center-cross flex-parent--center-main'>
-            <div className='w420 pr36 txt-truncate'>
+            <div className='w420 pr48 txt-truncate'>
               <PlaceName location={this.props.searchLocation}/>
+            </div>
+            <div
+              className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 mr24 cursor-pointer'
+              onClick={() => {
+                console.log('I asked for directions.');
+              }}
+            >
+              <img src='/directions.svg' alt='directions'/>
             </div>
           </div>
         }
         {
-          (this.props.searchString !== '' || this.props.searchLocation !== null)
+          (this.props.searchString !== '' || this.props.searchLocation !== null) // search bar is not empty
           ?
           <div
             className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer'
