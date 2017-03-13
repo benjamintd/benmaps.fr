@@ -7,7 +7,7 @@ class PlaceName extends Component {
     var main = parts[0];
     var rest = parts.slice(1).join(', ');
     return (
-      <div>
+      <div className='txt-truncate'>
         <div className='inline pr6'>{main}</div>
         <div className='inline txt-s color-darken50'>{rest}</div>
       </div>

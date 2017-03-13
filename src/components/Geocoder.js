@@ -151,7 +151,7 @@ var Geocoder = React.createClass({
                 <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>
                   <svg className='icon color-darken25'><use href='#icon-marker'></use></svg>
                 </div>
-                <div className='pl42 w420 txt-truncate' key={result.id}>
+                <div className='pl42 pr12 txt-truncate' key={result.id}>
                   <PlaceName location={result}/>
                 </div>
               </li>

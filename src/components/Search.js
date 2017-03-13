@@ -19,7 +19,7 @@ class Search extends Component {
           />
           :
           <div className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5 flex-parent flex-parent--center-cross flex-parent--center-main'>
-            <div className='w420 txt-truncate'>
+            <div className='w420 pr36 txt-truncate'>
               <PlaceName location={this.props.searchLocation}/>
             </div>
           </div>
