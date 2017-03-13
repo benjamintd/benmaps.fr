@@ -27,30 +27,16 @@ class MapComponent extends Component {
       this.props.setZoom(map.getZoom());
     });
 
-    map.on('load', () => {
-      map.addSource('single-point', {
-          type: 'geojson',
-          data: {
-              type: 'FeatureCollection',
-              features: []
-          }
-      });
-
-      map.addLayer({
-          id: 'point',
-          source: 'single-point',
-          type: 'symbol',
-          layout: {
-            'icon-image': 'marker-15'
-          }
-      });
-    })
-
     const markerElement = document.createElement('div');
     markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
     markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use href="#icon-marker"></use></svg>';
 
     const marker = new mapboxgl.Marker(markerElement);
+
+    const geolocateControl = new mapboxgl.GeolocateControl();
+
+    geolocateControl.on('geolocate', console.log);
+    map.addControl(geolocateControl, 'bottom-right');
 
     this.map = map;
     this.marker = marker;
