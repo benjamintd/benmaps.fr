@@ -9,6 +9,8 @@ const defaultState = {
   searchString: '',
   searchLocation: null,
   needMapUpdate: false,
+  // User
+  userLocation: null,
   // Directions
   directionsFrom: null,
   directionsTo: null
@@ -41,6 +43,11 @@ const reducer = (state = defaultState, action) => {
   case 'SET_MAP_UPDATED':
     return Object.assign({}, state, {
       needMapUpdate: !action.mapUpdated,
+    });
+
+  case 'SET_USER_LOCATION':
+    return Object.assign({}, state, {
+      userLocation: action.coordinates,
     });
 
   default:

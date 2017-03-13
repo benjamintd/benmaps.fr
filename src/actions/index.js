@@ -22,3 +22,8 @@ export const setMapUpdated = (bool) => ({
   type: 'SET_MAP_UPDATED',
   mapUpdated: bool
 });
+
+export const setUserLocation = (coordinates) => ({
+  type: 'SET_USER_LOCATION',
+  coordinates
+});
