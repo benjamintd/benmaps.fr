@@ -33,9 +33,17 @@ class MapComponent extends Component {
 
     const marker = new mapboxgl.Marker(markerElement);
 
+    const geolocationElement = document.createElement('div');
+    geolocationElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
+    geolocationElement.innerHTML = '<img src="./geolocation.svg"/>';
+
+    const geolocation = new mapboxgl.Marker(geolocationElement);
+
     const geolocateControl = new mapboxgl.GeolocateControl();
 
-    geolocateControl.on('geolocate', console.log);
+    geolocateControl.on('geolocate', (data) => {
+      geolocation.setLngLat([data.coords.longitude, data.coords.latitude]).addTo(map);
+    });
     map.addControl(geolocateControl, 'bottom-right');
 
     this.map = map;
