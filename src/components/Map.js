@@ -39,15 +39,21 @@ class MapComponent extends Component {
       map.addLayer({
           id: 'point',
           source: 'single-point',
-          type: 'circle',
-          paint: {
-              'circle-radius': 10,
-              'circle-color': '#007cbf'
+          type: 'symbol',
+          layout: {
+            'icon-image': 'marker-15'
           }
       });
     })
 
+    const markerElement = document.createElement('div');
+    markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
+    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use href="#icon-marker"></use></svg>';
+
+    const marker = new mapboxgl.Marker(markerElement);
+
     this.map = map;
+    this.marker = marker;
   }
 
   componentDidUpdate() {
@@ -61,12 +67,9 @@ class MapComponent extends Component {
           zoom: 16
         })
       }
-      this.map.getSource('single-point').setData(this.props.searchLocation.geometry);
+      this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
     } else if (this.props.searchLocation === null && this.props.needMapUpdate) { // Remove search location
-      this.map.getSource('single-point').setData({
-          type: 'FeatureCollection',
-          features: []
-      });
+      this.marker.remove();
     }
     this.props.setMapUpdated(true);
   }
