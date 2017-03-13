@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
-import {writeSearch, setSearchLocation} from '../actions/index';
+import {writeSearch, setSearchLocation, needMapUpdate} from '../actions/index';
 
 class Search extends Component {
   render() {
@@ -32,6 +32,7 @@ class Search extends Component {
             onClick={() => {
               this.props.writeSearch('');
               this.props.setSearchLocation(null);
+              this.props.needMapUpdate(true);
             }}
           >
             <svg className='icon color-darken25'><use href='#icon-close'></use></svg>
@@ -51,6 +52,7 @@ Search.propTypes = {
   searchLocation: React.PropTypes.object,
   writeSearch: React.PropTypes.func,
   setSearchLocation: React.PropTypes.func,
+  needMapUpdate: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -63,7 +65,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     writeSearch: (input) => dispatch(writeSearch(input)),
-    setSearchLocation: (location) => dispatch(setSearchLocation(location))
+    setSearchLocation: (location) => dispatch(setSearchLocation(location)),
+    needMapUpdate: (bool) => dispatch(needMapUpdate(bool))
   };
 };
 

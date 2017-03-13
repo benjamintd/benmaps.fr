@@ -27,14 +27,45 @@ class MapComponent extends Component {
       this.props.setZoom(map.getZoom());
     });
 
+    map.on('load', () => {
+      map.addSource('single-point', {
+          type: 'geojson',
+          data: {
+              type: 'FeatureCollection',
+              features: []
+          }
+      });
+
+      map.addLayer({
+          id: 'point',
+          source: 'single-point',
+          type: 'circle',
+          paint: {
+              'circle-radius': 10,
+              'circle-color': '#007cbf'
+          }
+      });
+    })
+
     this.map = map;
   }
 
   componentDidUpdate() {
+    // We just got a new search location
     if (this.props.searchLocation && this.props.needMapUpdate) {
-      this.map.easeTo({
-        center: this.props.searchLocation.geometry.coordinates,
-        zoom: 7 // TODO find something that takes the bbox of the searchLocation into account
+      if (this.props.searchLocation.bbox) { // We have a bbox to fit to
+        this.map.fitBounds(this.props.searchLocation.bbox, {linear: true});
+      } else { // We just have a point
+        this.map.easeTo({
+          center: this.props.searchLocation.geometry.coordinates,
+          zoom: 16
+        })
+      }
+      this.map.getSource('single-point').setData(this.props.searchLocation.geometry);
+    } else if (this.props.searchLocation === null && this.props.needMapUpdate) { // Remove search location
+      this.map.getSource('single-point').setData({
+          type: 'FeatureCollection',
+          features: []
       });
     }
     this.props.setMapUpdated(true);
