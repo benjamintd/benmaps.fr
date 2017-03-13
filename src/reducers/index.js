@@ -8,6 +8,7 @@ const defaultState = {
   // Search
   searchString: '',
   searchLocation: null,
+  needMapUpdate: false,
   // Directions
   directionsFrom: null,
   directionsTo: null
@@ -33,7 +34,13 @@ const reducer = (state = defaultState, action) => {
 
   case 'SET_SEARCH_LOCATION':
     return Object.assign({}, state, {
-      searchLocation: action.location
+      searchLocation: action.location,
+      needMapUpdate: true
+    });
+
+  case 'SET_MAP_UPDATED':
+    return Object.assign({}, state, {
+      needMapUpdate: !action.mapUpdated,
     });
 
   default:

@@ -17,3 +17,8 @@ export const setSearchLocation = (location) => ({
   type: 'SET_SEARCH_LOCATION',
   location
 });
+
+export const setMapUpdated = (bool) => ({
+  type: 'SET_MAP_UPDATED',
+  mapUpdated: bool
+});
