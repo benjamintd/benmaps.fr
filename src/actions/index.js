@@ -32,3 +32,10 @@ export const setMode = (mode) => ({
   type: 'SET_MODE',
   mode: mode
 });
+
+// Some generic action. When existant, prefer one of the above.
+export const setStateValue = (key, value) => ({
+  type: 'SET_STATE_VALUE',
+  key,
+  value
+})

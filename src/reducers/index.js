@@ -57,6 +57,14 @@ const reducer = (state = defaultState, action) => {
       mode: action.mode,
     });
 
+  // Some generic case. When possible, prefer some more expressive
+  // action name like above.
+  case 'SET_STATE_VALUE': {
+    const modifiedState = {};
+    modifiedState[action.key] = action.value
+    return Object.assign({}, state, modifiedState);
+  }
+
   default:
     return state;
   }
