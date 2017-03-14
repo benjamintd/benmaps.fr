@@ -17,7 +17,6 @@ var Geocoder = React.createClass({
       endpoint: 'https://api.tiles.mapbox.com',
       inputPosition: 'top',
       inputPlaceholder: 'Search',
-      showLoader: false,
       source: 'mapbox.places',
       bbox: '',
       types: '',
@@ -42,7 +41,6 @@ var Geocoder = React.createClass({
     accessToken: React.PropTypes.string.isRequired,
     proximity: React.PropTypes.string,
     bbox: React.PropTypes.string,
-    showLoader: React.PropTypes.bool,
     focusOnMount: React.PropTypes.bool,
     types: React.PropTypes.string,
     searchString: React.PropTypes.string,
@@ -143,7 +141,7 @@ var Geocoder = React.createClass({
       <div>
         {this.props.inputPosition === 'top' && input}
         {this.state.results.length > 0 && this.props.searchString !== '' && (
-          <ul className={`${this.props.showLoader && this.state.loading ? 'loading' : ''} bg-white shadow-darken5 mt12 border-darken10`}>
+          <ul className='bg-white shadow-darken5 mt12 border-darken10'>
             {this.state.results.map((result, i) => (
               <li
                 key={result.id}
@@ -184,7 +182,6 @@ function search(endpoint, source, accessToken, proximity, bbox, types, query, ca
 
 const mapStateToProps = (state) => {
   return {
-    searchString: state.searchString,
     accessToken: state.mapboxAccessToken,
     proximity: state.mapCenter.join(',')
   };

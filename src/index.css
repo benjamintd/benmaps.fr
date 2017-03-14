@@ -4,7 +4,6 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
-
 .marker {
   top: -42px;
   left: -21px;
@@ -13,4 +12,8 @@ body {
 .geolocation {
   top: -21px;
   left: -21px;
+}
+
+.directions-panel {
+  background-color: #3a94ff;
 }

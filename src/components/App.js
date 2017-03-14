@@ -1,16 +1,41 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux';
 import MapComponent from './Map';
 import Search from './Search';
+import Directions from './Directions';
 
 class App extends Component {
   render() {
     return (
       <div>
         <MapComponent/>
-        <Search/>
+        {
+          this.props.mode === 'directions'
+          ?
+          <Directions/>
+          :
+          <Search/>
+        }
       </div>
     );
   }
 }
 
-export default App;
+App.propTypes = {
+  mode: React.PropTypes.string
+}
+
+const mapStateToProps = (state) => {
+  return {
+    mode: state.mode
+  };
+};
+
+const mapDispatchToProps = () => {
+  return {};
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

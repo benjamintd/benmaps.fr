@@ -57,6 +57,18 @@ const reducer = (state = defaultState, action) => {
       mode: action.mode,
     });
 
+  case 'SET_DIRECTIONS_LOCATION': {
+    if (action.kind === 'from') {
+      return Object.assign({}, state, {
+        directionsFrom: action.location
+      });
+    } else if (action.kind === 'to') {
+      return Object.assign({}, state, {
+        directionsTo: action.location
+      });
+    } else return state;
+  }
+
   // Some generic case. When possible, prefer some more expressive
   // action name like above.
   case 'SET_STATE_VALUE': {

@@ -33,6 +33,12 @@ export const setMode = (mode) => ({
   mode: mode
 });
 
+export const setDirectionsLocation = (kind, location) => ({
+  type: 'SET_DIRECTIONS_LOCATION',
+  kind,
+  location
+});
+
 // Some generic action. When existant, prefer one of the above.
 export const setStateValue = (key, value) => ({
   type: 'SET_STATE_VALUE',
