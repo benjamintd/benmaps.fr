@@ -5,6 +5,8 @@ const defaultState = {
   mapStyle: 'mapbox://styles/benjamintd/cj06a6mi5004p2sroifies8t9',
   mapCenter: [-122.4, 37.8],
   mapZoom: 10,
+  // Mode
+  mode: 'search',
   // Search
   searchString: '',
   searchLocation: null,
@@ -48,6 +50,11 @@ const reducer = (state = defaultState, action) => {
   case 'SET_USER_LOCATION':
     return Object.assign({}, state, {
       userLocation: action.coordinates,
+    });
+
+  case 'SET_MODE':
+    return Object.assign({}, state, {
+      mode: action.mode,
     });
 
   default:

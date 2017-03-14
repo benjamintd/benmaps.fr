@@ -1,3 +1,5 @@
+// forked from https://github.com/mapbox/react-geocoder
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';

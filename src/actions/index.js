@@ -27,3 +27,8 @@ export const setUserLocation = (coordinates) => ({
   type: 'SET_USER_LOCATION',
   coordinates
 });
+
+export const setMode = (mode) => ({
+  type: 'SET_MODE',
+  mode: mode
+});

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
-import {writeSearch, setSearchLocation, setMapUpdated} from '../actions/index';
+import {writeSearch, setSearchLocation, setMapUpdated, setMode} from '../actions/index';
 
 class Search extends Component {
   render() {
@@ -25,7 +25,7 @@ class Search extends Component {
             <div
               className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 mr24 cursor-pointer'
               onClick={() => {
-                console.log('I asked for directions.');
+                this.props.setMode('directions');
               }}
             >
               <img src='/directions.svg' alt='directions'/>
@@ -60,7 +60,8 @@ Search.propTypes = {
   searchLocation: React.PropTypes.object,
   writeSearch: React.PropTypes.func,
   setSearchLocation: React.PropTypes.func,
-  setMapUpdated: React.PropTypes.func
+  setMapUpdated: React.PropTypes.func,
+  setMode: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -74,7 +75,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     writeSearch: (input) => dispatch(writeSearch(input)),
     setSearchLocation: (location) => dispatch(setSearchLocation(location)),
-    setMapUpdated: (bool) => dispatch(setMapUpdated(bool))
+    setMapUpdated: (bool) => dispatch(setMapUpdated(bool)),
+    setMode: (mode) => dispatch(setMode(mode))
   };
 };
 
