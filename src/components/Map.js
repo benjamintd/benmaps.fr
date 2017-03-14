@@ -54,7 +54,7 @@ class MapComponent extends Component {
     // Create marker for search results
     const markerElement = document.createElement('div');
     markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use href="#icon-marker"></use></svg>';
+    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use xlink:href="#icon-marker"></use></svg>';
 
     const marker = new mapboxgl.Marker(markerElement);
 

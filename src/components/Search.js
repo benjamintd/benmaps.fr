@@ -9,7 +9,7 @@ class Search extends Component {
     return (
       <div className='absolute top m24 w420 flex-parent flex-parent--row'>
         <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>
-          <svg className='icon color-darken25'><use href='#icon-search'></use></svg>
+          <svg className='icon color-darken25'><use xlinkHref='#icon-search'></use></svg>
         </div>
         {
           (this.props.searchLocation === null) // no place was selected yet
@@ -43,7 +43,7 @@ class Search extends Component {
               this.props.setMapUpdated(false);
             }}
           >
-            <svg className='icon color-darken25'><use href='#icon-close'></use></svg>
+            <svg className='icon color-darken25'><use xlinkHref='#icon-close'></use></svg>
           </div>
           :
           <div/>
