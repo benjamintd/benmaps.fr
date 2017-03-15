@@ -9,7 +9,7 @@ class CloseButton extends Component {
         className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer'
         onClick={this.props.onClick}
       >
-        <svg className={'icon ' + this.props.color}><use xlinkHref='#icon-close'></use></svg>
+        <svg className={'icon ' + (this.props.large ? 'icon--l ' : ' ') + this.props.color}><use xlinkHref='#icon-close'></use></svg>
       </div>
       :
       <div/>
@@ -20,13 +20,15 @@ class CloseButton extends Component {
 CloseButton.propTypes = {
   show: React.PropTypes.bool,
   onClick: React.PropTypes.func,
-  color: React.PropTypes.string
+  color: React.PropTypes.string,
+  large: React.PropTypes.bool
 }
 
 CloseButton.defaultProps = {
   show: true,
   onClick: () => {},
-  color: 'color-darken25'
+  color: 'color-darken25',
+  large: false
 }
 
 export default CloseButton;

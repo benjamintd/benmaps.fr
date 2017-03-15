@@ -35,6 +35,8 @@ var Geocoder = React.createClass({
     source: React.PropTypes.string,
     inputPosition: React.PropTypes.string,
     inputPlaceholder: React.PropTypes.string,
+    inputClass: React.PropTypes.string,
+    resultsClass: React.PropTypes.string,
     onSelect: React.PropTypes.func.isRequired,
     onSuggest: React.PropTypes.func,
     accessToken: React.PropTypes.string.isRequired,
@@ -129,7 +131,7 @@ var Geocoder = React.createClass({
   render() {
     var input = <input
       ref='input'
-      className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5'
+      className={this.props.inputClass}
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
       value={this.props.searchString}
@@ -140,7 +142,7 @@ var Geocoder = React.createClass({
       <div>
         {this.props.inputPosition === 'top' && input}
         {this.state.results.length > 0 && this.props.searchString !== '' && (
-          <ul className='bg-white shadow-darken5 mt12 border-darken10'>
+          <ul className={this.props.resultsClass}>
             {this.state.results.map((result, i) => (
               <li
                 key={result.id}

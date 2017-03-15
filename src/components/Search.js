@@ -32,6 +32,8 @@ class Search extends Component {
             onSelect={this.props.setSearchLocation}
             searchString={this.props.searchString}
             writeSearch={(value) => this.props.writeSearch(value)}
+            resultsClass='bg-white shadow-darken5 mt12 border-darken10'
+            inputClass='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5'
           />
           :
           <div className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5 flex-parent flex-parent--center-cross flex-parent--center-main'>

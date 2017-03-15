@@ -3,16 +3,20 @@ import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
+import ModalityButtons from './ModalityButtons';
 import {setMapUpdated, setMode, setDirectionsLocation, setStateValue} from '../actions/index';
 
 class Directions extends Component {
   render() {
     return (
-      <div className='directions-panel absolute top m24 pt24 w420 h240 shadow-darken25 flex-parent flex-parent--column'>
-        <div className='directions-modality color-white px42 p6 w420'>
-        car | bike | walk
-        </div>
-        <div className='fixed mt42 pr48 w420 flex-parent flex-parent--row'>
+      <div className='directions-panel absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column'>
+        <CloseButton
+          large={true}
+          color='color-white opacity50'
+          onClick={() => this.props.setMode('search')}
+        />
+        <ModalityButtons/>
+        <div className='absolute mt72 pr48 w420 flex-parent flex-parent--row'>
           {
             this.props.directionsFrom
             ?
@@ -24,13 +28,15 @@ class Directions extends Component {
               onSelect={(location) => this.props.setDirectionsLocation('from', location)}
               searchString={this.props.directionsFromString}
               writeSearch={(value) => this.props.writeSearchFrom(value)}
+              resultsClass='fixed bg-white shadow-darken5 mt72 border-darken10'
+              inputClass='input directions-input border--transparent color-white pl42 w420 h42'
             />
           }
           <CloseButton
             onClick={() => this.resetSearch('from')}
           />
         </div>
-        <div className='directions-location-to fixed pr48 w420 flex-parent flex-parent--row'>
+        <div className='directions-location-to absolute pr48 w420 flex-parent flex-parent--row'>
           {
             this.props.directionsTo
             ?
@@ -42,6 +48,8 @@ class Directions extends Component {
               onSelect={(location) => this.props.setDirectionsLocation('to', location)}
               searchString={this.props.directionsToString}
               writeSearch={(value) => this.props.writeSearchTo(value)}
+              resultsClass='fixed bg-white shadow-darken5 mt24 border-darken10'
+              inputClass='input directions-input border--transparent color-white pl42 w420 h42'
             />
           }
           <CloseButton
