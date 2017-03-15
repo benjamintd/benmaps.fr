@@ -64,21 +64,36 @@ class MapComponent extends Component {
   }
 
   componentDidUpdate() {
-    // We just got a new search location
-    if (this.props.searchLocation && this.props.needMapUpdate) {
-      if (this.props.searchLocation.bbox) { // We have a bbox to fit to
-        this.map.fitBounds(this.props.searchLocation.bbox, {linear: true});
-      } else { // We just have a point
-        this.map.easeTo({
-          center: this.props.searchLocation.geometry.coordinates,
-          zoom: 16
-        })
-      }
+    if (!this.props.needMapUpdate) return;
+
+    // We have a new search location (=> and no directions)
+    if (this.props.searchLocation) {
+      this.moveTo(this.props.searchLocation);
       this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
-    } else if (this.props.searchLocation === null && this.props.needMapUpdate) { // Remove search location
+    }
+
+    // We have a new destination
+    if (this.props.directionsTo && this.marker._map === null) {
+      this.moveTo(this.props.directionsTo);
+      this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
+    }
+
+    else if (this.props.searchLocation === null && this.props.directionsTo === null) { // Remove search location
       this.marker.remove();
     }
+
     this.props.setMapUpdated(true);
+  }
+
+  moveTo(location) {
+    if (location.bbox) { // We have a bbox to fit to
+      this.map.fitBounds(location.bbox, {linear: true});
+    } else { // We just have a point
+      this.map.easeTo({
+        center: location.geometry.coordinates,
+        zoom: 16
+      })
+    }
   }
 }
 
@@ -91,6 +106,7 @@ MapComponent.propTypes = {
   setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
   searchLocation: React.PropTypes.object,
+  directionsTo: React.PropTypes.object,
   needMapUpdate: React.PropTypes.bool,
   setMapUpdated: React.PropTypes.func,
   setUserLocation: React.PropTypes.func
@@ -103,6 +119,7 @@ const mapStateToProps = (state) => {
     center: state.mapCenter,
     zoom: state.mapZoom,
     searchLocation: state.searchLocation,
+    directionsTo: state.directionsTo,
     needMapUpdate: state.needMapUpdate
   };
 };

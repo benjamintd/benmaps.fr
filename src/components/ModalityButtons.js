@@ -11,14 +11,12 @@ class ModalityButtons extends Component {
 }
 
 ModalityButtons.propTypes = {
-  clickCar: React.PropTypes.func,
-  clickBike: React.PropTypes.func,
-  clickWalk: React.PropTypes.func,
-  selected: React.PropTypes.string
+  modality: React.PropTypes.string,
+  onSetModality: React.PropTypes.func
 }
 
 ModalityButtons.defaultProps = {
-  selected: 'car'
+  modality: 'driving'
 }
 
 export default ModalityButtons;

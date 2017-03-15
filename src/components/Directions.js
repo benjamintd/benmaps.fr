@@ -4,7 +4,7 @@ import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import ModalityButtons from './ModalityButtons';
-import {setMapUpdated, setMode, setDirectionsLocation, setStateValue} from '../actions/index';
+import {setMapUpdated, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
 
 class Directions extends Component {
   render() {
@@ -13,9 +13,12 @@ class Directions extends Component {
         <CloseButton
           large={true}
           color='color-white opacity50'
-          onClick={() => this.props.setMode('search')}
+          onClick={() => this.exitDirections()}
         />
-        <ModalityButtons/>
+        <ModalityButtons
+          modality={this.props.modality}
+          onSetModality={this.props.setModality}
+        />
         <div className='absolute mt72 pr48 w420 flex-parent flex-parent--row'>
           {
             this.props.directionsFrom
@@ -25,7 +28,10 @@ class Directions extends Component {
             </div>
             :
             <Geocoder
-              onSelect={(location) => this.props.setDirectionsLocation('from', location)}
+              onSelect={(location) => {
+                this.props.setDirectionsLocation('from', location);
+                this.props.setMapUpdated(false);
+              }}
               searchString={this.props.directionsFromString}
               writeSearch={(value) => this.props.writeSearchFrom(value)}
               resultsClass='fixed bg-white shadow-darken5 mt72 border-darken10'
@@ -45,7 +51,10 @@ class Directions extends Component {
             </div>
             :
             <Geocoder
-              onSelect={(location) => this.props.setDirectionsLocation('to', location)}
+              onSelect={(location) => {
+                this.props.setDirectionsLocation('to', location);
+                this.props.setMapUpdated(false);
+              }}
               searchString={this.props.directionsToString}
               writeSearch={(value) => this.props.writeSearchTo(value)}
               resultsClass='fixed bg-white shadow-darken5 mt24 border-darken10'
@@ -67,6 +76,15 @@ class Directions extends Component {
     this.props.setDirectionsLocation(kind, null);
     this.props.setMapUpdated(false);
   }
+
+  exitDirections() {
+    this.props.setMode('search');
+    this.props.setDirectionsLocation('from', null);
+    this.props.setDirectionsLocation('to', null);
+    this.props.writeSearchFrom('');
+    this.props.writeSearchTo('');
+    this.props.setMapUpdated(false);
+  }
 }
 
 Directions.propTypes = {
@@ -77,8 +95,10 @@ Directions.propTypes = {
   setDirectionsLocation: React.PropTypes.func,
   setMapUpdated: React.PropTypes.func,
   setMode: React.PropTypes.func,
+  setModality: React.PropTypes.func,
   writeSearchFrom: React.PropTypes.func,
   writeSearchTo: React.PropTypes.func,
+  modality: React.PropTypes.string
 }
 
 const mapStateToProps = (state) => {
@@ -86,7 +106,8 @@ const mapStateToProps = (state) => {
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
     directionsFromString: state.directionsFromString,
-    directionsToString: state.directionsToString
+    directionsToString: state.directionsToString,
+    modality: state.modality
   };
 };
 
@@ -95,6 +116,7 @@ const mapDispatchToProps = (dispatch) => {
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     setMapUpdated: (bool) => dispatch(setMapUpdated(bool)),
     setMode: (mode) => dispatch(setMode(mode)),
+    setModality: (modality) => dispatch(setModality(modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),
     writeSearchTo: (value) => dispatch(setStateValue('directionsToString', value))
   };

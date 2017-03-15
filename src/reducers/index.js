@@ -7,6 +7,7 @@ const defaultState = {
   mapZoom: 10,
   // Mode
   mode: 'search',
+  modality: 'driving',
   // Search
   searchString: '',
   searchLocation: null,
@@ -70,6 +71,11 @@ const reducer = (state = defaultState, action) => {
       });
     } else return state;
   }
+
+  case 'SET_MODALITY':
+    return Object.assign({}, state, {
+      modality: action.modality,
+    });
 
   // Some generic case. When possible, prefer some more expressive
   // action name like above.

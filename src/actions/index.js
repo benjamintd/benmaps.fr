@@ -39,6 +39,11 @@ export const setDirectionsLocation = (kind, location) => ({
   location
 });
 
+export const setModality = (modality) => ({
+  type: 'SET_MODALITY',
+  modality
+});
+
 // Some generic action. When existant, prefer one of the above.
 export const setStateValue = (key, value) => ({
   type: 'SET_STATE_VALUE',
