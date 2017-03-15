@@ -14,7 +14,9 @@ const defaultState = {
   // User
   userLocation: null,
   // Directions
+  directionsFromString: '',
   directionsFrom: null,
+  directionsToString: '',
   directionsTo: null
 };
 

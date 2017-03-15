@@ -4,7 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
-import {writeSearch} from '../actions/index';
 import xhr from 'xhr';
 
 /**
@@ -187,15 +186,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    writeSearch: (searchString) => {
-      dispatch(writeSearch(searchString))
-    },
-  };
-};
-
 export default connect(
-  mapStateToProps,
-  mapDispatchToProps
+  mapStateToProps
 )(Geocoder);

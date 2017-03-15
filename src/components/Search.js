@@ -16,6 +16,7 @@ class Search extends Component {
     this.props.writeSearch('');
     this.props.setMode('directions');
     this.props.setDirectionsLocation('to', this.props.searchLocation);
+    this.props.setSearchLocation(null);
   }
 
   render() {
@@ -30,6 +31,7 @@ class Search extends Component {
           <Geocoder
             onSelect={this.props.setSearchLocation}
             searchString={this.props.searchString}
+            writeSearch={(value) => this.props.writeSearch(value)}
           />
           :
           <div className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5 flex-parent flex-parent--center-cross flex-parent--center-main'>
@@ -37,7 +39,7 @@ class Search extends Component {
               <PlaceName location={this.props.searchLocation}/>
             </div>
             <div
-              className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 mr24 cursor-pointer'
+              className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 mr30 cursor-pointer'
               onClick={() => this.clickDirections()}
             >
               <img src='/directions.svg' alt='directions'/>
