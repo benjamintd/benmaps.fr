@@ -9,7 +9,7 @@ import {setMapUpdated, setMode, setDirectionsLocation, setStateValue, setModalit
 class Directions extends Component {
   render() {
     return (
-      <div className='directions-panel absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column'>
+      <div className={this.styles.directions}>
         <CloseButton
           large={true}
           color='color-white opacity50'
@@ -19,11 +19,11 @@ class Directions extends Component {
           modality={this.props.modality}
           onSetModality={this.props.setModality}
         />
-        <div className='absolute mt72 pr48 w420 flex-parent flex-parent--row'>
+        <div className={'mt72 ' + this.styles.row}>
           {
             this.props.directionsFrom
             ?
-            <div className='txt-truncate color-white pl42 h42 flex-parent flex-parent--row flex-parent--center-cross'>
+            <div className={this.styles.placeName}>
               <PlaceName location={this.props.directionsFrom} colors='light'/>
             </div>
             :
@@ -34,19 +34,19 @@ class Directions extends Component {
               }}
               searchString={this.props.directionsFromString}
               writeSearch={(value) => this.props.writeSearchFrom(value)}
-              resultsClass='fixed bg-white shadow-darken5 mt72 border-darken10'
-              inputClass='input directions-input border--transparent color-white pl42 w420 h42'
+              resultsClass={'mt72 ' + this.styles.results}
+              inputClass={this.styles.input}
             />
           }
           <CloseButton
             onClick={() => this.resetSearch('from')}
           />
         </div>
-        <div className='directions-location-to absolute pr48 w420 flex-parent flex-parent--row'>
+        <div className={'directions-location-to ' + this.styles.row}>
           {
             this.props.directionsTo
             ?
-            <div className='txt-truncate color-white pl42 h42 flex-parent flex-parent--row flex-parent--center-cross'>
+            <div className={this.styles.placeName}>
               <PlaceName location={this.props.directionsTo} colors='light'/>
             </div>
             :
@@ -57,8 +57,8 @@ class Directions extends Component {
               }}
               searchString={this.props.directionsToString}
               writeSearch={(value) => this.props.writeSearchTo(value)}
-              resultsClass='fixed bg-white shadow-darken5 mt24 border-darken10'
-              inputClass='input directions-input border--transparent color-white pl42 w420 h42'
+              resultsClass={'mt24 ' + this.styles.results}
+              inputClass={this.styles.input}
             />
           }
           <CloseButton
@@ -84,6 +84,16 @@ class Directions extends Component {
     this.props.writeSearchFrom('');
     this.props.writeSearchTo('');
     this.props.setMapUpdated(false);
+  }
+
+  get styles() {
+    return {
+      directions: 'directions-panel absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column',
+      input: 'input directions-input border--transparent color-white pl42 w420 h42',
+      results: 'fixed bg-white shadow-darken5 border-darken10',
+      placeName: 'txt-truncate color-white pl42 h42 flex-parent flex-parent--row flex-parent--center-cross',
+      row: 'absolute pr48 w420 flex-parent flex-parent--row'
+    }
   }
 }
 

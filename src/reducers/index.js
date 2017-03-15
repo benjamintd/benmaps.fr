@@ -7,7 +7,7 @@ const defaultState = {
   mapZoom: 10,
   // Mode
   mode: 'search',
-  modality: 'driving',
+  modality: 'car',
   // Search
   searchString: '',
   searchLocation: null,

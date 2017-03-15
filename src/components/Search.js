@@ -22,7 +22,7 @@ class Search extends Component {
   render() {
     return (
       <div className='absolute top m24 w420 flex-parent flex-parent--row'>
-        <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>
+        <div className={this.styles.icon}>
           <svg className='icon color-darken25'><use xlinkHref='#icon-search'></use></svg>
         </div>
         {
@@ -32,16 +32,16 @@ class Search extends Component {
             onSelect={this.props.setSearchLocation}
             searchString={this.props.searchString}
             writeSearch={(value) => this.props.writeSearch(value)}
-            resultsClass='bg-white shadow-darken5 mt12 border-darken10'
-            inputClass='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5'
+            resultsClass={this.styles.results}
+            inputClass={this.styles.input}
           />
           :
-          <div className='input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5 flex-parent flex-parent--center-cross flex-parent--center-main'>
+          <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
             <div className='w420 pr48 txt-truncate'>
               <PlaceName location={this.props.searchLocation}/>
             </div>
             <div
-              className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 mr30 cursor-pointer'
+              className={'mr30 cursor-pointer right ' + this.styles.icon}
               onClick={() => this.clickDirections()}
             >
               <img src='/directions.svg' alt='directions'/>
@@ -54,6 +54,14 @@ class Search extends Component {
         />
       </div>
     );
+  }
+
+  get styles() {
+    return {
+      icon: 'absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
+      input: 'input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5',
+      results: 'bg-white shadow-darken5 mt12 border-darken10'
+    }
   }
 }
 
