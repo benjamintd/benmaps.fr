@@ -146,7 +146,7 @@ var Geocoder = React.createClass({
             {this.state.results.map((result, i) => (
               <li
                 key={result.id}
-                className={(i === this.state.focus ? 'bg-blue-faint' : 'bg-darken5-on-hover') + ' h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'}
+                className={(i === this.state.focus ? 'bg-blue-faint' : 'bg-gray-faint-on-hover') + ' h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'}
                 onClick={this.clickOption.bind(this, result, i)}
               >
                 <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>

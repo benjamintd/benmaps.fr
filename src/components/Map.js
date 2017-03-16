@@ -117,7 +117,7 @@ class MapComponent extends Component {
   moveTo(location) {
     if (location.bbox) { // We have a bbox to fit to
       const distance = turfDistance([location.bbox[0], location.bbox[1]], [location.bbox[2], location.bbox[3]]);
-      const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance / 5, 'kilometers');
+      const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance, 'kilometers');
       const bbox = turfBbox(buffered);
       this.map.fitBounds(bbox, {linear: true});
     } else { // We just have a point

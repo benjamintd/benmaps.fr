@@ -52,7 +52,14 @@ const reducer = (state = defaultState, action) => {
 
   case 'SET_USER_LOCATION':
     return Object.assign({}, state, {
-      userLocation: action.coordinates,
+      userLocation: {
+        place_name: 'My Location',
+        center: action.coordinates,
+        geometry: {
+          type: 'Point',
+          coordinates: action.coordinates
+        }
+      },
     });
 
   case 'SET_MODE':

@@ -31,6 +31,7 @@ class Directions extends Component {
             <Geocoder
               onSelect={(location) => {
                 this.props.setDirectionsLocation('from', location);
+                this.props.writeSearchFrom('');
                 this.props.setMapUpdated(false);
               }}
               searchString={this.props.directionsFromString}
@@ -54,6 +55,7 @@ class Directions extends Component {
             <Geocoder
               onSelect={(location) => {
                 this.props.setDirectionsLocation('to', location);
+                this.props.writeSearchTo('');
                 this.props.setMapUpdated(false);
               }}
               searchString={this.props.directionsToString}
@@ -67,10 +69,25 @@ class Directions extends Component {
           />
         </div>
 
-        <MyLocation/>
+        {
+          this.showUserLocation()
+          ?
+          <MyLocation
+            onClick={() => this.setUserLocationDirections()}
+            userLocation={this.props.userLocation}
+          />
+          :
+          <div/>
+        }
 
       </div>
     );
+  }
+
+  setUserLocationDirections() {
+    if (!this.props.directionsFrom) this.props.setDirectionsLocation('from', this.props.userLocation);
+    else if (!this.props.directionsTo) this.props.setDirectionsLocation('to', this.props.userLocation);
+    this.props.setMapUpdated(false);
   }
 
   resetSearch(kind) {
@@ -87,6 +104,15 @@ class Directions extends Component {
     this.props.writeSearchFrom('');
     this.props.writeSearchTo('');
     this.props.setMapUpdated(false);
+  }
+
+  showUserLocation() {
+    return (
+      !(this.props.directionsFrom && this.props.directionsTo)
+      && (!this.props.directionsFromString)
+      && (!this.props.directionsToString)
+      && this.props.userLocation
+    )
   }
 
   get styles() {
