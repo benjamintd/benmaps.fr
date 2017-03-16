@@ -49,4 +49,4 @@ export const setStateValue = (key, value) => ({
   type: 'SET_STATE_VALUE',
   key,
   value
-})
+});

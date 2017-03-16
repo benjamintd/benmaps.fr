@@ -18,7 +18,9 @@ const defaultState = {
   directionsFromString: '',
   directionsFrom: null,
   directionsToString: '',
-  directionsTo: null
+  directionsTo: null,
+  routes: [],
+  routesStatus: 'idle'
 };
 
 const reducer = (state = defaultState, action) => {
