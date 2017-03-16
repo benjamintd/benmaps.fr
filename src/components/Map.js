@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
+import turfBbox from '@turf/bbox';
+import turfBboxPolygon from '@turf/bbox-polygon';
+import turfBuffer from '@turf/buffer';
+import turfDistance from '@turf/distance';
 import {setZoom, setCenter, setMapUpdated, setUserLocation} from '../actions/index'
 
 class MapComponent extends Component {
@@ -18,7 +22,8 @@ class MapComponent extends Component {
         container: 'map',
         style: this.props.style,
         center: this.props.center,
-        zoom: this.props.zoom
+        zoom: this.props.zoom,
+        minZoom: 2
     });
 
     map.on('moveend', () => {
@@ -58,28 +63,52 @@ class MapComponent extends Component {
 
     const marker = new mapboxgl.Marker(markerElement);
 
+    // Create marker for From location
+    const fromElement = document.createElement('div');
+    fromElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
+    fromElement.innerHTML = '<img src="./fromLocation.svg"/>';
+
+    const fromMarker = new mapboxgl.Marker(fromElement);
+
     // store variables at the MapComponent level
     this.map = map;
     this.marker = marker;
+    this.fromMarker = fromMarker
   }
 
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    // We have a new search location (=> and no directions)
-    if (this.props.searchLocation) {
+    if (this.props.searchLocation && !this.marker._map) { // We have a new search location (=> and no directions)
       this.moveTo(this.props.searchLocation);
       this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
     }
 
-    // We have a new destination
-    if (this.props.directionsTo && this.marker._map === null) {
+    if (this.props.directionsTo && !this.marker._map) { // We have a new destination
       this.moveTo(this.props.directionsTo);
       this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
     }
 
-    else if (this.props.searchLocation === null && this.props.directionsTo === null) { // Remove search location
+    if (this.props.directionsFrom && !this.fromMarker._map) { // We have a new origin
+      this.moveTo(this.props.directionsFrom);
+      this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
+    }
+
+    if (this.props.directionsFrom && this.props.directionsTo) { // We have origin and destination
+      const bbox = turfBbox({
+        type: 'FeatureCollection',
+        features: [this.props.directionsFrom, this.props.directionsTo]
+      });
+
+      this.moveTo({bbox: bbox});
+    }
+
+    if (!this.props.searchLocation && !this.props.directionsTo) { // Remove search location
       this.marker.remove();
+    }
+
+    if (!this.props.directionsFrom) { // Remove search location
+      this.fromMarker.remove();
     }
 
     this.props.setMapUpdated(true);
@@ -87,7 +116,10 @@ class MapComponent extends Component {
 
   moveTo(location) {
     if (location.bbox) { // We have a bbox to fit to
-      this.map.fitBounds(location.bbox, {linear: true});
+      const distance = turfDistance([location.bbox[0], location.bbox[1]], [location.bbox[2], location.bbox[3]]);
+      const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance / 5, 'kilometers');
+      const bbox = turfBbox(buffered);
+      this.map.fitBounds(bbox, {linear: true});
     } else { // We just have a point
       this.map.easeTo({
         center: location.geometry.coordinates,
@@ -106,6 +138,7 @@ MapComponent.propTypes = {
   setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
   searchLocation: React.PropTypes.object,
+  directionsFrom: React.PropTypes.object,
   directionsTo: React.PropTypes.object,
   needMapUpdate: React.PropTypes.bool,
   setMapUpdated: React.PropTypes.func,
@@ -119,6 +152,7 @@ const mapStateToProps = (state) => {
     center: state.mapCenter,
     zoom: state.mapZoom,
     searchLocation: state.searchLocation,
+    directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
     needMapUpdate: state.needMapUpdate
   };

@@ -4,6 +4,7 @@ import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import ModalityButtons from './ModalityButtons';
+import MyLocation from './MyLocation';
 import {setMapUpdated, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
 
 class Directions extends Component {
@@ -66,6 +67,8 @@ class Directions extends Component {
           />
         </div>
 
+        <MyLocation/>
+
       </div>
     );
   }
@@ -92,7 +95,8 @@ class Directions extends Component {
       input: 'input directions-input border--transparent color-white pl42 w420 h42',
       results: 'fixed bg-white shadow-darken5 border-darken10',
       placeName: 'txt-truncate color-white pl42 h42 flex-parent flex-parent--row flex-parent--center-cross',
-      row: 'absolute pr48 w420 flex-parent flex-parent--row'
+      row: 'absolute pr48 w420 flex-parent flex-parent--row',
+      userLocation: 'user-location-menu h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'
     }
   }
 }
@@ -108,7 +112,8 @@ Directions.propTypes = {
   setModality: React.PropTypes.func,
   writeSearchFrom: React.PropTypes.func,
   writeSearchTo: React.PropTypes.func,
-  modality: React.PropTypes.string
+  modality: React.PropTypes.string,
+  userLocation: React.PropTypes.object
 }
 
 const mapStateToProps = (state) => {
@@ -117,7 +122,8 @@ const mapStateToProps = (state) => {
     directionsTo: state.directionsTo,
     directionsFromString: state.directionsFromString,
     directionsToString: state.directionsToString,
-    modality: state.modality
+    modality: state.modality,
+    userLocation: state.userLocation
   };
 };
 

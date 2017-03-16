@@ -9,6 +9,10 @@
   },
   "dependencies": {
     "@mapbox/react-geocoder": "^2.5.0",
+    "@turf/bbox": "^3.13.0",
+    "@turf/bbox-polygon": "^3.13.0",
+    "@turf/buffer": "^3.13.0",
+    "@turf/distance": "^3.13.0",
     "mapbox-gl": "^0.33.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",

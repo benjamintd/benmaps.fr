@@ -29,3 +29,7 @@ body {
 .directions-input::-moz-placeholder { /* Firefox 19+ */
   color: #ffffff;
 }
+
+.user-location-menu {
+  margin-top: 186px;
+}
