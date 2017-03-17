@@ -8,6 +8,7 @@
     "react-scripts": "0.9.5"
   },
   "dependencies": {
+    "@mapbox/polyline": "^0.2.0",
     "@mapbox/react-geocoder": "^2.5.0",
     "@turf/bbox": "^3.13.0",
     "@turf/bbox-polygon": "^3.13.0",

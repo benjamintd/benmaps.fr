@@ -10,8 +10,21 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       value: 'pending'
     });
 
+    console.log(action);
+    const baseUrl = 'https://api.mapbox.com/directions/v5/mapbox/';
+
+    let profile = 'driving-traffic';
+    if (action.modality === 'car') profile = 'driving-traffic';
+    if (action.modality === 'bike') profile = 'cycling';
+    if (action.modality === 'walk') profile = 'walking';
+
+    const fromCoordinates = action.directionsFrom.geometry.coordinates.join(',');
+    const toCoordinates = action.directionsTo.geometry.coordinates.join(',');
+
+    const url = baseUrl + profile + '/' + fromCoordinates + ';' + toCoordinates + '?access_token=' + action.accessToken;
+
     // Fetch
-    fetch('https://google.com', {method: 'get'})
+    fetch(url, {method: 'get'})
       .then(res => {
         if (res.ok) {
           return res.json();
@@ -26,6 +39,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         }
       })
       .then(data => {
+        console.log(data);
         // Success
         next({
           type: 'SET_ROUTE',
@@ -37,7 +51,11 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
           value: 'idle'
         });
       })
-      .catch(err => console.log(err));
+      .catch(() => next({
+        type: 'SET_STATE_VALUE',
+        key: 'routeStatus',
+        value: 'error'
+      }));
     break;
 
   default:

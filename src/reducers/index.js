@@ -1,3 +1,5 @@
+import polyline from '@mapbox/polyline';
+
 const defaultState = {
   // Mapbox Access Token
   mapboxAccessToken: 'pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng',
@@ -19,7 +21,7 @@ const defaultState = {
   directionsFrom: null,
   directionsToString: '',
   directionsTo: null,
-  route: [],
+  route: null,
   routeStatus: 'idle'
 };
 
@@ -87,9 +89,21 @@ const reducer = (state = defaultState, action) => {
     });
 
   case 'SET_ROUTE': {
-    return Object.assign({}, state, {
-      route: action.data
-    });
+    if (action.data.routes.length > 0) {
+      const route = action.data.routes[0];
+
+      const geojsonLine = polyline.toGeoJSON(route.geometry);
+      route.geometry = geojsonLine
+
+      return Object.assign({}, state, {
+        route: route
+      });
+    } else {
+      return Object.assign({}, state, {
+        routeStatus: 'error'
+      });
+    }
+
   }
 
   // Some generic case. When possible, prefer some more expressive

@@ -5,7 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setZoom, setCenter, setStateValue, setUserLocation} from '../actions/index'
+import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
   render() {
@@ -94,7 +94,27 @@ class MapComponent extends Component {
       this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
     }
 
-    if (this.props.directionsFrom && this.props.directionsTo) { // We have origin and destination
+    if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
+      // We have origin and destination but no route yet.
+      const bbox = turfBbox({
+        type: 'FeatureCollection',
+        features: [this.props.directionsFrom, this.props.directionsTo]
+      });
+
+      this.moveTo({bbox: bbox});
+
+      // Trigger the API call to directions
+      this.props.getRoute(
+        this.props.directionsFrom,
+        this.props.directionsTo,
+        this.props.modality,
+        this.props.accessToken
+      );
+    }
+
+    if (this.props.route) {
+      // We have origin and destination, and a route.
+      // TODO bbox should be the route's
       const bbox = turfBbox({
         type: 'FeatureCollection',
         features: [this.props.directionsFrom, this.props.directionsTo]
@@ -137,12 +157,15 @@ MapComponent.propTypes = {
   setCenter: React.PropTypes.func,
   setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
+  route: React.PropTypes.object,
   searchLocation: React.PropTypes.object,
   directionsFrom: React.PropTypes.object,
   directionsTo: React.PropTypes.object,
+  modality: React.PropTypes.string,
   needMapUpdate: React.PropTypes.bool,
   setStateValue: React.PropTypes.func,
-  setUserLocation: React.PropTypes.func
+  setUserLocation: React.PropTypes.func,
+  getRoute: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -154,6 +177,7 @@ const mapStateToProps = (state) => {
     searchLocation: state.searchLocation,
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
+    modality: state.modality,
     needMapUpdate: state.needMapUpdate
   };
 };
@@ -163,7 +187,8 @@ const mapDispatchToProps = (dispatch) => {
     setCenter: (coordinates) => dispatch(setCenter(coordinates)),
     setZoom: (zoom) => dispatch(setZoom(zoom)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
-    setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates))
+    setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
+    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken))
   };
 };
 

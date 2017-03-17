@@ -43,6 +43,14 @@ export const setModality = (modality) => ({
   modality
 });
 
+export const getRoute = (directionsFrom, directionsTo, modality, accessToken) => ({
+  type: 'GET_ROUTE',
+  directionsFrom,
+  directionsTo,
+  modality,
+  accessToken
+});
+
 // Some generic action. When existant, prefer one of the above.
 export const setStateValue = (key, value) => ({
   type: 'SET_STATE_VALUE',
