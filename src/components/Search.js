@@ -3,13 +3,13 @@ import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
-import {writeSearch, setSearchLocation, setMapUpdated, setMode, setDirectionsLocation} from '../actions/index';
+import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation} from '../actions/index';
 
 class Search extends Component {
   closeSearch() {
     this.props.writeSearch('');
     this.props.setSearchLocation(null);
-    this.props.setMapUpdated(false);
+    this.props.triggerMapUpdate();
   }
 
   clickDirections() {
@@ -70,7 +70,7 @@ Search.propTypes = {
   searchLocation: React.PropTypes.object,
   writeSearch: React.PropTypes.func,
   setSearchLocation: React.PropTypes.func,
-  setMapUpdated: React.PropTypes.func,
+  triggerMapUpdate: React.PropTypes.func,
   setMode: React.PropTypes.func,
   setDirectionsLocation: React.PropTypes.func
 }
@@ -86,7 +86,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     writeSearch: (input) => dispatch(writeSearch(input)),
     setSearchLocation: (location) => dispatch(setSearchLocation(location)),
-    setMapUpdated: (bool) => dispatch(setMapUpdated(bool)),
+    triggerMapUpdate: () => dispatch(triggerMapUpdate()),
     setMode: (mode) => dispatch(setMode(mode)),
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location))
   };

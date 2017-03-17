@@ -5,7 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setZoom, setCenter, setMapUpdated, setUserLocation} from '../actions/index'
+import {setZoom, setCenter, setStateValue, setUserLocation} from '../actions/index'
 
 class MapComponent extends Component {
   render() {
@@ -111,7 +111,7 @@ class MapComponent extends Component {
       this.fromMarker.remove();
     }
 
-    this.props.setMapUpdated(true);
+    this.props.setStateValue('needMapUpdate', false);
   }
 
   moveTo(location) {
@@ -141,7 +141,7 @@ MapComponent.propTypes = {
   directionsFrom: React.PropTypes.object,
   directionsTo: React.PropTypes.object,
   needMapUpdate: React.PropTypes.bool,
-  setMapUpdated: React.PropTypes.func,
+  setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func
 }
 
@@ -162,7 +162,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setCenter: (coordinates) => dispatch(setCenter(coordinates)),
     setZoom: (zoom) => dispatch(setZoom(zoom)),
-    setMapUpdated: (bool) => dispatch(setMapUpdated(bool)),
+    setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates))
   };
 };

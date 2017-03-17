@@ -19,8 +19,8 @@ const defaultState = {
   directionsFrom: null,
   directionsToString: '',
   directionsTo: null,
-  routes: [],
-  routesStatus: 'idle'
+  route: [],
+  routeStatus: 'idle'
 };
 
 const reducer = (state = defaultState, action) => {
@@ -47,9 +47,9 @@ const reducer = (state = defaultState, action) => {
       needMapUpdate: true
     });
 
-  case 'SET_MAP_UPDATED':
+  case 'TRIGGER_MAP_UPDATE':
     return Object.assign({}, state, {
-      needMapUpdate: !action.mapUpdated,
+      needMapUpdate: true,
     });
 
   case 'SET_USER_LOCATION':
@@ -85,6 +85,12 @@ const reducer = (state = defaultState, action) => {
     return Object.assign({}, state, {
       modality: action.modality,
     });
+
+  case 'SET_ROUTE': {
+    return Object.assign({}, state, {
+      route: action.data
+    });
+  }
 
   // Some generic case. When possible, prefer some more expressive
   // action name like above.

@@ -18,9 +18,8 @@ export const setSearchLocation = (location) => ({
   location
 });
 
-export const setMapUpdated = (bool) => ({
-  type: 'SET_MAP_UPDATED',
-  mapUpdated: bool
+export const triggerMapUpdate = () => ({
+  type: 'TRIGGER_MAP_UPDATE'
 });
 
 export const setUserLocation = (coordinates) => ({

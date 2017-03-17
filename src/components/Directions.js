@@ -5,7 +5,7 @@ import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import ModalityButtons from './ModalityButtons';
 import MyLocation from './MyLocation';
-import {setMapUpdated, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
+import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
 
 class Directions extends Component {
   render() {
@@ -29,11 +29,7 @@ class Directions extends Component {
             </div>
             :
             <Geocoder
-              onSelect={(location) => {
-                this.props.setDirectionsLocation('from', location);
-                this.props.writeSearchFrom('');
-                this.props.setMapUpdated(false);
-              }}
+              onSelect={this.setDirectionsLocation('from')}
               searchString={this.props.directionsFromString}
               writeSearch={(value) => this.props.writeSearchFrom(value)}
               resultsClass={'mt72 ' + this.styles.results}
@@ -53,11 +49,7 @@ class Directions extends Component {
             </div>
             :
             <Geocoder
-              onSelect={(location) => {
-                this.props.setDirectionsLocation('to', location);
-                this.props.writeSearchTo('');
-                this.props.setMapUpdated(false);
-              }}
+              onSelect={this.setDirectionsLocation('to')}
               searchString={this.props.directionsToString}
               writeSearch={(value) => this.props.writeSearchTo(value)}
               resultsClass={'mt24 ' + this.styles.results}
@@ -84,17 +76,26 @@ class Directions extends Component {
     );
   }
 
+  setDirectionsLocation(kind) {
+    return (location) => {
+      this.props.setDirectionsLocation(kind, location);
+      if (kind === 'to') this.props.writeSearchTo('');
+      if (kind === 'from') this.props.writeSearchFrom('');
+      this.props.triggerMapUpdate();
+    }
+  }
+
   setUserLocationDirections() {
     if (!this.props.directionsFrom) this.props.setDirectionsLocation('from', this.props.userLocation);
     else if (!this.props.directionsTo) this.props.setDirectionsLocation('to', this.props.userLocation);
-    this.props.setMapUpdated(false);
+    this.props.triggerMapUpdate();
   }
 
   resetSearch(kind) {
     if (kind === 'from') this.props.writeSearchFrom('');
     if (kind === 'to') this.props.writeSearchTo('');
     this.props.setDirectionsLocation(kind, null);
-    this.props.setMapUpdated(false);
+    this.props.triggerMapUpdate();
   }
 
   exitDirections() {
@@ -103,7 +104,7 @@ class Directions extends Component {
     this.props.setDirectionsLocation('to', null);
     this.props.writeSearchFrom('');
     this.props.writeSearchTo('');
-    this.props.setMapUpdated(false);
+    this.props.triggerMapUpdate();
   }
 
   showUserLocation() {
@@ -133,7 +134,7 @@ Directions.propTypes = {
   directionsToString: React.PropTypes.string,
   directionsTo: React.PropTypes.object,
   setDirectionsLocation: React.PropTypes.func,
-  setMapUpdated: React.PropTypes.func,
+  triggerMapUpdate: React.PropTypes.func,
   setMode: React.PropTypes.func,
   setModality: React.PropTypes.func,
   writeSearchFrom: React.PropTypes.func,
@@ -156,7 +157,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
-    setMapUpdated: (bool) => dispatch(setMapUpdated(bool)),
+    triggerMapUpdate: () => dispatch(triggerMapUpdate()),
     setMode: (mode) => dispatch(setMode(mode)),
     setModality: (modality) => dispatch(setModality(modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),
