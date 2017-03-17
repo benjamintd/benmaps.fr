@@ -18,7 +18,11 @@ class Directions extends Component {
         />
         <ModalityButtons
           modality={this.props.modality}
-          onSetModality={this.props.setModality}
+          onSetModality={(modality) => {
+            this.props.setModality(modality);
+            this.props.setRoute(null);
+            this.props.triggerMapUpdate();
+          }}
         />
         <div className={'mt72 ' + this.styles.row}>
           {
@@ -139,6 +143,7 @@ Directions.propTypes = {
   setModality: React.PropTypes.func,
   writeSearchFrom: React.PropTypes.func,
   writeSearchTo: React.PropTypes.func,
+  setRoute: React.PropTypes.func,
   modality: React.PropTypes.string,
   userLocation: React.PropTypes.object
 }
@@ -161,7 +166,8 @@ const mapDispatchToProps = (dispatch) => {
     setMode: (mode) => dispatch(setMode(mode)),
     setModality: (modality) => dispatch(setModality(modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),
-    writeSearchTo: (value) => dispatch(setStateValue('directionsToString', value))
+    writeSearchTo: (value) => dispatch(setStateValue('directionsToString', value)),
+    setRoute: (route) => dispatch(setStateValue('route', route))
   };
 };
 

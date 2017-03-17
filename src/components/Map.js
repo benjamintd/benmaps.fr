@@ -70,6 +70,46 @@ class MapComponent extends Component {
 
     const fromMarker = new mapboxgl.Marker(fromElement);
 
+    // Create geojson source for the route
+    map.on('load', () => {
+      map.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+        });
+
+        map.addLayer({
+          'id': 'route',
+          'source': 'route',
+          'type': 'line',
+          'paint': {
+            'line-color': '#2abaf7',
+            'line-width': 5.5
+          },
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+        }, 'bridge-oneway-arrows-white');
+
+        map.addLayer({
+          'id': 'route-casing',
+          'source': 'route',
+          'type': 'line',
+          'paint': {
+            'line-color': '#2779b5',
+            'line-width': 6.5
+          },
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+        }, 'route');
+
+    });
+
     // store variables at the MapComponent level
     this.map = map;
     this.marker = marker;
@@ -110,6 +150,9 @@ class MapComponent extends Component {
         this.props.modality,
         this.props.accessToken
       );
+    }
+    if (this.props.route) {
+      this.map.getSource('route').setData(this.props.route.geometry)
     }
 
     if (this.props.route) {
@@ -178,7 +221,8 @@ const mapStateToProps = (state) => {
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
     modality: state.modality,
-    needMapUpdate: state.needMapUpdate
+    needMapUpdate: state.needMapUpdate,
+    route: state.route
   };
 };
 

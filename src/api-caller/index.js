@@ -10,7 +10,6 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       value: 'pending'
     });
 
-    console.log(action);
     const baseUrl = 'https://api.mapbox.com/directions/v5/mapbox/';
 
     let profile = 'driving-traffic';
@@ -39,7 +38,6 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         }
       })
       .then(data => {
-        console.log(data);
         // Success
         next({
           type: 'SET_ROUTE',
@@ -49,6 +47,9 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
           type: 'SET_STATE_VALUE',
           key: 'routeStatus',
           value: 'idle'
+        });
+        next({
+          type: 'TRIGGER_MAP_UPDATE'
         });
       })
       .catch(() => next({
