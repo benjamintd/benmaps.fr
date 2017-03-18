@@ -23,8 +23,11 @@ class MapComponent extends Component {
         style: this.props.style,
         center: this.props.center,
         zoom: this.props.zoom,
-        minZoom: 2
+        minZoom: 2,
+        maxZoom: 21
     });
+
+    this.map = map;
 
     map.on('moveend', () => {
       const center = map.getCenter();
@@ -44,6 +47,7 @@ class MapComponent extends Component {
       const coords = [data.coords.longitude, data.coords.latitude]
       geolocation.setLngLat(coords).addTo(map);
       this.props.setUserLocation(coords);
+      this.moveTo({type: 'Feature', geometry: {type: 'Point', coordinates: coords}, properties: {}}, 13);
     }
 
     // Create geolocation control
@@ -52,7 +56,12 @@ class MapComponent extends Component {
     map.addControl(geolocateControl, 'bottom-right');
 
     // Initial ask for location and display on the map
-    if (navigator.geolocation) {
+    if (this.props.userLocation) {
+      console.log('coucou', this.props.userLocation)
+      const coords = this.props.userLocation.geometry.coordinates;
+      geolocation.setLngLat(coords).addTo(map);
+      this.moveTo(this.props.userLocation, 13);
+    } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setGeolocation);
     }
 
@@ -111,7 +120,6 @@ class MapComponent extends Component {
     });
 
     // store variables at the MapComponent level
-    this.map = map;
     this.marker = marker;
     this.fromMarker = fromMarker
   }
@@ -178,7 +186,7 @@ class MapComponent extends Component {
     this.props.setStateValue('needMapUpdate', false);
   }
 
-  moveTo(location) {
+  moveTo(location, zoom) {
     if (location.bbox) { // We have a bbox to fit to
       const distance = turfDistance([location.bbox[0], location.bbox[1]], [location.bbox[2], location.bbox[3]]);
       const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance, 'kilometers');
@@ -189,9 +197,10 @@ class MapComponent extends Component {
         return;
       }
     } else { // We just have a point
+      zoom = zoom || 16
       this.map.easeTo({
         center: location.geometry.coordinates,
-        zoom: 16
+        zoom: zoom
       });
     }
   }
@@ -206,6 +215,7 @@ MapComponent.propTypes = {
   setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
   route: React.PropTypes.object,
+  userLocation: React.PropTypes.object,
   routeStatus: React.PropTypes.string,
   searchLocation: React.PropTypes.object,
   directionsFrom: React.PropTypes.object,
@@ -226,6 +236,7 @@ const mapStateToProps = (state) => {
     searchLocation: state.searchLocation,
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
+    userLocation: state.userLocation,
     modality: state.modality,
     needMapUpdate: state.needMapUpdate,
     route: state.route,
