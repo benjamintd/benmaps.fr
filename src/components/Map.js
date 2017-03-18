@@ -39,12 +39,25 @@ class MapComponent extends Component {
     const geolocationElement = document.createElement('div');
     geolocationElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
     geolocationElement.innerHTML = '<img src="./geolocation.svg"/>';
-
     const geolocation = new mapboxgl.Marker(geolocationElement);
+
+
+    // Create marker for search results
+    const markerElement = document.createElement('div');
+    markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
+    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use xlink:href="#icon-marker"></use></svg>';
+    const marker = new mapboxgl.Marker(markerElement);
+
+    // Create marker for From location
+    const fromElement = document.createElement('div');
+    fromElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
+    fromElement.innerHTML = '<img src="./fromLocation.svg"/>';
+    const fromMarker = new mapboxgl.Marker(fromElement);
+
 
     // helper to set geolocation
     const setGeolocation = (data) => {
-      const coords = [data.coords.longitude, data.coords.latitude]
+      const coords = [data.coords.longitude, data.coords.latitude];
       geolocation.setLngLat(coords).addTo(map);
       this.props.setUserLocation(coords);
       this.moveTo({type: 'Feature', geometry: {type: 'Point', coordinates: coords}, properties: {}}, 13);
@@ -57,7 +70,6 @@ class MapComponent extends Component {
 
     // Initial ask for location and display on the map
     if (this.props.userLocation) {
-      console.log('coucou', this.props.userLocation)
       const coords = this.props.userLocation.geometry.coordinates;
       geolocation.setLngLat(coords).addTo(map);
       this.moveTo(this.props.userLocation, 13);
@@ -65,19 +77,16 @@ class MapComponent extends Component {
       navigator.geolocation.getCurrentPosition(setGeolocation);
     }
 
-    // Create marker for search results
-    const markerElement = document.createElement('div');
-    markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use xlink:href="#icon-marker"></use></svg>';
-
-    const marker = new mapboxgl.Marker(markerElement);
-
-    // Create marker for From location
-    const fromElement = document.createElement('div');
-    fromElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    fromElement.innerHTML = '<img src="./fromLocation.svg"/>';
-
-    const fromMarker = new mapboxgl.Marker(fromElement);
+    // Regularly poll the user location and update the map
+    setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((data) => {
+          const coords = [data.coords.longitude, data.coords.latitude];
+          geolocation.setLngLat(coords).addTo(map);
+          this.props.setUserLocation(coords);
+        });
+      }
+    }, 10000);
 
     // Create geojson source for the route
     map.on('load', () => {
