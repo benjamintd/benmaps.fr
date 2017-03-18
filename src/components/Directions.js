@@ -123,9 +123,9 @@ class Directions extends Component {
   get styles() {
     return {
       directions: 'directions-panel absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column',
-      input: 'input directions-input border--transparent color-white pl42 w420 h42',
+      input: 'input directions-input border--transparent color-white pl48 h42 w-full',
       results: 'fixed bg-white shadow-darken5 border-darken10',
-      placeName: 'txt-truncate color-white pl42 h42 flex-parent flex-parent--row flex-parent--center-cross',
+      placeName: 'txt-truncate color-white pl48 h42 flex-parent flex-parent--row flex-parent--center-cross',
       row: 'absolute pr48 w420 flex-parent flex-parent--row',
       userLocation: 'user-location-menu h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'
     }

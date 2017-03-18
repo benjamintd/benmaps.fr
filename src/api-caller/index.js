@@ -2,7 +2,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
 
   switch (action.type) {
   // ---------------------------------------------------------------------------
-  case 'GET_ROUTE':
+  case 'GET_ROUTE': {
     // Dispatch pending action
     next({
       type: 'SET_STATE_VALUE',
@@ -58,6 +58,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         value: 'error'
       }));
     break;
+  }
 
   default:
     next(action); // let through as default
