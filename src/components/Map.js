@@ -143,13 +143,15 @@ class MapComponent extends Component {
 
       this.moveTo({bbox: bbox});
 
-      // Trigger the API call to directions
-      this.props.getRoute(
-        this.props.directionsFrom,
-        this.props.directionsTo,
-        this.props.modality,
-        this.props.accessToken
-      );
+      if (this.props.routeStatus !== 'error') { // Do not retry when the previous request errored
+        // Trigger the API call to directions
+        this.props.getRoute(
+          this.props.directionsFrom,
+          this.props.directionsTo,
+          this.props.modality,
+          this.props.accessToken
+        );
+      }
     }
     if (this.props.route) {
       this.map.getSource('route').setData(this.props.route.geometry)
@@ -181,12 +183,16 @@ class MapComponent extends Component {
       const distance = turfDistance([location.bbox[0], location.bbox[1]], [location.bbox[2], location.bbox[3]]);
       const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance, 'kilometers');
       const bbox = turfBbox(buffered);
-      this.map.fitBounds(bbox, {linear: true});
+      try {
+        this.map.fitBounds(bbox, {linear: true});
+      } catch (e) {
+        return;
+      }
     } else { // We just have a point
       this.map.easeTo({
         center: location.geometry.coordinates,
         zoom: 16
-      })
+      });
     }
   }
 }
@@ -200,6 +206,7 @@ MapComponent.propTypes = {
   setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
   route: React.PropTypes.object,
+  routeStatus: React.PropTypes.string,
   searchLocation: React.PropTypes.object,
   directionsFrom: React.PropTypes.object,
   directionsTo: React.PropTypes.object,
@@ -221,7 +228,8 @@ const mapStateToProps = (state) => {
     directionsTo: state.directionsTo,
     modality: state.modality,
     needMapUpdate: state.needMapUpdate,
-    route: state.route
+    route: state.route,
+    routeStatus: state.routeStatus
   };
 };
 

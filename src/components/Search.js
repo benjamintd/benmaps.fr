@@ -23,7 +23,7 @@ class Search extends Component {
     return (
       <div className='absolute top m24 w420 flex-parent flex-parent--row'>
         <div className={this.styles.icon}>
-          <svg className='icon color-darken25'><use xlinkHref='#icon-search'></use></svg>
+          <svg className='icon color-gray'><use xlinkHref='#icon-search'></use></svg>
         </div>
         {
           (this.props.searchLocation === null) // no place was selected yet

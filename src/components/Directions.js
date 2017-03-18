@@ -13,7 +13,7 @@ class Directions extends Component {
       <div className={this.styles.directions}>
         <CloseButton
           large={true}
-          color='color-white opacity50'
+          color='color-lighten50'
           onClick={() => this.exitDirections()}
         />
         <ModalityButtons
@@ -21,9 +21,16 @@ class Directions extends Component {
           onSetModality={(modality) => {
             this.props.setModality(modality);
             this.props.setRoute(null);
+            this.props.setStateValue('routeStatus', 'idle');
             this.props.triggerMapUpdate();
           }}
         />
+        <div
+          className='swap-button absolute left pl12 w42 h36 flex-parent flex-parent--center-cross flex-parent--center-main'
+          onClick={() => this.swapDirections()}
+        >
+          <img src='swapDirections.svg' alt='swap directions'/>
+        </div>
         <div className={'mt72 ' + this.styles.row}>
           {
             this.props.directionsFrom
@@ -42,6 +49,7 @@ class Directions extends Component {
           }
           <CloseButton
             onClick={() => this.resetSearch('from')}
+            color='color-lighten50'
           />
         </div>
         <div className={'directions-location-to ' + this.styles.row}>
@@ -62,6 +70,7 @@ class Directions extends Component {
           }
           <CloseButton
             onClick={() => this.resetSearch('to')}
+            color='color-lighten50'
           />
         </div>
 
@@ -100,6 +109,7 @@ class Directions extends Component {
     if (kind === 'to') this.props.writeSearchTo('');
     this.props.setDirectionsLocation(kind, null);
     this.props.setRoute(null);
+    this.props.setStateValue('routeStatus', 'idle');
     this.props.triggerMapUpdate();
   }
 
@@ -110,6 +120,7 @@ class Directions extends Component {
     this.props.writeSearchFrom('');
     this.props.writeSearchTo('');
     this.props.setRoute(null);
+    this.props.setStateValue('routeStatus', 'idle');
     this.props.triggerMapUpdate();
   }
 
@@ -122,10 +133,18 @@ class Directions extends Component {
     )
   }
 
+  swapDirections() {
+    this.props.setDirectionsLocation('from', this.props.directionsTo);
+    this.props.setDirectionsLocation('to', this.props.directionsFrom);
+    this.props.setRoute(null);
+    this.props.setStateValue('routeStatus', 'idle');
+    this.props.triggerMapUpdate();
+  }
+
   get styles() {
     return {
       directions: 'directions-panel absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column',
-      input: 'input directions-input border--transparent color-white pl48 h42 w-full',
+      input: 'input directions-input border--transparent color-white pl48 h42 w360',
       results: 'fixed bg-white shadow-darken5 border-darken10',
       placeName: 'txt-truncate color-white pl48 h42 flex-parent flex-parent--row flex-parent--center-cross',
       row: 'absolute pr48 w420 flex-parent flex-parent--row',
@@ -146,6 +165,7 @@ Directions.propTypes = {
   writeSearchFrom: React.PropTypes.func,
   writeSearchTo: React.PropTypes.func,
   setRoute: React.PropTypes.func,
+  setStateValue: React.PropTypes.func,
   modality: React.PropTypes.string,
   userLocation: React.PropTypes.object
 }
@@ -169,7 +189,8 @@ const mapDispatchToProps = (dispatch) => {
     setModality: (modality) => dispatch(setModality(modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),
     writeSearchTo: (value) => dispatch(setStateValue('directionsToString', value)),
-    setRoute: (route) => dispatch(setStateValue('route', route))
+    setRoute: (route) => dispatch(setStateValue('route', route)),
+    setStateValue: (k, v) => dispatch(setStateValue(k, v))
   };
 };
 

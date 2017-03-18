@@ -27,7 +27,7 @@ CloseButton.propTypes = {
 CloseButton.defaultProps = {
   show: true,
   onClick: () => {},
-  color: 'color-darken25',
+  color: 'color-gray',
   large: false
 }
 
