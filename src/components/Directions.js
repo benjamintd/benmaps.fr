@@ -153,7 +153,7 @@ class Directions extends Component {
 
   get styles() {
     return {
-      directions: 'directions-panel absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column',
+      directions: 'my-by-blue absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white pl48 h42 w360',
       results: 'fixed bg-white shadow-darken5 border-darken10',
       placeName: 'txt-truncate color-white pl48 h42 flex-parent flex-parent--row flex-parent--center-cross',

@@ -1,3 +1,5 @@
+import wdk from 'wikidata-sdk';
+
 const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
 
   switch (action.type) {
@@ -59,6 +61,30 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         key: 'routeStatus',
         value: 'error'
       }));
+    break;
+  }
+
+  case 'GET_PLACE_INFO': {
+    const url = wdk.getEntities({
+      ids: action.id,
+      languages: ['en'],
+    });
+    console.log(url);
+
+    fetch(url, {method: 'get'})
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      } else { // 4xx or 5xx response
+        var err = new Error(res.statusText);
+        return Promise.reject(err);
+      }
+    })
+    .then(data => {
+      // Success
+      console.log(data);
+    })
+    .catch(() => {});
     break;
   }
 

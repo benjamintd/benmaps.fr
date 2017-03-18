@@ -3,7 +3,8 @@ import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
-import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation} from '../actions/index';
+import PlaceInfo from './PlaceInfo';
+import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo} from '../actions/index';
 
 class Search extends Component {
   closeSearch() {
@@ -28,7 +29,7 @@ class Search extends Component {
           (this.props.searchLocation === null) // no place was selected yet
           ?
           <Geocoder
-            onSelect={this.props.setSearchLocation}
+            onSelect={(data) => this.onSelect(data)}
             searchString={this.props.searchString}
             writeSearch={(value) => this.props.writeSearch(value)}
             resultsClass={this.styles.results}
@@ -51,15 +52,28 @@ class Search extends Component {
           show={(this.props.searchString !== '' || this.props.searchLocation !== null)}
           onClick={() => this.closeSearch()}
         />
+
+        {
+          this.props.placeInfo
+          ?
+          <PlaceInfo info={this.props.placeInfo}/>
+          :
+          null
+        }
       </div>
     );
+  }
+
+  onSelect(data) {
+    this.props.setSearchLocation(data);
+    if (data.properties.wikidata) this.props.getPlaceInfo(data.properties.wikidata);
   }
 
   get styles() {
     return {
       icon: 'absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
-      input: 'input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken5',
-      results: 'bg-white shadow-darken5 mt12 border-darken10'
+      input: 'input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken25',
+      results: 'bg-white shadow-darken25 mt6 border-darken10'
     }
   }
 }
@@ -67,6 +81,8 @@ class Search extends Component {
 Search.propTypes = {
   searchString: React.PropTypes.string,
   searchLocation: React.PropTypes.object,
+  placeInfo: React.PropTypes.object,
+  getPlaceInfo: React.PropTypes.func,
   writeSearch: React.PropTypes.func,
   setSearchLocation: React.PropTypes.func,
   triggerMapUpdate: React.PropTypes.func,
@@ -77,7 +93,8 @@ Search.propTypes = {
 const mapStateToProps = (state) => {
   return {
     searchString: state.searchString,
-    searchLocation: state.searchLocation
+    searchLocation: state.searchLocation,
+    placeInfo: state.placeInfo
   };
 };
 
@@ -87,7 +104,8 @@ const mapDispatchToProps = (dispatch) => {
     setSearchLocation: (location) => dispatch(setSearchLocation(location)),
     triggerMapUpdate: () => dispatch(triggerMapUpdate()),
     setMode: (mode) => dispatch(setMode(mode)),
-    setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location))
+    setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
+    getPlaceInfo: (id) => dispatch(getPlaceInfo(id))
   };
 };
 

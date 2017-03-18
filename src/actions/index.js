@@ -51,6 +51,11 @@ export const getRoute = (directionsFrom, directionsTo, modality, accessToken) =>
   accessToken
 });
 
+export const getPlaceInfo = (wikidata) => ({
+  type: 'GET_PLACE_INFO',
+  id: wikidata
+});
+
 // Some generic action. When existant, prefer one of the above.
 export const setStateValue = (key, value) => ({
   type: 'SET_STATE_VALUE',

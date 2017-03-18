@@ -14,6 +14,7 @@ const defaultState = {
   searchString: '',
   searchLocation: null,
   needMapUpdate: false,
+  placeInfo: null,
   // User
   userLocation: null,
   // Directions
@@ -103,11 +104,10 @@ const reducer = (state = defaultState, action) => {
         routeStatus: 'error'
       });
     }
-
   }
 
   // Some generic case. When possible, prefer some more expressive
-  // action name like above.
+  // action name above.
   case 'SET_STATE_VALUE': {
     const modifiedState = {};
     modifiedState[action.key] = action.value

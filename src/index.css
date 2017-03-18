@@ -14,7 +14,7 @@ body {
   left: -21px;
 }
 
-.directions-panel {
+.my-by-blue {
   background-color: #3a94ff;
 }
 
@@ -37,6 +37,11 @@ body {
 .route-panel {
   margin-top: 186px!important;
 }
+
+.place-info {
+  margin-top: 48px!important;
+}
+
 
 .swap-button {
   margin-top: 96px;
