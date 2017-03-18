@@ -136,7 +136,7 @@ class MapComponent extends Component {
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    if (this.props.searchLocation && !this.marker._map) { // We have a new search location (=> and no directions)
+    if (this.props.searchLocation && !this.marker._map && this.props.mode === 'search') { // We have a new search location (=> and no directions)
       this.moveTo(this.props.searchLocation);
       this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
     }
@@ -184,7 +184,7 @@ class MapComponent extends Component {
       });
     }
 
-    if (!this.props.searchLocation && !this.props.directionsTo) { // Remove search location
+    if (!(this.props.searchLocation && this.props.mode === 'search') && !this.props.directionsTo) { // Remove search location
       this.marker.remove();
     }
 
@@ -223,6 +223,7 @@ MapComponent.propTypes = {
   setCenter: React.PropTypes.func,
   setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
+  mode: React.PropTypes.string,
   route: React.PropTypes.object,
   userLocation: React.PropTypes.object,
   routeStatus: React.PropTypes.string,
@@ -247,6 +248,7 @@ const mapStateToProps = (state) => {
     directionsTo: state.directionsTo,
     userLocation: state.userLocation,
     modality: state.modality,
+    mode: state.mode,
     needMapUpdate: state.needMapUpdate,
     route: state.route,
     routeStatus: state.routeStatus

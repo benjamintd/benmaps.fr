@@ -12,7 +12,7 @@ class CloseButton extends Component {
         <svg className={'icon ' + (this.props.large ? 'icon--l ' : ' ') + this.props.color}><use xlinkHref='#icon-close'></use></svg>
       </div>
       :
-      <div/>
+      null
     );
   }
 }

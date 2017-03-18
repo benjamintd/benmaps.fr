@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
+import RoutePanel from './RoutePanel';
 import ModalityButtons from './ModalityButtons';
 import MyLocation from './MyLocation';
 import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
@@ -82,7 +83,15 @@ class Directions extends Component {
             userLocation={this.props.userLocation}
           />
           :
-          <div/>
+          null
+        }
+
+        {
+          (this.props.route || this.props.routeStatus === 'error')
+          ?
+          <RoutePanel/>
+          :
+          null
         }
 
       </div>
@@ -110,6 +119,7 @@ class Directions extends Component {
     this.props.setDirectionsLocation(kind, null);
     this.props.setRoute(null);
     this.props.setStateValue('routeStatus', 'idle');
+    this.props.setStateValue('searchLocation', null);
     this.props.triggerMapUpdate();
   }
 
@@ -164,6 +174,8 @@ Directions.propTypes = {
   setModality: React.PropTypes.func,
   writeSearchFrom: React.PropTypes.func,
   writeSearchTo: React.PropTypes.func,
+  route: React.PropTypes.object,
+  routeStatus: React.PropTypes.string,
   setRoute: React.PropTypes.func,
   setStateValue: React.PropTypes.func,
   modality: React.PropTypes.string,
@@ -177,7 +189,9 @@ const mapStateToProps = (state) => {
     directionsFromString: state.directionsFromString,
     directionsToString: state.directionsToString,
     modality: state.modality,
-    userLocation: state.userLocation
+    userLocation: state.userLocation,
+    route: state.route,
+    routeStatus: state.routeStatus
   };
 };
 

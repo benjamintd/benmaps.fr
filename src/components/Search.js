@@ -13,10 +13,9 @@ class Search extends Component {
   }
 
   clickDirections() {
-    this.props.writeSearch('');
     this.props.setMode('directions');
+    this.props.writeSearch('');
     this.props.setDirectionsLocation('to', this.props.searchLocation);
-    this.props.setSearchLocation(null);
   }
 
   render() {

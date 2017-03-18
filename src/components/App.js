@@ -18,13 +18,6 @@ class App extends Component {
             :
             <Search/>
           }
-          {
-            (this.props.route || this.props.routeStatus === 'error')
-            ?
-            <RoutePanel/>
-            :
-            null
-          }
         </div>
       </div>
     );
