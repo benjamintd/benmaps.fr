@@ -19,11 +19,9 @@ class App extends Component {
             <Search/>
           }
           {
-            this.props.route
+            (this.props.route || this.props.routeStatus !== 'idle')
             ?
-            <RoutePanel
-              route={this.props.route}
-            />
+            <RoutePanel/>
             :
             null
           }
@@ -35,13 +33,15 @@ class App extends Component {
 
 App.propTypes = {
   mode: React.PropTypes.string,
-  route: React.PropTypes.object
+  route: React.PropTypes.object,
+  routeStatus: React.PropTypes.string
 }
 
 const mapStateToProps = (state) => {
   return {
     mode: state.mode,
-    route: state.route
+    route: state.route,
+    routeStatus: state.routeStatus
   };
 };
 

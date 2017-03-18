@@ -156,14 +156,13 @@ class MapComponent extends Component {
     }
 
     if (this.props.route) {
-      // We have origin and destination, and a route.
-      // TODO bbox should be the route's
-      const bbox = turfBbox({
-        type: 'FeatureCollection',
-        features: [this.props.directionsFrom, this.props.directionsTo]
-      });
-
+      const bbox = turfBbox(this.props.route.geometry);
       this.moveTo({bbox: bbox});
+    } else {
+      this.map.getSource('route').setData({
+        type: 'FeatureCollection',
+        features: []
+      });
     }
 
     if (!this.props.searchLocation && !this.props.directionsTo) { // Remove search location

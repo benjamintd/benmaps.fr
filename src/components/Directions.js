@@ -99,6 +99,7 @@ class Directions extends Component {
     if (kind === 'from') this.props.writeSearchFrom('');
     if (kind === 'to') this.props.writeSearchTo('');
     this.props.setDirectionsLocation(kind, null);
+    this.props.setRoute(null);
     this.props.triggerMapUpdate();
   }
 
@@ -108,6 +109,7 @@ class Directions extends Component {
     this.props.setDirectionsLocation('to', null);
     this.props.writeSearchFrom('');
     this.props.writeSearchTo('');
+    this.props.setRoute(null);
     this.props.triggerMapUpdate();
   }
 

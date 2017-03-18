@@ -20,7 +20,9 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     const fromCoordinates = action.directionsFrom.geometry.coordinates.join(',');
     const toCoordinates = action.directionsTo.geometry.coordinates.join(',');
 
-    const url = baseUrl + profile + '/' + fromCoordinates + ';' + toCoordinates + '?access_token=' + action.accessToken;
+    const url = baseUrl + profile + '/' + fromCoordinates + ';' + toCoordinates +
+      '?access_token=' + action.accessToken +
+      '&overview=full';
 
     // Fetch
     fetch(url, {method: 'get'})
