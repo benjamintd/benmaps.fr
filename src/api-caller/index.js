@@ -69,7 +69,6 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       ids: action.id,
       languages: ['en'],
     });
-    console.log(url);
 
     fetch(url, {method: 'get'})
     .then(res => {
@@ -83,6 +82,18 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     .then(data => {
       // Success
       console.log(data);
+      const entity = data.entities[action.id];
+      const simplifiedClaims = wdk.simplifyClaims(entity.claims);
+      const description = entity.descriptions.en.value;
+      const label = entity.labels.en.value;
+      next({
+        type: 'SET_PLACE_INFO',
+        info: {
+          claims: simplifiedClaims,
+          description,
+          label
+        }
+      });
     })
     .catch(() => {});
     break;

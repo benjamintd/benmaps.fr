@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 class RoutePanel extends Component {
   render() {
     return (
-      <div className='route-panel absolute top bg-white w420 h72 py18 shadow-darken25 flex-parent flex-parent--column flex-parent--center-main'>
+      <div className='sub-menu absolute top bg-white w420 h72 py18 shadow-darken25 flex-parent flex-parent--column flex-parent--center-main'>
         {this.routeInfo()}
       </div>
     );

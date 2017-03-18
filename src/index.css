@@ -14,7 +14,7 @@ body {
   left: -21px;
 }
 
-.my-by-blue {
+.my-bg-blue {
   background-color: #3a94ff;
 }
 
@@ -30,11 +30,7 @@ body {
   color: #ffffff;
 }
 
-.user-location-menu {
-  margin-top: 186px;
-}
-
-.route-panel {
+.sub-menu {
   margin-top: 186px!important;
 }
 
@@ -42,6 +38,9 @@ body {
   margin-top: 48px!important;
 }
 
+.place-image {
+  object-fit: cover;
+}
 
 .swap-button {
   margin-top: 96px;

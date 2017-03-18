@@ -106,6 +106,13 @@ const reducer = (state = defaultState, action) => {
     }
   }
 
+  case 'SET_PLACE_INFO': {
+    console.log(action.info);
+    return Object.assign({}, state, {
+      placeInfo: action.info
+    });
+  }
+
   // Some generic case. When possible, prefer some more expressive
   // action name above.
   case 'SET_STATE_VALUE': {
