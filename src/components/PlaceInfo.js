@@ -89,7 +89,7 @@ class PlaceInfo extends Component {
 
   get styles() {
     return {
-      placeInfo: 'place-info absolute top bg-white w-full w420-ml shadow-darken25 flex-parent flex-parent--column',
+      placeInfo: 'place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
       infoRow: 'h36 py6 pr12 flex-parent flex-parent--row flex-parent--center-cross',
       icon: 'flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
       mainInfo: 'p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main',

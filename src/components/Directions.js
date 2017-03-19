@@ -53,7 +53,7 @@ class Directions extends Component {
                     onSelect={this.setDirectionsLocation('from')}
                     searchString={this.props.directionsFromString}
                     writeSearch={(value) => this.props.writeSearchFrom(value)}
-                    resultsClass={'mt72 ' + this.styles.results}
+                    resultsClass={'mt48 ' + this.styles.results}
                     inputClass={this.styles.input}
                   />
                 }
@@ -75,7 +75,7 @@ class Directions extends Component {
                     onSelect={this.setDirectionsLocation('to')}
                     searchString={this.props.directionsToString}
                     writeSearch={(value) => this.props.writeSearchTo(value)}
-                    resultsClass={'mt30 ' + this.styles.results}
+                    resultsClass={'mt6 ' + this.styles.results}
                     inputClass={this.styles.input}
                   />
                 }
@@ -166,12 +166,12 @@ class Directions extends Component {
 
   get styles() {
     return {
-      directions: 'relative my-bg-blue w-full w420-ml shadow-darken25 flex-parent flex-parent--column',
+      directions: 'relative my-bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white px48 h42 w-full',
       results: 'absolute w-full bg-white shadow-darken5 border-darken10',
       placeName: 'txt-truncate color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
-      row: 'flex-child hmin42 w-full w420-ml flex-parent flex-parent--row',
-      userLocation: 'relative bg-white h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-ml'
+      row: 'flex-child hmin42 w-full w420-mm flex-parent flex-parent--row',
+      userLocation: 'relative bg-white h42 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-mm'
     }
   }
 }
