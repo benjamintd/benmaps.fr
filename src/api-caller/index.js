@@ -42,6 +42,8 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         }
       })
       .then(data => {
+        if (data.code !== 'Ok') return Promise.reject();
+
         // Success
         next({
           type: 'SET_ROUTE',

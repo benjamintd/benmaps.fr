@@ -28,7 +28,7 @@ class RoutePanel extends Component {
     } else if (this.props.routeStatus === 'pending') {
       return <div className='loading loading--s'/>
     } else if (this.props.routeStatus === 'error') {
-      return <div className='txt-s txt-m-ml animation-shake animation--speed-1 px12'>Sorry, no route found for these locations.</div>
+      return <div className='txt-s txt-m-ml animation-subtle-shake px18'>Sorry, no route found for these locations.</div>
     } else return null;
   }
 
