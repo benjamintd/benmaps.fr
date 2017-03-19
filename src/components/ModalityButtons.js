@@ -16,7 +16,6 @@ class ModalityButtons extends Component {
         )
       }
       </div>
-
     );
   }
 }

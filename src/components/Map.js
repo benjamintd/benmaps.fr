@@ -5,7 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../actions/index'
+import {setZoom, setCenter, setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
   render() {
@@ -37,6 +37,8 @@ class MapComponent extends Component {
 
     map.on('load', () => {
 
+      // Add sources
+
       map.addSource('route', {
         type: 'geojson',
         data: this.emptyData
@@ -58,7 +60,8 @@ class MapComponent extends Component {
       });
 
 
-      // Route style
+      // Add and style layers
+
       map.addLayer({
         'id': 'route',
         'source': 'route',
@@ -86,7 +89,6 @@ class MapComponent extends Component {
         },
       }, 'route');
 
-      // Marker style
       map.addLayer({
         'id': 'marker',
         'source': 'marker',
@@ -148,10 +150,45 @@ class MapComponent extends Component {
       }, 10000);
 
     });
+
+    map.on('click', (e) => {
+      var features = map.queryRenderedFeatures(e.point, {layers: this.selectableLayers}); // TODO add POI layers
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+
+      let key;
+      if (this.props.mode === 'search') key = 'searchLocation';
+      else if (!this.props.directionsFrom) key = 'directionsFrom';
+      else {
+        this.props.setStateValue('route', null);
+        this.props.setStateValue('searchLocation', null);
+        key = 'directionsTo';
+      }
+
+      if (key) {
+        this.props.setStateValue(key, {
+          type: 'Feature',
+          place_name: feature.properties.name,
+          properties: {},
+          geometry: feature.geometry
+        });
+        this.props.triggerMapUpdate();
+      }
+    });
+
+    map.on('mousemove', (e) => {
+      var features = map.queryRenderedFeatures(e.point, { layers: this.selectableLayers });
+      map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+    });
   }
 
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
+
+    // This is where we update the layers and map bbox
 
     // Search mode
     if (this.props.mode === 'search') {
@@ -258,6 +295,21 @@ class MapComponent extends Component {
     };
   }
 
+  get selectableLayers() {
+    return [
+      'rail-label',
+      'poi-scalerank1',
+      'poi-parks-scalerank1',
+      'poi-scalerank2',
+      'poi-parks-scalerank2',
+      'poi-scalerank3',
+      'poi-parks-scalerank3',
+      'poi-scalerank4-l1',
+      'poi-scalerank4-l15',
+      'poi-parks_scalerank4',
+    ]
+  }
+
 }
 
 MapComponent.propTypes = {
@@ -280,7 +332,8 @@ MapComponent.propTypes = {
   needMapRepan: React.PropTypes.bool,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
-  getRoute: React.PropTypes.func
+  getRoute: React.PropTypes.func,
+  triggerMapUpdate: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -308,7 +361,8 @@ const mapDispatchToProps = (dispatch) => {
     setZoom: (zoom) => dispatch(setZoom(zoom)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
-    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken))
+    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan))
   };
 };
 
