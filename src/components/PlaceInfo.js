@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ImageWithFallback from './ImageWithFallback';
+import directionsIcon from '../assets/directions.svg';
 import md5 from 'blueimp-md5';
 
 class PlaceInfo extends Component {
@@ -18,7 +19,7 @@ class PlaceInfo extends Component {
             <div className='color-lighten75 pl42 pr12 txt-s'>{this.props.info.description}</div>
           </div>
           <div onClick={this.props.clickDirections} className={this.styles.directionsIcon}>
-            <img src='/directions.svg' alt='directions'/>
+            <img src={directionsIcon} alt='directions'/>
           </div>
         </div>
         {this.getAddress()}

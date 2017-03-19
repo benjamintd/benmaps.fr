@@ -5,6 +5,8 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
+import geolocationIcon from '../assets/geolocation.svg';
+import fromLocationIcon from '../assets/fromLocation.svg'
 import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
@@ -38,7 +40,7 @@ class MapComponent extends Component {
     // Create marker for geolocation
     const geolocationElement = document.createElement('div');
     geolocationElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    geolocationElement.innerHTML = '<img src="./geolocation.svg"/>';
+    geolocationElement.innerHTML = '<img src="' + geolocationIcon + '"/>';
     const geolocation = new mapboxgl.Marker(geolocationElement);
 
 
@@ -51,7 +53,7 @@ class MapComponent extends Component {
     // Create marker for From location
     const fromElement = document.createElement('div');
     fromElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    fromElement.innerHTML = '<img src="./fromLocation.svg"/>';
+    fromElement.innerHTML = '<img src="' + fromLocationIcon + '"/>';
     const fromMarker = new mapboxgl.Marker(fromElement);
 
 

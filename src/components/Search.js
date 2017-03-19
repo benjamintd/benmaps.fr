@@ -4,6 +4,7 @@ import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import PlaceInfo from './PlaceInfo';
+import directionsIcon from '../assets/directions.svg';
 import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
 
 class Search extends Component {
@@ -45,7 +46,7 @@ class Search extends Component {
               className={'mr30 cursor-pointer right ' + this.styles.icon}
               onClick={() => this.clickDirections()}
             >
-              <img src='/directions.svg' alt='directions'/>
+              <img src={directionsIcon} alt='directions'/>
             </div>
           </div>
         }

@@ -6,6 +6,7 @@ import CloseButton from './CloseButton';
 import RoutePanel from './RoutePanel';
 import ModalityButtons from './ModalityButtons';
 import MyLocation from './MyLocation';
+import swapDirectionsIcon from '../assets/swapDirections.svg';
 import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
 
 class Directions extends Component {
@@ -36,7 +37,7 @@ class Directions extends Component {
               className='flex-child absolute left pl12 w42 h-full flex-parent flex-parent--center-cross flex-parent--center-main'
               onClick={() => this.swapDirections()}
             >
-              <img src='swapDirections.svg' alt='swap directions'/>
+              <img src={swapDirectionsIcon} alt='swap directions'/>
             </div>
 
             <div className='flex-child w-full h-full'>
