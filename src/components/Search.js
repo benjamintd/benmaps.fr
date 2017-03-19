@@ -38,7 +38,7 @@ class Search extends Component {
           />
           :
           <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
-            <div className='w-full w420-ml pr48 txt-truncate'>
+            <div className='w-full w420-ml pr42 txt-truncate'>
               <PlaceName location={this.props.searchLocation}/>
             </div>
             <div
@@ -73,8 +73,8 @@ class Search extends Component {
   get styles() {
     return {
       main: 'absolute h42 w-full w420-ml bg-white shadow-darken25 flex-parent flex-parent--row flex-parent--space-between-main',
-      icon: 'flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
-      input: 'input h42 border--transparent',
+      icon: 'absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
+      input: 'input px42 h42 border--transparent',
       results: 'results bg-white shadow-darken25 mt6 border-darken10'
     }
   }
