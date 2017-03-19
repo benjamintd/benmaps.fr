@@ -44,7 +44,7 @@ class RoutePanel extends Component {
     hours -= 24 * days;
 
     var daysString = (days > 0) ? `${days} day${days > 1 ? 's,' : ','} ` : '';
-    var hoursString = (hours > 0) ? `${hours} hour${hours > 1 ? 's' : ''} ` : '';
+    var hoursString = (hours > 0) ? `${hours} hour${hours > 1 ? 's and' : 'and'} ` : '';
     var minutesString = `${minutes} minute${minutes > 1 ? 's' : ''} `;
     return daysString + hoursString + minutesString;
   }
