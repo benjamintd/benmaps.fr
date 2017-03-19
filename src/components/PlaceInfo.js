@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
+import ImageWithFallback from './ImageWithFallback';
 import md5 from 'blueimp-md5';
 
 class PlaceInfo extends Component {
   render() {
     return (
       <div className={this.styles.placeInfo}>
-        <img
+        <ImageWithFallback
           className='place-image w-full h120'
-          src={this.getImageUrl().thumb}
+          primary={this.getImageUrl().thumb}
+          secondary={this.getImageUrl().full}
           alt={this.props.info.description}
         />
         <div className='my-bg-blue flex-parent flex-parent--row'>
@@ -34,10 +36,10 @@ class PlaceInfo extends Component {
       const baseUrl = 'https://upload.wikimedia.org/wikipedia/commons/';
       const hash = md5(imageName);
       const thumb = baseUrl + 'thumb/' + hash[0] + '/' + hash.slice(0, 2) + '/' + imageName + '/640px-' + imageName;
-      const image = baseUrl + hash[0] + '/' + hash.slice(0, 2) + '/' + imageName; // TODO fallback to this if thumb does not exist
+      const full = baseUrl + hash[0] + '/' + hash.slice(0, 2) + '/' + imageName;
       return {
         thumb,
-        image
+        full
       }
     }
   }

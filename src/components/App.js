@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import MapComponent from './Map';
 import Search from './Search';
-import RoutePanel from './RoutePanel';
 import Directions from './Directions';
 
 class App extends Component {

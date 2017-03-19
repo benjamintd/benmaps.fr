@@ -51,9 +51,9 @@ export const getRoute = (directionsFrom, directionsTo, modality, accessToken) =>
   accessToken
 });
 
-export const getPlaceInfo = (wikidata) => ({
+export const getPlaceInfo = (wikidataId) => ({
   type: 'GET_PLACE_INFO',
-  id: wikidata
+  id: wikidataId
 });
 
 // Some generic action. When existant, prefer one of the above.
