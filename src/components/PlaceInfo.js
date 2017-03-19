@@ -88,11 +88,11 @@ class PlaceInfo extends Component {
 
   get styles() {
     return {
-      placeInfo: 'place-info absolute top bg-white w420 shadow-darken25 flex-parent flex-parent--column',
+      placeInfo: 'place-info absolute top bg-white w-full w420-ml shadow-darken25 flex-parent flex-parent--column',
       infoRow: 'h36 py6 pr12 flex-parent flex-parent--row flex-parent--center-cross',
       icon: 'flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
-      mainInfo: 'w300 p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main',
-      directionsIcon: 'bg-white h48 w48 m12 round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross'
+      mainInfo: 'p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main',
+      directionsIcon: 'bg-white hmin48 wmin48 m12 round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross'
     }
   }
 }

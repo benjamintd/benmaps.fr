@@ -10,7 +10,7 @@ import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../a
 class MapComponent extends Component {
   render() {
     return (
-      <div id='map' className='relative viewport-full'>
+      <div id='map' className='viewport-full'>
       </div>
     );
   }
@@ -136,31 +136,34 @@ class MapComponent extends Component {
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    if (this.props.searchLocation && !this.marker._map && this.props.mode === 'search') { // We have a new search location (=> and no directions)
+    // We have a new search location
+    if (this.props.searchLocation && !this.marker._map && this.props.mode === 'search') {
       this.moveTo(this.props.searchLocation);
       this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
     }
 
-    if (this.props.directionsTo && !this.marker._map) { // We have a new destination
+    // We have a new destination
+    if (this.props.directionsTo && !this.marker._map) {
       this.moveTo(this.props.directionsTo);
       this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
     }
 
-    if (this.props.directionsFrom && !this.fromMarker._map) { // We have a new origin
+    // We have a new origin
+    if (this.props.directionsFrom && !this.fromMarker._map) {
       this.moveTo(this.props.directionsFrom);
       this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
     }
 
+    // We have origin and destination but no route yet.
     if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
-      // We have origin and destination but no route yet.
       const bbox = turfBbox({
         type: 'FeatureCollection',
         features: [this.props.directionsFrom, this.props.directionsTo]
       });
-
       this.moveTo({bbox: bbox});
 
-      if (this.props.routeStatus !== 'error') { // Do not retry when the previous request errored
+      // Do not retry when the previous request errored
+      if (this.props.routeStatus !== 'error') {
         // Trigger the API call to directions
         this.props.getRoute(
           this.props.directionsFrom,
@@ -170,11 +173,10 @@ class MapComponent extends Component {
         );
       }
     }
-    if (this.props.route) {
-      this.map.getSource('route').setData(this.props.route.geometry)
-    }
 
+    // We have a new route
     if (this.props.route) {
+      this.map.getSource('route').setData(this.props.route.geometry);
       const bbox = turfBbox(this.props.route.geometry);
       this.moveTo({bbox: bbox});
     } else {
@@ -206,10 +208,9 @@ class MapComponent extends Component {
         this.map.fitBounds(location.bbox, {linear: true});
       }
     } else { // We just have a point
-      zoom = zoom || 16
       this.map.easeTo({
         center: location.geometry.coordinates,
-        zoom: zoom
+        zoom: zoom || 16
       });
     }
   }

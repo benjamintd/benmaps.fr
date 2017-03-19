@@ -7,9 +7,9 @@ import Directions from './Directions';
 class App extends Component {
   render() {
     return (
-      <div>
+      <div className='root'>
         <MapComponent/>
-        <div className='flex-parent flex-parent--column'>
+        <div className='relative m12 m24-ml flex-parent flex-parent--column'>
           {
             this.props.mode === 'directions'
             ?

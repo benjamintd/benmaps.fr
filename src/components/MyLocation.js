@@ -5,7 +5,7 @@ class MyLocation extends Component {
   render() {
     return (
       <div
-        className='fixed bg-white shadow-darken5 border-darken10 bg-gray-faint-on-hover sub-menu h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'
+        className='relative bg-white shadow-darken25 mt6 border-darken10 bg-gray-faint-on-hover hmin36 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-ml'
         onClick={this.props.onClick}
       >
         <div className='absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42'>

@@ -4,9 +4,23 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+.root {
+  touch-action: none;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
 .marker {
   top: -36px;
   left: -18px;
+}
+
+.results {
 }
 
 .geolocation {
@@ -22,20 +36,12 @@ body {
   color: #3a94ff;
 }
 
-.directions-location-to {
-  margin-top: 120px;
-}
-
 .directions-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: rgba(255, 255, 255, 0.6);
 }
 
 .directions-input::-moz-placeholder { /* Firefox 19+ */
   color: #ffffff;
-}
-
-.sub-menu {
-  margin-top: 186px!important;
 }
 
 .place-info {
