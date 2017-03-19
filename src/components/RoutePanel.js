@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 class RoutePanel extends Component {
   render() {
     return (
-      <div className='relative mt6 bg-white w-full w420-ml h72 py18 shadow-darken25 flex-parent flex-parent--column flex-parent--center-main'>
+      <div className='relative mt6 bg-white w-full w420-ml h42 h72-ml py18 shadow-darken25 flex-parent flex-parent--column flex-parent--center-main'>
         {this.routeInfo()}
       </div>
     );
@@ -17,7 +17,7 @@ class RoutePanel extends Component {
           <div className='w48 h48 flex-parent flex-parent--center-main flex-parent--center-cross'>
             <svg className='icon color-gray'><use xlinkHref={'#icon-' + this.props.modality}></use></svg>
           </div>
-          <div className='bottom txt-h4 pr12'>
+          <div className='bottom txt-h4-ml pr12'>
             {this.secondsToReadableTime(this.props.route.duration)}
           </div>
           <div className='bottom color-gray'>
@@ -26,9 +26,9 @@ class RoutePanel extends Component {
         </div>
       )
     } else if (this.props.routeStatus === 'pending') {
-      return <div className='loading'/>
+      return <div className='loading loading--s'/>
     } else if (this.props.routeStatus === 'error') {
-      return <div className='animation-shake animation--speed-1 px48'>Sorry, no route found for these locations.</div>
+      return <div className='txt-s txt-m-ml animation-shake animation--speed-1 px48'>Sorry, no route found for these locations.</div>
     } else return null;
   }
 

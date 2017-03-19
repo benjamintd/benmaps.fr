@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class ModalityButtons extends Component {
   render() {
     return (
-      <div className='flex-child color-white px42 hmin72 w-full flex-parent flex-parent--row flex-parent--center-main flex-parent--center-cross'>
+      <div className='flex-child color-white px42 hmin48 w-full flex-parent flex-parent--row flex-parent--center-main flex-parent--center-cross'>
       {
         ['car', 'bike', 'walk'].map((modality) =>
           <div

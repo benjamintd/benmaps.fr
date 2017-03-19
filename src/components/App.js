@@ -9,7 +9,7 @@ class App extends Component {
     return (
       <div className='root'>
         <MapComponent/>
-        <div className='relative m24 flex-parent flex-parent--column'>
+        <div className='relative m12 m24-ml flex-parent flex-parent--column'>
           {
             this.props.mode === 'directions'
             ?

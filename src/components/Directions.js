@@ -11,70 +11,81 @@ import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModa
 class Directions extends Component {
   render() {
     return (
-      <div>
-      <div className={this.styles.directions}>
-        <CloseButton
-          large={true}
-          color='color-lighten50'
-          onClick={() => this.exitDirections()}
-        />
-        <ModalityButtons
-          modality={this.props.modality}
-          onSetModality={(modality) => {
-            this.props.setModality(modality);
-            this.props.setRoute(null);
-            this.props.setStateValue('routeStatus', 'idle');
-            this.props.triggerMapUpdate();
-          }}
-        />
-        <div
-          className='swap-button absolute left pl12 w42 h36 flex-parent flex-parent--center-cross flex-parent--center-main'
-          onClick={() => this.swapDirections()}
-        >
-          <img src='swapDirections.svg' alt='swap directions'/>
-        </div>
-        <div className={this.styles.row}>
-          {
-            this.props.directionsFrom
-            ?
-            <div className={this.styles.placeName}>
-              <PlaceName location={this.props.directionsFrom} colors='light'/>
-            </div>
-            :
-            <Geocoder
-              onSelect={this.setDirectionsLocation('from')}
-              searchString={this.props.directionsFromString}
-              writeSearch={(value) => this.props.writeSearchFrom(value)}
-              resultsClass={'mt72 ' + this.styles.results}
-              inputClass={this.styles.input}
-            />
-          }
+      <div id='directions'>
+
+        <div className={this.styles.directions}>
+
           <CloseButton
-            onClick={() => this.resetSearch('from')}
+            large={true}
             color='color-lighten50'
+            onClick={() => this.exitDirections()}
           />
-        </div>
-        <div className={this.styles.row}>
-          {
-            this.props.directionsTo
-            ?
-            <div className={this.styles.placeName}>
-              <PlaceName location={this.props.directionsTo} colors='light'/>
+          <ModalityButtons
+            modality={this.props.modality}
+            onSetModality={(modality) => {
+              this.props.setModality(modality);
+              this.props.setRoute(null);
+              this.props.setStateValue('routeStatus', 'idle');
+              this.props.triggerMapUpdate();
+            }}
+          />
+
+          <div id='directionsFromTo' className='flex-parent flex-parent--row flex-parent--center-cross'>
+
+            <div
+              className='flex-child absolute left pl12 w42 h-full flex-parent flex-parent--center-cross flex-parent--center-main'
+              onClick={() => this.swapDirections()}
+            >
+              <img src='swapDirections.svg' alt='swap directions'/>
             </div>
-            :
-            <Geocoder
-              onSelect={this.setDirectionsLocation('to')}
-              searchString={this.props.directionsToString}
-              writeSearch={(value) => this.props.writeSearchTo(value)}
-              resultsClass={'mt30 ' + this.styles.results}
-              inputClass={this.styles.input}
-            />
-          }
-          <CloseButton
-            onClick={() => this.resetSearch('to')}
-            color='color-lighten50'
-          />
-        </div>
+
+            <div className='flex-child w-full h-full'>
+              <div className={this.styles.row}>
+                {
+                  this.props.directionsFrom
+                  ?
+                  <div className={this.styles.placeName}>
+                    <PlaceName location={this.props.directionsFrom} colors='light'/>
+                  </div>
+                  :
+                  <Geocoder
+                    onSelect={this.setDirectionsLocation('from')}
+                    searchString={this.props.directionsFromString}
+                    writeSearch={(value) => this.props.writeSearchFrom(value)}
+                    resultsClass={'mt72 ' + this.styles.results}
+                    inputClass={this.styles.input}
+                  />
+                }
+                <CloseButton
+                  onClick={() => this.resetSearch('from')}
+                  color='color-lighten50'
+                />
+              </div>
+
+              <div className={this.styles.row}>
+                {
+                  this.props.directionsTo
+                  ?
+                  <div className={this.styles.placeName}>
+                    <PlaceName location={this.props.directionsTo} colors='light'/>
+                  </div>
+                  :
+                  <Geocoder
+                    onSelect={this.setDirectionsLocation('to')}
+                    searchString={this.props.directionsToString}
+                    writeSearch={(value) => this.props.writeSearchTo(value)}
+                    resultsClass={'mt30 ' + this.styles.results}
+                    inputClass={this.styles.input}
+                  />
+                }
+                <CloseButton
+                  onClick={() => this.resetSearch('to')}
+                  color='color-lighten50'
+                />
+              </div>
+
+            </div>
+          </div>
         </div>
 
         {
@@ -154,7 +165,7 @@ class Directions extends Component {
 
   get styles() {
     return {
-      directions: 'relative my-bg-blue w-full w420-ml h180 shadow-darken25 flex-parent flex-parent--column',
+      directions: 'relative my-bg-blue w-full w420-ml shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white px48 h42 w-full',
       results: 'absolute w-full bg-white shadow-darken5 border-darken10',
       placeName: 'txt-truncate color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
