@@ -93,7 +93,7 @@ const reducer = (state = defaultState, action) => {
     });
 
   case 'SET_ROUTE': {
-    if (action.data.routes.length > 0) {
+    if (action.data.routes.length > 0 && state.directionsFrom && state.directionsTo) {
       const route = action.data.routes[0];
 
       const geojsonLine = polyline.toGeoJSON(route.geometry);
@@ -110,7 +110,6 @@ const reducer = (state = defaultState, action) => {
   }
 
   case 'SET_PLACE_INFO': {
-    console.log(action.info);
     return Object.assign({}, state, {
       placeInfo: action.info
     });

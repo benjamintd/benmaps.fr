@@ -149,7 +149,11 @@ class Directions extends Component {
 
   showUserLocation() {
     return (
-      !(this.props.directionsFrom && this.props.directionsTo)
+      (
+        (!this.props.directionsFrom && !this.props.directionsTo)
+        || (!this.props.directionsTo && this.props.directionsFrom && this.props.directionsFrom.place_name !== 'My Location')
+        || (!this.props.directionsFrom && this.props.directionsTo && this.props.directionsTo.place_name !== 'My Location')
+      )
       && (!this.props.directionsFromString)
       && (!this.props.directionsToString)
       && this.props.userLocation
