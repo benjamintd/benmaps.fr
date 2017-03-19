@@ -36,10 +36,6 @@ body {
   color: #3a94ff;
 }
 
-.directions-location-to {
-  margin-top: 120px;
-}
-
 .directions-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: rgba(255, 255, 255, 0.6);
 }
