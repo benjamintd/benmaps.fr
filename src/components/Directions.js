@@ -11,6 +11,7 @@ import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModa
 class Directions extends Component {
   render() {
     return (
+      <div>
       <div className={this.styles.directions}>
         <CloseButton
           large={true}
@@ -32,7 +33,7 @@ class Directions extends Component {
         >
           <img src='swapDirections.svg' alt='swap directions'/>
         </div>
-        <div className={'mt72 ' + this.styles.row}>
+        <div className={this.styles.row}>
           {
             this.props.directionsFrom
             ?
@@ -65,7 +66,7 @@ class Directions extends Component {
               onSelect={this.setDirectionsLocation('to')}
               searchString={this.props.directionsToString}
               writeSearch={(value) => this.props.writeSearchTo(value)}
-              resultsClass={'mt24 ' + this.styles.results}
+              resultsClass={'mt30 ' + this.styles.results}
               inputClass={this.styles.input}
             />
           }
@@ -73,6 +74,7 @@ class Directions extends Component {
             onClick={() => this.resetSearch('to')}
             color='color-lighten50'
           />
+        </div>
         </div>
 
         {
@@ -93,7 +95,6 @@ class Directions extends Component {
           :
           null
         }
-
       </div>
     );
   }
@@ -154,11 +155,11 @@ class Directions extends Component {
   get styles() {
     return {
       directions: 'relative my-bg-blue w-full w420-ml h180 shadow-darken25 flex-parent flex-parent--column',
-      input: 'input directions-input border--transparent color-white pl48 h42 w-full',
-      results: 'bg-white shadow-darken5 border-darken10',
-      placeName: 'txt-truncate color-white pl48 h42 flex-parent flex-parent--row flex-parent--center-cross',
-      row: 'relative pr48 w-full w420-ml flex-parent flex-parent--row',
-      userLocation: 'relative sub-menu h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-ml'
+      input: 'input directions-input border--transparent color-white px48 h42 w-full',
+      results: 'absolute w-full bg-white shadow-darken5 border-darken10',
+      placeName: 'txt-truncate color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
+      row: 'flex-child hmin42 w-full w420-ml flex-parent flex-parent--row',
+      userLocation: 'relative bg-white h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-ml'
     }
   }
 }

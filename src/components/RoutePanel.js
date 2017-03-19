@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 class RoutePanel extends Component {
   render() {
     return (
-      <div className='sub-menu absolute top bg-white w-full w420-ml h72 py18 shadow-darken25 flex-parent flex-parent--column flex-parent--center-main'>
+      <div className='relative mt6 bg-white w-full w420-ml h72 py18 shadow-darken25 flex-parent flex-parent--column flex-parent--center-main'>
         {this.routeInfo()}
       </div>
     );
@@ -43,7 +43,7 @@ class RoutePanel extends Component {
     var days = Math.floor(hours / 24);
     hours -= 24 * days;
 
-    var daysString = (days > 0) ? `${days} day${days > 1 ? 's' : ''} ` : '';
+    var daysString = (days > 0) ? `${days} day${days > 1 ? 's,' : ','} ` : '';
     var hoursString = (hours > 0) ? `${hours} hour${hours > 1 ? 's' : ''} ` : '';
     var minutesString = `${minutes} minute${minutes > 1 ? 's' : ''} `;
     return daysString + hoursString + minutesString;
