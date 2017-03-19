@@ -4,12 +4,13 @@ import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import PlaceInfo from './PlaceInfo';
-import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo} from '../actions/index';
+import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
 
 class Search extends Component {
   closeSearch() {
     this.props.writeSearch('');
     this.props.setSearchLocation(null);
+    this.props.setPlaceInfo(null);
     this.props.triggerMapUpdate();
   }
 
@@ -56,7 +57,7 @@ class Search extends Component {
         {
           this.props.placeInfo
           ?
-          <PlaceInfo info={this.props.placeInfo}/>
+          <PlaceInfo info={this.props.placeInfo} clickDirections={() => this.clickDirections()}/>
           :
           null
         }
@@ -87,6 +88,7 @@ Search.propTypes = {
   setSearchLocation: React.PropTypes.func,
   triggerMapUpdate: React.PropTypes.func,
   setMode: React.PropTypes.func,
+  setPlaceInfo: React.PropTypes.func,
   setDirectionsLocation: React.PropTypes.func
 }
 
@@ -105,7 +107,8 @@ const mapDispatchToProps = (dispatch) => {
     triggerMapUpdate: () => dispatch(triggerMapUpdate()),
     setMode: (mode) => dispatch(setMode(mode)),
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
-    getPlaceInfo: (id) => dispatch(getPlaceInfo(id))
+    getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),
+    setPlaceInfo: (info) => dispatch(setStateValue('placeInfo', info))
   };
 };
 
