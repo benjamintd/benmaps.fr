@@ -5,8 +5,6 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import geolocationIcon from '../assets/geolocation.svg';
-import fromLocationIcon from '../assets/fromLocation.svg'
 import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
@@ -37,102 +35,119 @@ class MapComponent extends Component {
       this.props.setZoom(map.getZoom());
     });
 
-    // Create marker for geolocation
-    const geolocationElement = document.createElement('div');
-    geolocationElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    geolocationElement.innerHTML = '<img src="' + geolocationIcon + '"/>';
-    const geolocation = new mapboxgl.Marker(geolocationElement);
-
-
-    // Create marker for search results
-    const markerElement = document.createElement('div');
-    markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use xlink:href="#icon-marker"></use></svg>';
-    const marker = new mapboxgl.Marker(markerElement);
-
-    // Create marker for From location
-    const fromElement = document.createElement('div');
-    fromElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    fromElement.innerHTML = '<img src="' + fromLocationIcon + '"/>';
-    const fromMarker = new mapboxgl.Marker(fromElement);
-
-
-    // helper to set geolocation
-    const setGeolocation = (data) => {
-      const coords = [data.coords.longitude, data.coords.latitude];
-      geolocation.setLngLat(coords).addTo(map);
-      this.props.setUserLocation(coords);
-      this.moveTo({type: 'Feature', geometry: {type: 'Point', coordinates: coords}, properties: {}}, 13);
-    }
-
-    // Create geolocation control
-    const geolocateControl = new mapboxgl.GeolocateControl();
-    geolocateControl.on('geolocate', setGeolocation);
-    map.addControl(geolocateControl, 'bottom-right');
-
-    // Initial ask for location and display on the map
-    if (this.props.userLocation) {
-      const coords = this.props.userLocation.geometry.coordinates;
-      geolocation.setLngLat(coords).addTo(map);
-      this.moveTo(this.props.userLocation, 13);
-    } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(setGeolocation);
-    }
-
-    // Regularly poll the user location and update the map
-    setInterval(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((data) => {
-          const coords = [data.coords.longitude, data.coords.latitude];
-          geolocation.setLngLat(coords).addTo(map);
-          this.props.setUserLocation(coords);
-        });
-      }
-    }, 10000);
-
-    // Create geojson source for the route
     map.on('load', () => {
+
       map.addSource('route', {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: []
+        data: this.emptyData
+      });
+
+      map.addSource('marker', {
+        type: 'geojson',
+        data: this.emptyData
+      });
+
+      map.addSource('geolocation', {
+        type: 'geojson',
+        data: this.emptyData
+      });
+
+      map.addSource('fromMarker', {
+        type: 'geojson',
+        data: this.emptyData
+      });
+
+
+      // Route style
+      map.addLayer({
+        'id': 'route',
+        'source': 'route',
+        'type': 'line',
+        'paint': {
+          'line-color': '#2abaf7',
+          'line-width': 5.5
+        },
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+      }, 'bridge-oneway-arrows-white');
+      map.addLayer({
+        'id': 'route-casing',
+        'source': 'route',
+        'type': 'line',
+        'paint': {
+          'line-color': '#2779b5',
+          'line-width': 6.5
+        },
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+      }, 'route');
+
+      // Marker style
+      map.addLayer({
+        'id': 'marker',
+        'source': 'marker',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'pin',
+          'icon-offset': [0, -20]
+        },
+      });
+
+      map.addLayer({
+        'id': 'fromMarker',
+        'source': 'fromMarker',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'fromLocation'
+        },
+      }, 'marker');
+
+      map.addLayer({
+        'id': 'geolocation',
+        'source': 'geolocation',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'geolocation'
+        },
+      }, 'fromMarker');
+
+      // helper to set geolocation
+      const setGeolocation = (data) => {
+        const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
+        this.map.getSource('geolocation').setData(geometry);
+        this.props.setUserLocation(geometry.coordinates);
+        this.moveTo(geometry, 13);
+      }
+
+      // Create geolocation control
+      const geolocateControl = new mapboxgl.GeolocateControl();
+      geolocateControl.on('geolocate', setGeolocation);
+      map.addControl(geolocateControl, 'bottom-right');
+
+      // Initial ask for location and display on the map
+      if (this.props.userLocation) {
+        this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
+        this.moveTo(this.props.userLocation, 13);
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(setGeolocation);
+      }
+
+      // Regularly poll the user location and update the map
+      window.setInterval(() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((data) => {
+            const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
+            this.map.getSource('geolocation').setData(geometry);
+            this.props.setUserLocation(geometry.coordinates);
+          });
         }
-        });
-
-        map.addLayer({
-          'id': 'route',
-          'source': 'route',
-          'type': 'line',
-          'paint': {
-            'line-color': '#2abaf7',
-            'line-width': 5.5
-          },
-          'layout': {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-        }, 'bridge-oneway-arrows-white');
-
-        map.addLayer({
-          'id': 'route-casing',
-          'source': 'route',
-          'type': 'line',
-          'paint': {
-            'line-color': '#2779b5',
-            'line-width': 6.5
-          },
-          'layout': {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-        }, 'route');
+      }, 10000);
 
     });
-
-    // store variables at the MapComponent level
-    this.marker = marker;
-    this.fromMarker = fromMarker
   }
 
   componentDidUpdate() {
@@ -141,39 +156,34 @@ class MapComponent extends Component {
     // Search mode
     if (this.props.mode === 'search') {
       if (this.props.searchLocation) {
-        this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
+        this.map.getSource('marker').setData(this.props.searchLocation.geometry);
       } else {
-        this.marker.remove();
+        this.map.getSource('marker').setData(this.emptyData);
       }
 
-      this.fromMarker.remove();
-      this.map.getSource('route').setData({
-        type: 'FeatureCollection',
-        features: []
-      });
+      // remove items specific to directions mode
+      this.map.getSource('fromMarker').setData(this.emptyData);
+      this.map.getSource('route').setData(this.emptyData);
     }
 
     // Directions mode
     if (this.props.mode === 'directions') {
       if (this.props.directionsFrom) {
-        this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
+        this.map.getSource('fromMarker').setData(this.props.directionsFrom.geometry);
       } else {
-        this.fromMarker.remove();
+        this.map.getSource('fromMarker').setData(this.emptyData);
       }
 
       if (this.props.directionsTo) {
-        this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
+        this.map.getSource('marker').setData(this.props.directionsTo.geometry);
       } else {
-        this.marker.remove();
+        this.map.getSource('marker').setData(this.emptyData);
       }
 
       if (this.props.route) {
         this.map.getSource('route').setData(this.props.route.geometry);
       } else {
-        this.map.getSource('route').setData({
-          type: 'FeatureCollection',
-          features: []
-        });
+        this.map.getSource('route').setData(this.emptyData);
       }
 
       // We have origin and destination but no route yet
@@ -240,6 +250,14 @@ class MapComponent extends Component {
       });
     }
   }
+
+  get emptyData() {
+    return {
+      type: 'FeatureCollection',
+      features: []
+    };
+  }
+
 }
 
 MapComponent.propTypes = {
