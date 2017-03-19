@@ -145,6 +145,12 @@ class MapComponent extends Component {
       } else {
         this.marker.remove();
       }
+
+      this.fromMarker.remove();
+      this.map.getSource('route').setData({
+        type: 'FeatureCollection',
+        features: []
+      });
     }
 
     // Directions mode

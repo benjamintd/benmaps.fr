@@ -68,6 +68,7 @@ class Search extends Component {
 
   onSelect(data) {
     this.props.setSearchLocation(data);
+    this.props.triggerMapUpdate('repan');
     if (data.properties.wikidata) this.props.getPlaceInfo(data.properties.wikidata);
   }
 
