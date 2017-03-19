@@ -138,68 +138,86 @@ class MapComponent extends Component {
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    // We have a new search location
-    if (this.props.searchLocation && !this.marker._map && this.props.mode === 'search') {
-      this.moveTo(this.props.searchLocation);
-      this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
-    }
-
-    // We have a new destination
-    if (this.props.directionsTo && !this.marker._map) {
-      this.moveTo(this.props.directionsTo);
-      this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
-    }
-
-    // We have a new origin
-    if (this.props.directionsFrom && !this.fromMarker._map) {
-      this.moveTo(this.props.directionsFrom);
-      this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
-    }
-
-    // We have origin and destination but no route yet.
-    if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
-      const bbox = turfBbox({
-        type: 'FeatureCollection',
-        features: [this.props.directionsFrom, this.props.directionsTo]
-      });
-      this.moveTo({bbox: bbox});
-
-      // Do not retry when the previous request errored
-      if (this.props.routeStatus !== 'error') {
-        // Trigger the API call to directions
-        this.props.getRoute(
-          this.props.directionsFrom,
-          this.props.directionsTo,
-          this.props.modality,
-          this.props.accessToken
-        );
+    // Search mode
+    if (this.props.mode === 'search') {
+      if (this.props.searchLocation) {
+        this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
+      } else {
+        this.marker.remove();
       }
     }
 
-    // We have a new route
-    if (this.props.route) {
-      this.map.getSource('route').setData(this.props.route.geometry);
-      const bbox = turfBbox(this.props.route.geometry);
-      this.moveTo({bbox: bbox});
-    } else {
-      this.map.getSource('route').setData({
-        type: 'FeatureCollection',
-        features: []
-      });
+    // Directions mode
+    if (this.props.mode === 'directions') {
+      if (this.props.directionsFrom) {
+        this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
+      } else {
+        this.fromMarker.remove();
+      }
+
+      if (this.props.directionsTo) {
+        this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
+      } else {
+        this.marker.remove();
+      }
+
+      if (this.props.route) {
+        this.map.getSource('route').setData(this.props.route.geometry);
+      } else {
+        this.map.getSource('route').setData({
+          type: 'FeatureCollection',
+          features: []
+        });
+      }
+
+      // We have origin and destination but no route yet
+      if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
+        // Do not retry when the previous request errored
+        if (this.props.routeStatus !== 'error') {
+          // Trigger the API call to directions
+          this.props.getRoute(
+            this.props.directionsFrom,
+            this.props.directionsTo,
+            this.props.modality,
+            this.props.accessToken
+          );
+        }
+      }
     }
 
-    if (!(this.props.searchLocation && this.props.mode === 'search') && !this.props.directionsTo) { // Remove search location
-      this.marker.remove();
-    }
+    if (this.props.needMapRepan) {
+      // Search mode
+      if (this.props.mode === 'search') {
+        this.moveTo(this.props.searchLocation);
+      }
 
-    if (!this.props.directionsFrom) { // Remove search location
-      this.fromMarker.remove();
+      // Directions mode
+      if (this.props.mode === 'directions') {
+        if (this.props.route) {
+          const bbox = turfBbox(this.props.route.geometry);
+          this.moveTo({bbox: bbox});
+
+        } else if (this.props.directionsTo && this.props.directionsFrom) {
+          const bbox = turfBbox({
+            type: 'FeatureCollection',
+            features: [this.props.directionsFrom, this.props.directionsTo]
+          });
+          this.moveTo({bbox: bbox});
+
+        } else {
+          // Whichever exists
+          this.moveTo(this.props.directionsTo);
+          this.moveTo(this.props.directionsFrom);
+        }
+      }
     }
 
     this.props.setStateValue('needMapUpdate', false);
+    this.props.setStateValue('needMapRepan', false);
   }
 
   moveTo(location, zoom) {
+    if (!location) return;
     if (location.bbox) { // We have a bbox to fit to
       const distance = turfDistance([location.bbox[0], location.bbox[1]], [location.bbox[2], location.bbox[3]]);
       const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance / 2, 'kilometers');
@@ -235,6 +253,7 @@ MapComponent.propTypes = {
   directionsTo: React.PropTypes.object,
   modality: React.PropTypes.string,
   needMapUpdate: React.PropTypes.bool,
+  needMapRepan: React.PropTypes.bool,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
   getRoute: React.PropTypes.func
@@ -253,6 +272,7 @@ const mapStateToProps = (state) => {
     modality: state.modality,
     mode: state.mode,
     needMapUpdate: state.needMapUpdate,
+    needMapRepan: state.needMapRepan,
     route: state.route,
     routeStatus: state.routeStatus
   };

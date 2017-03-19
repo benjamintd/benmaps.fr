@@ -116,14 +116,14 @@ class Directions extends Component {
       this.props.setDirectionsLocation(kind, location);
       if (kind === 'to') this.props.writeSearchTo('');
       if (kind === 'from') this.props.writeSearchFrom('');
-      this.props.triggerMapUpdate();
+      this.props.triggerMapUpdate('repan');
     }
   }
 
   setUserLocationDirections() {
     if (!this.props.directionsFrom) this.props.setDirectionsLocation('from', this.props.userLocation);
     else if (!this.props.directionsTo) this.props.setDirectionsLocation('to', this.props.userLocation);
-    this.props.triggerMapUpdate();
+    this.props.triggerMapUpdate('repan');
   }
 
   resetSearch(kind) {
@@ -161,7 +161,7 @@ class Directions extends Component {
     this.props.setDirectionsLocation('to', this.props.directionsFrom);
     this.props.setRoute(null);
     this.props.setStateValue('routeStatus', 'idle');
-    this.props.triggerMapUpdate();
+    this.props.triggerMapUpdate('repan');
   }
 
   get styles() {
@@ -211,7 +211,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
-    triggerMapUpdate: () => dispatch(triggerMapUpdate()),
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
     setMode: (mode) => dispatch(setMode(mode)),
     setModality: (modality) => dispatch(setModality(modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),

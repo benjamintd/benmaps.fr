@@ -14,6 +14,7 @@ const defaultState = {
   searchString: '',
   searchLocation: null,
   needMapUpdate: false,
+  needMapRepan: false,
   placeInfo: null,
   // User
   userLocation: null,
@@ -23,7 +24,8 @@ const defaultState = {
   directionsToString: '',
   directionsTo: null,
   route: null,
-  routeStatus: 'idle'
+  routeStatus: 'idle',
+  lastQueried: 0
 };
 
 const reducer = (state = defaultState, action) => {
@@ -53,6 +55,7 @@ const reducer = (state = defaultState, action) => {
   case 'TRIGGER_MAP_UPDATE':
     return Object.assign({}, state, {
       needMapUpdate: true,
+      needMapRepan: action.needMapRepan
     });
 
   case 'SET_USER_LOCATION':

@@ -55,7 +55,8 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
           value: 'idle'
         });
         next({
-          type: 'TRIGGER_MAP_UPDATE'
+          type: 'TRIGGER_MAP_UPDATE',
+          needMapRepan: true
         });
       })
       .catch(() => next({
@@ -83,7 +84,6 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     })
     .then(data => {
       // Success
-      console.log(data);
       const entity = data.entities[action.id];
       const simplifiedClaims = wdk.simplifyClaims(entity.claims);
       const description = entity.descriptions.en.value;
