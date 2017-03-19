@@ -153,12 +153,12 @@ class Directions extends Component {
 
   get styles() {
     return {
-      directions: 'my-bg-blue absolute top m24 w420 h180 shadow-darken25 flex-parent flex-parent--column',
+      directions: 'my-bg-blue absolute top p24 w-full w420-ml h180 shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white pl48 h42 w360',
       results: 'fixed bg-white shadow-darken5 border-darken10',
       placeName: 'txt-truncate color-white pl48 h42 flex-parent flex-parent--row flex-parent--center-cross',
-      row: 'absolute pr48 w420 flex-parent flex-parent--row',
-      userLocation: 'sub-menu h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w420'
+      row: 'absolute pr48 w-full w420-ml flex-parent flex-parent--row',
+      userLocation: 'sub-menu h36 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-ml'
     }
   }
 }

@@ -4,9 +4,23 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+.root {
+  touch-action: none;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
 .marker {
   top: -36px;
   left: -18px;
+}
+
+.results {
 }
 
 .geolocation {

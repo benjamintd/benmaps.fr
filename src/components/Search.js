@@ -22,7 +22,7 @@ class Search extends Component {
 
   render() {
     return (
-      <div className='absolute top m24 w420 flex-parent flex-parent--row'>
+      <div className={this.styles.main}>
         <div className={this.styles.icon}>
           <svg className='icon color-gray'><use xlinkHref='#icon-search'></use></svg>
         </div>
@@ -38,7 +38,7 @@ class Search extends Component {
           />
           :
           <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
-            <div className='w420 pr48 txt-truncate'>
+            <div className='w-full w420-ml pr48 txt-truncate'>
               <PlaceName location={this.props.searchLocation}/>
             </div>
             <div
@@ -55,7 +55,7 @@ class Search extends Component {
         />
 
         {
-          this.props.placeInfo
+          (this.props.searchLocation && this.props.placeInfo)
           ?
           <PlaceInfo info={this.props.placeInfo} clickDirections={() => this.clickDirections()}/>
           :
@@ -72,9 +72,10 @@ class Search extends Component {
 
   get styles() {
     return {
-      icon: 'absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
-      input: 'input input--border-darken5 unround pl36 w420 h42 bg-white shadow-darken25',
-      results: 'bg-white shadow-darken25 mt6 border-darken10'
+      main: 'absolute h42 w-full w420-ml bg-white shadow-darken25 flex-parent flex-parent--row flex-parent--space-between-main',
+      icon: 'flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
+      input: 'input h42 border--transparent',
+      results: 'results bg-white shadow-darken25 mt6 border-darken10'
     }
   }
 }

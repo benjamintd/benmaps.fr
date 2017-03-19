@@ -10,7 +10,7 @@ import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../a
 class MapComponent extends Component {
   render() {
     return (
-      <div id='map' className='relative viewport-full'>
+      <div id='map' className='viewport-full'>
       </div>
     );
   }

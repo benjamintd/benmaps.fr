@@ -6,7 +6,7 @@ class CloseButton extends Component {
       this.props.show
       ?
       <div
-        className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer'
+        className='relative right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer'
         onClick={this.props.onClick}
       >
         <svg className={'icon ' + (this.props.large ? 'icon--l ' : ' ') + this.props.color}><use xlinkHref='#icon-close'></use></svg>
