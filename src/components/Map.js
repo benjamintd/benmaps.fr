@@ -8,6 +8,15 @@ import turfDistance from '@turf/distance';
 import {setZoom, setCenter, setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isDragging: false,
+      isCursorOverPoint: false,
+      draggingFeature: null
+    };
+  }
+
   render() {
     return (
       <div id='map' className='viewport-full'>
@@ -149,39 +158,26 @@ class MapComponent extends Component {
         }
       }, 10000);
 
-    });
+      // Click and drag behaviors
+      map.on('click', (e) => this.onClick(e));
 
-    map.on('click', (e) => {
-      var features = map.queryRenderedFeatures(e.point, {layers: this.selectableLayers}); // TODO add POI layers
-      if (!features.length) {
-        return;
-      }
+      map.on('mousemove', (e) => {
+        var features = map.queryRenderedFeatures(e.point, { layers: this.movableLayers.concat(this.selectableLayers) });
 
-      var feature = features[0];
+        if (features.length) {
+          map.getCanvas().style.cursor = 'pointer';
+          if (this.movableLayers.indexOf(features[0].layer.id) > -1) {
+            this.setState({isCursorOverPoint: true});
+            this.map.dragPan.disable();
+          }
+        } else {
+          map.getCanvas().style.cursor = '';
+          this.setState({isCursorOverPoint: false});
+          map.dragPan.enable();
+        }
+      });
 
-      let key;
-      if (this.props.mode === 'search') key = 'searchLocation';
-      else if (!this.props.directionsFrom) key = 'directionsFrom';
-      else {
-        this.props.setStateValue('route', null);
-        this.props.setStateValue('searchLocation', null);
-        key = 'directionsTo';
-      }
-
-      if (key) {
-        this.props.setStateValue(key, {
-          type: 'Feature',
-          place_name: feature.properties.name,
-          properties: {},
-          geometry: feature.geometry
-        });
-        this.props.triggerMapUpdate();
-      }
-    });
-
-    map.on('mousemove', (e) => {
-      var features = map.queryRenderedFeatures(e.point, { layers: this.selectableLayers });
-      map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+      map.on('mousedown', (e) => this.mouseDown(e), true);
     });
   }
 
@@ -224,7 +220,7 @@ class MapComponent extends Component {
       }
 
       // We have origin and destination but no route yet
-      if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
+      if (this.props.directionsFrom && this.props.directionsTo && this.props.route === null) {
         // Do not retry when the previous request errored
         if (this.props.routeStatus !== 'error') {
           // Trigger the API call to directions
@@ -307,9 +303,109 @@ class MapComponent extends Component {
       'poi-scalerank4-l1',
       'poi-scalerank4-l15',
       'poi-parks_scalerank4',
-    ]
+    ];
   }
 
+  get movableLayers() {
+    return ['marker', 'fromMarker'];
+  }
+
+  mouseDown(e) {
+    if (!this.state.isDragging && !this.state.isCursorOverPoint) return;
+
+    var features = this.map.queryRenderedFeatures(e.point, { layers: this.movableLayers });
+    if (!features.length) return;
+
+
+    // Set a cursor indicator
+    this.map.getCanvas().style.cursor = 'grab';
+
+    const mouseMoveFn = (e) => this.onMove(e);
+
+    this.setState({isDragging: true, draggingFeature: features[0], mouseMoveFn: mouseMoveFn});
+
+    // Mouse events
+    this.map.on('mousemove', mouseMoveFn);
+    this.map.once('mouseup', () => this.onUp());
+  }
+
+  onMove(e) {
+    if (!this.state.isDragging) return;
+
+    const layerId = this.state.draggingFeature.layer.id;
+    if (this.movableLayers.indexOf(layerId) < 0) return;
+
+    var coords = e.lngLat;
+
+    // Set a UI indicator for dragging.
+    this.map.getCanvas().style.cursor = 'grabbing';
+
+    const geometry = {
+      type: 'Point',
+      coordinates: [coords.lng, coords.lat]
+    };
+
+    this.map.getSource(layerId).setData(geometry);
+
+    this.props.setStateValue('placeInfo', null);
+    this.props.setStateValue('searchLocation', null);
+    this.props.setStateValue(this.layerToKey(layerId), {
+      place_name: 'Dropped pin',
+      geometry: geometry
+    });
+    this.props.setStateValue('route', undefined); // Will make the route disappear without triggering a call to the API
+    this.props.triggerMapUpdate();
+  }
+
+  onUp() {
+    if (!this.state.isDragging) return;
+
+    this.map.getCanvas().style.cursor = '';
+
+    this.setState({isDragging: false});
+
+    // Unbind mouse events
+    this.map.off('mousemove', this.state.mouseMoveFn);
+
+    // TODO here, trigger an event that will call the geocoding API for a place/address from the dropped pin.
+
+    this.props.setStateValue('route', null); // retrigger API call
+    this.props.triggerMapUpdate();
+  }
+
+  onClick(e) {
+    var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers}); // TODO add POI layers
+    if (!features.length) {
+      return;
+    }
+
+    var feature = features[0];
+
+    let key;
+    if (this.props.mode === 'search') key = 'searchLocation';
+    else if (!this.props.directionsFrom) key = 'directionsFrom';
+    else {
+      this.props.setStateValue('route', null);
+      this.props.setStateValue('searchLocation', null);
+      key = 'directionsTo';
+    }
+
+    if (key) {
+      this.props.setStateValue(key, {
+        type: 'Feature',
+        place_name: feature.properties.name,
+        properties: {},
+        geometry: feature.geometry
+      });
+      this.props.triggerMapUpdate();
+    }
+  }
+
+  layerToKey(layer) {
+    if (this.props.mode === 'search' && layer === 'marker') return 'searchLocation';
+    else if (this.props.mode === 'directions' && layer === 'marker') return 'directionsTo';
+    else if (this.props.mode === 'directions' && layer === 'fromMarker') return 'directionsFrom';
+  }
 }
 
 MapComponent.propTypes = {
