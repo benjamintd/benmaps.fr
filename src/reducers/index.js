@@ -14,6 +14,7 @@ const defaultState = {
   searchString: '',
   searchLocation: null,
   needMapUpdate: false,
+  needMapRepan: false,
   placeInfo: null,
   // User
   userLocation: null,
@@ -23,7 +24,8 @@ const defaultState = {
   directionsToString: '',
   directionsTo: null,
   route: null,
-  routeStatus: 'idle'
+  routeStatus: 'idle',
+  lastQueried: 0
 };
 
 const reducer = (state = defaultState, action) => {
@@ -53,6 +55,7 @@ const reducer = (state = defaultState, action) => {
   case 'TRIGGER_MAP_UPDATE':
     return Object.assign({}, state, {
       needMapUpdate: true,
+      needMapRepan: action.needMapRepan
     });
 
   case 'SET_USER_LOCATION':
@@ -90,7 +93,7 @@ const reducer = (state = defaultState, action) => {
     });
 
   case 'SET_ROUTE': {
-    if (action.data.routes.length > 0) {
+    if (action.data.routes.length > 0 && state.directionsFrom && state.directionsTo) {
       const route = action.data.routes[0];
 
       const geojsonLine = polyline.toGeoJSON(route.geometry);
@@ -107,7 +110,6 @@ const reducer = (state = defaultState, action) => {
   }
 
   case 'SET_PLACE_INFO': {
-    console.log(action.info);
     return Object.assign({}, state, {
       placeInfo: action.info
     });

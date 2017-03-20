@@ -15,19 +15,6 @@ body {
   width: 100%;
 }
 
-.marker {
-  top: -36px;
-  left: -18px;
-}
-
-.results {
-}
-
-.geolocation {
-  top: -21px;
-  left: -21px;
-}
-
 .my-bg-blue {
   background-color: #3a94ff;
 }

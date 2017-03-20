@@ -68,6 +68,7 @@ class Search extends Component {
 
   onSelect(data) {
     this.props.setSearchLocation(data);
+    this.props.triggerMapUpdate('repan');
     if (data.properties.wikidata) this.props.getPlaceInfo(data.properties.wikidata);
   }
 
@@ -106,7 +107,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     writeSearch: (input) => dispatch(writeSearch(input)),
     setSearchLocation: (location) => dispatch(setSearchLocation(location)),
-    triggerMapUpdate: () => dispatch(triggerMapUpdate()),
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
     setMode: (mode) => dispatch(setMode(mode)),
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),

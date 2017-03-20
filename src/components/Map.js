@@ -5,9 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import geolocationIcon from '../assets/geolocation.svg';
-import fromLocationIcon from '../assets/fromLocation.svg'
-import {setZoom, setCenter, setStateValue, setUserLocation, getRoute} from '../actions/index'
+import {setZoom, setCenter, setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
   render() {
@@ -37,169 +35,242 @@ class MapComponent extends Component {
       this.props.setZoom(map.getZoom());
     });
 
-    // Create marker for geolocation
-    const geolocationElement = document.createElement('div');
-    geolocationElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    geolocationElement.innerHTML = '<img src="' + geolocationIcon + '"/>';
-    const geolocation = new mapboxgl.Marker(geolocationElement);
-
-
-    // Create marker for search results
-    const markerElement = document.createElement('div');
-    markerElement.className = 'marker flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    markerElement.innerHTML = '<svg class="icon icon--l color-red-dark"><use xlink:href="#icon-marker"></use></svg>';
-    const marker = new mapboxgl.Marker(markerElement);
-
-    // Create marker for From location
-    const fromElement = document.createElement('div');
-    fromElement.className = 'geolocation flex-parent flex-parent--center-cross flex-parent--center-main w42 h42';
-    fromElement.innerHTML = '<img src="' + fromLocationIcon + '"/>';
-    const fromMarker = new mapboxgl.Marker(fromElement);
-
-
-    // helper to set geolocation
-    const setGeolocation = (data) => {
-      const coords = [data.coords.longitude, data.coords.latitude];
-      geolocation.setLngLat(coords).addTo(map);
-      this.props.setUserLocation(coords);
-      this.moveTo({type: 'Feature', geometry: {type: 'Point', coordinates: coords}, properties: {}}, 13);
-    }
-
-    // Create geolocation control
-    const geolocateControl = new mapboxgl.GeolocateControl();
-    geolocateControl.on('geolocate', setGeolocation);
-    map.addControl(geolocateControl, 'bottom-right');
-
-    // Initial ask for location and display on the map
-    if (this.props.userLocation) {
-      const coords = this.props.userLocation.geometry.coordinates;
-      geolocation.setLngLat(coords).addTo(map);
-      this.moveTo(this.props.userLocation, 13);
-    } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(setGeolocation);
-    }
-
-    // Regularly poll the user location and update the map
-    setInterval(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((data) => {
-          const coords = [data.coords.longitude, data.coords.latitude];
-          geolocation.setLngLat(coords).addTo(map);
-          this.props.setUserLocation(coords);
-        });
-      }
-    }, 10000);
-
-    // Create geojson source for the route
     map.on('load', () => {
+
+      // Add sources
+
       map.addSource('route', {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: []
+        data: this.emptyData
+      });
+
+      map.addSource('marker', {
+        type: 'geojson',
+        data: this.emptyData
+      });
+
+      map.addSource('geolocation', {
+        type: 'geojson',
+        data: this.emptyData
+      });
+
+      map.addSource('fromMarker', {
+        type: 'geojson',
+        data: this.emptyData
+      });
+
+
+      // Add and style layers
+
+      map.addLayer({
+        'id': 'route',
+        'source': 'route',
+        'type': 'line',
+        'paint': {
+          'line-color': '#2abaf7',
+          'line-width': 5.5
+        },
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+      }, 'bridge-oneway-arrows-white');
+      map.addLayer({
+        'id': 'route-casing',
+        'source': 'route',
+        'type': 'line',
+        'paint': {
+          'line-color': '#2779b5',
+          'line-width': 6.5
+        },
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+      }, 'route');
+
+      map.addLayer({
+        'id': 'marker',
+        'source': 'marker',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'pin',
+          'icon-offset': [0, -20]
+        },
+      });
+
+      map.addLayer({
+        'id': 'fromMarker',
+        'source': 'fromMarker',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'fromLocation'
+        },
+      }, 'marker');
+
+      map.addLayer({
+        'id': 'geolocation',
+        'source': 'geolocation',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'geolocation'
+        },
+      }, 'fromMarker');
+
+      // helper to set geolocation
+      const setGeolocation = (data) => {
+        const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
+        this.map.getSource('geolocation').setData(geometry);
+        this.props.setUserLocation(geometry.coordinates);
+        this.moveTo(geometry, 13);
+      }
+
+      // Create geolocation control
+      const geolocateControl = new mapboxgl.GeolocateControl();
+      geolocateControl.on('geolocate', setGeolocation);
+      map.addControl(geolocateControl, 'bottom-right');
+
+      // Initial ask for location and display on the map
+      if (this.props.userLocation) {
+        this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
+        this.moveTo(this.props.userLocation, 13);
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(setGeolocation);
+      }
+
+      // Regularly poll the user location and update the map
+      window.setInterval(() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((data) => {
+            const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
+            this.map.getSource('geolocation').setData(geometry);
+            this.props.setUserLocation(geometry.coordinates);
+          });
         }
-        });
-
-        map.addLayer({
-          'id': 'route',
-          'source': 'route',
-          'type': 'line',
-          'paint': {
-            'line-color': '#2abaf7',
-            'line-width': 5.5
-          },
-          'layout': {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-        }, 'bridge-oneway-arrows-white');
-
-        map.addLayer({
-          'id': 'route-casing',
-          'source': 'route',
-          'type': 'line',
-          'paint': {
-            'line-color': '#2779b5',
-            'line-width': 6.5
-          },
-          'layout': {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-        }, 'route');
+      }, 10000);
 
     });
 
-    // store variables at the MapComponent level
-    this.marker = marker;
-    this.fromMarker = fromMarker
+    map.on('click', (e) => {
+      var features = map.queryRenderedFeatures(e.point, {layers: this.selectableLayers}); // TODO add POI layers
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+
+      let key;
+      if (this.props.mode === 'search') key = 'searchLocation';
+      else if (!this.props.directionsFrom) key = 'directionsFrom';
+      else {
+        this.props.setStateValue('route', null);
+        this.props.setStateValue('searchLocation', null);
+        key = 'directionsTo';
+      }
+
+      if (key) {
+        this.props.setStateValue(key, {
+          type: 'Feature',
+          place_name: feature.properties.name,
+          properties: {},
+          geometry: feature.geometry
+        });
+        this.props.triggerMapUpdate();
+      }
+    });
+
+    map.on('mousemove', (e) => {
+      var features = map.queryRenderedFeatures(e.point, { layers: this.selectableLayers });
+      map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+    });
   }
 
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    // We have a new search location
-    if (this.props.searchLocation && !this.marker._map && this.props.mode === 'search') {
-      this.moveTo(this.props.searchLocation);
-      this.marker.setLngLat(this.props.searchLocation.geometry.coordinates).addTo(this.map);
+    // This is where we update the layers and map bbox
+
+    // Search mode
+    if (this.props.mode === 'search') {
+      if (this.props.searchLocation) {
+        this.map.getSource('marker').setData(this.props.searchLocation.geometry);
+      } else {
+        this.map.getSource('marker').setData(this.emptyData);
+      }
+
+      // remove items specific to directions mode
+      this.map.getSource('fromMarker').setData(this.emptyData);
+      this.map.getSource('route').setData(this.emptyData);
     }
 
-    // We have a new destination
-    if (this.props.directionsTo && !this.marker._map) {
-      this.moveTo(this.props.directionsTo);
-      this.marker.setLngLat(this.props.directionsTo.geometry.coordinates).addTo(this.map);
-    }
+    // Directions mode
+    if (this.props.mode === 'directions') {
+      if (this.props.directionsFrom) {
+        this.map.getSource('fromMarker').setData(this.props.directionsFrom.geometry);
+      } else {
+        this.map.getSource('fromMarker').setData(this.emptyData);
+      }
 
-    // We have a new origin
-    if (this.props.directionsFrom && !this.fromMarker._map) {
-      this.moveTo(this.props.directionsFrom);
-      this.fromMarker.setLngLat(this.props.directionsFrom.geometry.coordinates).addTo(this.map);
-    }
+      if (this.props.directionsTo) {
+        this.map.getSource('marker').setData(this.props.directionsTo.geometry);
+      } else {
+        this.map.getSource('marker').setData(this.emptyData);
+      }
 
-    // We have origin and destination but no route yet.
-    if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
-      const bbox = turfBbox({
-        type: 'FeatureCollection',
-        features: [this.props.directionsFrom, this.props.directionsTo]
-      });
-      this.moveTo({bbox: bbox});
+      if (this.props.route) {
+        this.map.getSource('route').setData(this.props.route.geometry);
+      } else {
+        this.map.getSource('route').setData(this.emptyData);
+      }
 
-      // Do not retry when the previous request errored
-      if (this.props.routeStatus !== 'error') {
-        // Trigger the API call to directions
-        this.props.getRoute(
-          this.props.directionsFrom,
-          this.props.directionsTo,
-          this.props.modality,
-          this.props.accessToken
-        );
+      // We have origin and destination but no route yet
+      if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
+        // Do not retry when the previous request errored
+        if (this.props.routeStatus !== 'error') {
+          // Trigger the API call to directions
+          this.props.getRoute(
+            this.props.directionsFrom,
+            this.props.directionsTo,
+            this.props.modality,
+            this.props.accessToken
+          );
+        }
       }
     }
 
-    // We have a new route
-    if (this.props.route) {
-      this.map.getSource('route').setData(this.props.route.geometry);
-      const bbox = turfBbox(this.props.route.geometry);
-      this.moveTo({bbox: bbox});
-    } else {
-      this.map.getSource('route').setData({
-        type: 'FeatureCollection',
-        features: []
-      });
-    }
+    if (this.props.needMapRepan) {
+      // Search mode
+      if (this.props.mode === 'search') {
+        this.moveTo(this.props.searchLocation);
+      }
 
-    if (!(this.props.searchLocation && this.props.mode === 'search') && !this.props.directionsTo) { // Remove search location
-      this.marker.remove();
-    }
+      // Directions mode
+      if (this.props.mode === 'directions') {
+        if (this.props.route) {
+          const bbox = turfBbox(this.props.route.geometry);
+          this.moveTo({bbox: bbox});
 
-    if (!this.props.directionsFrom) { // Remove search location
-      this.fromMarker.remove();
+        } else if (this.props.directionsTo && this.props.directionsFrom) {
+          const bbox = turfBbox({
+            type: 'FeatureCollection',
+            features: [this.props.directionsFrom, this.props.directionsTo]
+          });
+          this.moveTo({bbox: bbox});
+
+        } else {
+          // Whichever exists
+          this.moveTo(this.props.directionsTo);
+          this.moveTo(this.props.directionsFrom);
+        }
+      }
     }
 
     this.props.setStateValue('needMapUpdate', false);
+    this.props.setStateValue('needMapRepan', false);
   }
 
   moveTo(location, zoom) {
+    if (!location) return;
     if (location.bbox) { // We have a bbox to fit to
       const distance = turfDistance([location.bbox[0], location.bbox[1]], [location.bbox[2], location.bbox[3]]);
       const buffered = turfBuffer(turfBboxPolygon(location.bbox), distance / 2, 'kilometers');
@@ -216,6 +287,29 @@ class MapComponent extends Component {
       });
     }
   }
+
+  get emptyData() {
+    return {
+      type: 'FeatureCollection',
+      features: []
+    };
+  }
+
+  get selectableLayers() {
+    return [
+      'rail-label',
+      'poi-scalerank1',
+      'poi-parks-scalerank1',
+      'poi-scalerank2',
+      'poi-parks-scalerank2',
+      'poi-scalerank3',
+      'poi-parks-scalerank3',
+      'poi-scalerank4-l1',
+      'poi-scalerank4-l15',
+      'poi-parks_scalerank4',
+    ]
+  }
+
 }
 
 MapComponent.propTypes = {
@@ -235,9 +329,11 @@ MapComponent.propTypes = {
   directionsTo: React.PropTypes.object,
   modality: React.PropTypes.string,
   needMapUpdate: React.PropTypes.bool,
+  needMapRepan: React.PropTypes.bool,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
-  getRoute: React.PropTypes.func
+  getRoute: React.PropTypes.func,
+  triggerMapUpdate: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -253,6 +349,7 @@ const mapStateToProps = (state) => {
     modality: state.modality,
     mode: state.mode,
     needMapUpdate: state.needMapUpdate,
+    needMapRepan: state.needMapRepan,
     route: state.route,
     routeStatus: state.routeStatus
   };
@@ -264,7 +361,8 @@ const mapDispatchToProps = (dispatch) => {
     setZoom: (zoom) => dispatch(setZoom(zoom)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
-    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken))
+    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan))
   };
 };
 

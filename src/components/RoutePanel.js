@@ -19,6 +19,7 @@ class RoutePanel extends Component {
           </div>
           <div className='bottom txt-h4-mm pr12'>
             {this.secondsToReadableTime(this.props.route.duration)}
+            {this.props.modality === 'car' ? ' with current traffic' : ''}
           </div>
           <div className='bottom color-gray'>
             {(this.props.route.distance / 1000).toFixed(1)} km
