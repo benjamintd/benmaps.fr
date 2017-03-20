@@ -135,6 +135,7 @@ var Geocoder = React.createClass({
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
       value={this.props.searchString}
+      onChange={this.onInput}
       placeholder={this.props.inputPlaceholder}
       type='text' />;
 
