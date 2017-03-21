@@ -74,30 +74,77 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     });
 
     fetch(url, {method: 'get'})
-    .then(res => {
-      if (res.ok) {
-        return res.json();
-      } else { // 4xx or 5xx response
-        var err = new Error(res.statusText);
-        return Promise.reject(err);
-      }
-    })
-    .then(data => {
-      // Success
-      const entity = data.entities[action.id];
-      const simplifiedClaims = wdk.simplifyClaims(entity.claims);
-      const description = entity.descriptions.en.value;
-      const label = entity.labels.en.value;
-      next({
-        type: 'SET_PLACE_INFO',
-        info: {
-          claims: simplifiedClaims,
-          description,
-          label
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        } else { // 4xx or 5xx response
+          var err = new Error(res.statusText);
+          return Promise.reject(err);
         }
+      })
+      .then(data => {
+        // Success
+        const entity = data.entities[action.id];
+        const simplifiedClaims = wdk.simplifyClaims(entity.claims);
+        const description = entity.descriptions.en.value;
+        const label = entity.labels.en.value;
+        next({
+          type: 'SET_STATE_VALUE',
+          key: 'placeInfo',
+          value: {
+            claims: simplifiedClaims,
+            description,
+            label
+          }
+        });
+      })
+      .catch(() => {});
+    break;
+  }
+
+  case 'GET_REVERSE_GEOCODE': {
+    const url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' +
+      action.coordinates.join(',') + '.json' +
+      '?access_token=' + action.accessToken;
+
+    fetch(url, {method: 'get'})
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        } else { // 4xx or 5xx response
+          var err = new Error(res.statusText);
+          return Promise.reject(err);
+        }
+      })
+      .then(data => {
+        // Success
+        if (data.features && data.features.length > 0) {
+          next({
+            type: 'SET_STATE_VALUE',
+            key: action.key,
+            value: {
+              place_name: data.features[0].place_name,
+              geometry: {
+                type: 'Point',
+                coordinates: action.coordinates
+              }
+            }
+          });
+        } else return Promise.reject();
+      })
+      .catch(() => {
+        next({
+          type: 'SET_STATE_VALUE',
+          key: action.key,
+          value: {
+            place_name: 'Dropped pin',
+            geometry: {
+              type: 'Point',
+              coordinates: action.coordinates
+            }
+          }
+        });
       });
-    })
-    .catch(() => {});
     break;
   }
 

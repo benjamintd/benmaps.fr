@@ -31,26 +31,11 @@ const defaultState = {
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
 
-  case 'SET_CENTER':
-    return Object.assign({}, state, {
-      mapCenter: action.coordinates
-    });
-
-  case 'SET_ZOOM':
-    return Object.assign({}, state, {
-      mapZoom: action.zoom
-    });
-
-  case 'WRITE_SEARCH':
-    return Object.assign({}, state, {
-      searchString: action.searchString
-    });
-
-  case 'SET_SEARCH_LOCATION':
-    return Object.assign({}, state, {
-      searchLocation: action.location,
-      needMapUpdate: true
-    });
+  case 'SET_STATE_VALUE': {
+    const modifiedState = {};
+    modifiedState[action.key] = action.value
+    return Object.assign({}, state, modifiedState);
+  }
 
   case 'TRIGGER_MAP_UPDATE':
     return Object.assign({}, state, {
@@ -61,18 +46,13 @@ const reducer = (state = defaultState, action) => {
   case 'SET_USER_LOCATION':
     return Object.assign({}, state, {
       userLocation: {
-        place_name: 'My Location',
+        place_name: 'My location',
         center: action.coordinates,
         geometry: {
           type: 'Point',
           coordinates: action.coordinates
         }
       },
-    });
-
-  case 'SET_MODE':
-    return Object.assign({}, state, {
-      mode: action.mode,
     });
 
   case 'SET_DIRECTIONS_LOCATION': {
@@ -86,11 +66,6 @@ const reducer = (state = defaultState, action) => {
       });
     } else return state;
   }
-
-  case 'SET_MODALITY':
-    return Object.assign({}, state, {
-      modality: action.modality,
-    });
 
   case 'SET_ROUTE': {
     if (action.data.routes.length > 0 && state.directionsFrom && state.directionsTo) {
@@ -107,20 +82,6 @@ const reducer = (state = defaultState, action) => {
         routeStatus: 'error'
       });
     }
-  }
-
-  case 'SET_PLACE_INFO': {
-    return Object.assign({}, state, {
-      placeInfo: action.info
-    });
-  }
-
-  // Some generic case. When possible, prefer some more expressive
-  // action name above.
-  case 'SET_STATE_VALUE': {
-    const modifiedState = {};
-    modifiedState[action.key] = action.value
-    return Object.assign({}, state, modifiedState);
   }
 
   default:

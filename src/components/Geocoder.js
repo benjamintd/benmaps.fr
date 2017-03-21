@@ -135,6 +135,7 @@ var Geocoder = React.createClass({
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
       value={this.props.searchString}
+      onChange={this.onInput}
       placeholder={this.props.inputPlaceholder}
       type='text' />;
 
@@ -184,7 +185,7 @@ function search(endpoint, source, accessToken, proximity, bbox, types, query, ca
 const mapStateToProps = (state) => {
   return {
     accessToken: state.mapboxAccessToken,
-    proximity: state.mapCenter.join(',')
+    proximity: state.mapZoom > 7 ? state.mapCenter.join(',') : ''
   };
 };
 

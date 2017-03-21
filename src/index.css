@@ -28,7 +28,7 @@ body {
 }
 
 .directions-input::-moz-placeholder { /* Firefox 19+ */
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .place-info {
@@ -37,10 +37,6 @@ body {
 
 .place-image {
   object-fit: cover;
-}
-
-.swap-button {
-  margin-top: 96px;
 }
 
 .animation-subtle-shake {

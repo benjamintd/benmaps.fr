@@ -17,8 +17,14 @@ class PlaceName extends Component {
     }
 
     return (
-      <div className='txt-truncate'>
-        <div className={'inline pr6 ' + mainColor}>{main}</div>
+      <div className='txt-truncate w-full'>
+        {
+          main === '__loading'
+          ?
+          <div className={'loading loading--s ' + (this.props.colors === 'light' ? 'loading--dark' : '')}></div>
+          :
+          <div className={'inline pr6 ' + mainColor}>{main}</div>
+        }
         <div className={'inline txt-s ' +restColor}>{rest}</div>
       </div>
     );

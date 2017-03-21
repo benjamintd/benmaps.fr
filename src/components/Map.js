@@ -5,9 +5,19 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setZoom, setCenter, setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
+import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index'
 
 class MapComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isDragging: false,
+      isCursorOverPoint: false,
+      draggedLayer: '',
+      draggedCoords: null
+    };
+  }
+
   render() {
     return (
       <div id='map' className='viewport-full'>
@@ -28,12 +38,6 @@ class MapComponent extends Component {
     });
 
     this.map = map;
-
-    map.on('moveend', () => {
-      const center = map.getCenter();
-      this.props.setCenter([center.lng, center.lat]);
-      this.props.setZoom(map.getZoom());
-    });
 
     map.on('load', () => {
 
@@ -149,39 +153,33 @@ class MapComponent extends Component {
         }
       }, 10000);
 
-    });
+      // Set event listeners
 
-    map.on('click', (e) => {
-      var features = map.queryRenderedFeatures(e.point, {layers: this.selectableLayers}); // TODO add POI layers
-      if (!features.length) {
-        return;
-      }
+      map.on('click', (e) => this.onClick(e));
 
-      var feature = features[0];
+      map.on('mousemove', (e) => {
+        var features = map.queryRenderedFeatures(e.point, { layers: this.movableLayers.concat(this.selectableLayers) });
 
-      let key;
-      if (this.props.mode === 'search') key = 'searchLocation';
-      else if (!this.props.directionsFrom) key = 'directionsFrom';
-      else {
-        this.props.setStateValue('route', null);
-        this.props.setStateValue('searchLocation', null);
-        key = 'directionsTo';
-      }
+        if (features.length) {
+          map.getCanvas().style.cursor = 'pointer';
+          if (this.movableLayers.indexOf(features[0].layer.id) > -1) {
+            this.setState({isCursorOverPoint: true});
+            this.map.dragPan.disable();
+          }
+        } else {
+          map.getCanvas().style.cursor = '';
+          this.setState({isCursorOverPoint: false});
+          map.dragPan.enable();
+        }
+      });
 
-      if (key) {
-        this.props.setStateValue(key, {
-          type: 'Feature',
-          place_name: feature.properties.name,
-          properties: {},
-          geometry: feature.geometry
-        });
-        this.props.triggerMapUpdate();
-      }
-    });
+      map.on('mousedown', (e) => this.mouseDown(e), true);
 
-    map.on('mousemove', (e) => {
-      var features = map.queryRenderedFeatures(e.point, { layers: this.selectableLayers });
-      map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        this.props.setStateValue('mapCenter', [center.lng, center.lat]);
+        this.props.setStateValue('mapZoom', map.getZoom());
+      });
     });
   }
 
@@ -224,7 +222,7 @@ class MapComponent extends Component {
       }
 
       // We have origin and destination but no route yet
-      if (this.props.directionsFrom && this.props.directionsTo && !this.props.route) {
+      if (this.props.directionsFrom && this.props.directionsTo && this.props.route === null) {
         // Do not retry when the previous request errored
         if (this.props.routeStatus !== 'error') {
           // Trigger the API call to directions
@@ -265,6 +263,7 @@ class MapComponent extends Component {
       }
     }
 
+    // No need to re-update until the state says so
     this.props.setStateValue('needMapUpdate', false);
     this.props.setStateValue('needMapRepan', false);
   }
@@ -288,6 +287,109 @@ class MapComponent extends Component {
     }
   }
 
+  mouseDown(e) {
+    if (!this.state.isDragging && !this.state.isCursorOverPoint) return;
+
+    var features = this.map.queryRenderedFeatures(e.point, { layers: this.movableLayers });
+    if (!features.length) return;
+
+
+    // Set a cursor indicator
+    this.map.getCanvas().style.cursor = 'grab';
+
+    const mouseMoveFn = (e) => this.onMove(e);
+
+    this.setState({isDragging: true, draggedLayer: features[0].layer.id, mouseMoveFn: mouseMoveFn});
+
+    // Mouse events
+    this.map.on('mousemove', mouseMoveFn);
+    this.map.once('mouseup', () => this.onUp());
+  }
+
+  onMove(e) {
+    if (!this.state.isDragging) return;
+
+    const layerId = this.state.draggedLayer;
+    if (this.movableLayers.indexOf(layerId) < 0) return;
+
+    var coords = [e.lngLat.lng, e.lngLat.lat];
+    this.setState({draggedCoords: coords});
+
+    // Set a UI indicator for dragging.
+    this.map.getCanvas().style.cursor = 'grabbing';
+
+    const geometry = {
+      type: 'Point',
+      coordinates: coords
+    };
+
+    this.map.getSource(layerId).setData(geometry);
+
+    this.props.setStateValue('placeInfo', null);
+    this.props.setStateValue('searchLocation', null);
+    this.props.setStateValue(this.layerToKey(layerId), {
+      place_name: '__loading',
+      geometry: geometry
+    });
+    this.props.setStateValue('route', undefined); // Will make the route disappear without triggering a call to the API
+    this.props.setStateValue('routeStatus', 'idle');
+    this.props.triggerMapUpdate();
+  }
+
+  onUp() {
+    if (!this.state.isDragging) return;
+
+    this.map.getCanvas().style.cursor = '';
+
+    // Unbind mouse events
+    this.map.off('mousemove', this.state.mouseMoveFn);
+
+    this.props.getReverseGeocode(
+      this.layerToKey(this.state.draggedLayer),
+      this.state.draggedCoords,
+      this.props.accessToken
+    );
+
+    this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
+
+    this.props.setStateValue('route', null); // retrigger API call
+    this.props.triggerMapUpdate();
+  }
+
+  onClick(e) {
+    var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers});
+    if (!features.length) {
+      return;
+    }
+
+    var feature = features[0];
+
+    let key;
+    if (this.props.mode === 'search') key = 'searchLocation';
+    else if (!this.props.directionsFrom) key = 'directionsFrom';
+    else {
+      this.props.setStateValue('route', null);
+      this.props.setStateValue('searchLocation', null);
+      key = 'directionsTo';
+    }
+
+    if (key) {
+      this.props.setStateValue(key, {
+        type: 'Feature',
+        place_name: feature.properties.name,
+        properties: {},
+        geometry: feature.geometry
+      });
+      this.props.triggerMapUpdate();
+    }
+  }
+
+  layerToKey(layer) {
+    if (this.props.mode === 'search' && layer === 'marker') return 'searchLocation';
+    else if (this.props.mode === 'directions' && layer === 'marker') return 'directionsTo';
+    else if (this.props.mode === 'directions' && layer === 'fromMarker') return 'directionsFrom';
+  }
+
   get emptyData() {
     return {
       type: 'FeatureCollection',
@@ -307,9 +409,12 @@ class MapComponent extends Component {
       'poi-scalerank4-l1',
       'poi-scalerank4-l15',
       'poi-parks_scalerank4',
-    ]
+    ];
   }
 
+  get movableLayers() {
+    return ['marker', 'fromMarker'];
+  }
 }
 
 MapComponent.propTypes = {
@@ -317,8 +422,6 @@ MapComponent.propTypes = {
   style: React.PropTypes.string,
   center: React.PropTypes.array,
   zoom: React.PropTypes.number,
-  setCenter: React.PropTypes.func,
-  setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
   mode: React.PropTypes.string,
   route: React.PropTypes.object,
@@ -333,7 +436,8 @@ MapComponent.propTypes = {
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
   getRoute: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func
+  triggerMapUpdate: React.PropTypes.func,
+  getReverseGeocode: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -357,12 +461,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setCenter: (coordinates) => dispatch(setCenter(coordinates)),
-    setZoom: (zoom) => dispatch(setZoom(zoom)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
-    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan))
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken))
   };
 };
 

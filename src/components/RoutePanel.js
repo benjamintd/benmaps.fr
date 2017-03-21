@@ -17,7 +17,7 @@ class RoutePanel extends Component {
           <div className='w48 h48 flex-parent flex-parent--center-main flex-parent--center-cross'>
             <svg className='icon color-gray'><use xlinkHref={'#icon-' + this.props.modality}></use></svg>
           </div>
-          <div className='bottom txt-h4-mm pr12'>
+          <div className='bottom pr12'>
             {this.secondsToReadableTime(this.props.route.duration)}
             {this.props.modality === 'car' ? ' with current traffic' : ''}
           </div>
@@ -45,7 +45,7 @@ class RoutePanel extends Component {
     hours -= 24 * days;
 
     var daysString = (days > 0) ? `${days} day${days > 1 ? 's,' : ','} ` : '';
-    var hoursString = (hours > 0) ? `${hours} hour${hours > 1 ? 's and' : 'and'} ` : '';
+    var hoursString = (hours > 0) ? `${hours} hour${hours > 1 ? 's and' : ' and'} ` : '';
     var minutesString = `${minutes} minute${minutes > 1 ? 's' : ''} `;
     return daysString + hoursString + minutesString;
   }

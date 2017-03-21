@@ -5,7 +5,7 @@ import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import PlaceInfo from './PlaceInfo';
 import directionsIcon from '../assets/directions.svg';
-import {writeSearch, setSearchLocation, triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
+import {triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
 
 class Search extends Component {
   closeSearch() {
@@ -105,10 +105,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    writeSearch: (input) => dispatch(writeSearch(input)),
-    setSearchLocation: (location) => dispatch(setSearchLocation(location)),
+    writeSearch: (input) => dispatch(setStateValue('searchString', input)),
+    setSearchLocation: (location) => dispatch(setStateValue('searchLocation', location)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
-    setMode: (mode) => dispatch(setMode(mode)),
+    setMode: (mode) => dispatch(setStateValue('mode', mode)),
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),
     setPlaceInfo: (info) => dispatch(setStateValue('placeInfo', info))

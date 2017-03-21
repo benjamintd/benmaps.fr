@@ -7,7 +7,7 @@ import RoutePanel from './RoutePanel';
 import ModalityButtons from './ModalityButtons';
 import MyLocation from './MyLocation';
 import swapDirectionsIcon from '../assets/swapDirections.svg';
-import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
+import {triggerMapUpdate, setDirectionsLocation, setStateValue} from '../actions/index';
 
 class Directions extends Component {
   render() {
@@ -173,7 +173,7 @@ class Directions extends Component {
       directions: 'relative my-bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white px48 h42 w-full',
       results: 'absolute w-full bg-white shadow-darken5 border-darken10',
-      placeName: 'txt-truncate color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
+      placeName: 'txt-truncate w-full color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
       row: 'flex-child hmin42 w-full w420-mm flex-parent flex-parent--row',
       userLocation: 'relative bg-white h42 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-mm'
     }
@@ -216,8 +216,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
-    setMode: (mode) => dispatch(setMode(mode)),
-    setModality: (modality) => dispatch(setModality(modality)),
+    setMode: (mode) => dispatch(setStateValue('mode', mode)),
+    setModality: (modality) => dispatch(setStateValue('modality', modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),
     writeSearchTo: (value) => dispatch(setStateValue('directionsToString', value)),
     setRoute: (route) => dispatch(setStateValue('route', route)),
