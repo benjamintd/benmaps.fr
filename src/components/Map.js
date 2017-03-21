@@ -5,7 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setZoom, setCenter, setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
+import {setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
 
 class MapComponent extends Component {
   constructor(props) {
@@ -40,8 +40,8 @@ class MapComponent extends Component {
 
     map.on('moveend', () => {
       const center = map.getCenter();
-      this.props.setCenter([center.lng, center.lat]);
-      this.props.setZoom(map.getZoom());
+      this.props.setStateValue('mapCenter', [center.lng, center.lat]);
+      this.props.setStateValue('mapZoom', map.getZoom());
     });
 
     map.on('load', () => {
@@ -413,8 +413,6 @@ MapComponent.propTypes = {
   style: React.PropTypes.string,
   center: React.PropTypes.array,
   zoom: React.PropTypes.number,
-  setCenter: React.PropTypes.func,
-  setZoom: React.PropTypes.func,
   map: React.PropTypes.object,
   mode: React.PropTypes.string,
   route: React.PropTypes.object,
@@ -453,8 +451,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setCenter: (coordinates) => dispatch(setCenter(coordinates)),
-    setZoom: (zoom) => dispatch(setZoom(zoom)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),

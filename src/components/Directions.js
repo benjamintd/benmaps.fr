@@ -7,7 +7,7 @@ import RoutePanel from './RoutePanel';
 import ModalityButtons from './ModalityButtons';
 import MyLocation from './MyLocation';
 import swapDirectionsIcon from '../assets/swapDirections.svg';
-import {triggerMapUpdate, setMode, setDirectionsLocation, setStateValue, setModality} from '../actions/index';
+import {triggerMapUpdate, setDirectionsLocation, setStateValue} from '../actions/index';
 
 class Directions extends Component {
   render() {
@@ -216,8 +216,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
-    setMode: (mode) => dispatch(setMode(mode)),
-    setModality: (modality) => dispatch(setModality(modality)),
+    setMode: (mode) => dispatch(setStateValue('mode', mode)),
+    setModality: (modality) => dispatch(setStateValue('modality', modality)),
     writeSearchFrom: (value) => dispatch(setStateValue('directionsFromString', value)),
     writeSearchTo: (value) => dispatch(setStateValue('directionsToString', value)),
     setRoute: (route) => dispatch(setStateValue('route', route)),

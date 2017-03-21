@@ -89,8 +89,9 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       const description = entity.descriptions.en.value;
       const label = entity.labels.en.value;
       next({
-        type: 'SET_PLACE_INFO',
-        info: {
+        type: 'SET_STATE_VALUE',
+        key: 'placeInfo',
+        value: {
           claims: simplifiedClaims,
           description,
           label

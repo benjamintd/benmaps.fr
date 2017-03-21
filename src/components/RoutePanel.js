@@ -17,7 +17,7 @@ class RoutePanel extends Component {
           <div className='w48 h48 flex-parent flex-parent--center-main flex-parent--center-cross'>
             <svg className='icon color-gray'><use xlinkHref={'#icon-' + this.props.modality}></use></svg>
           </div>
-          <div className='bottom txt-h4-mm pr12'>
+          <div className='bottom pr12'>
             {this.secondsToReadableTime(this.props.route.duration)}
             {this.props.modality === 'car' ? ' with current traffic' : ''}
           </div>
