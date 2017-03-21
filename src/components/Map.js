@@ -5,7 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setStateValue, setUserLocation, triggerMapUpdate, getRoute} from '../actions/index'
+import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index'
 
 class MapComponent extends Component {
   constructor(props) {
@@ -13,7 +13,8 @@ class MapComponent extends Component {
     this.state = {
       isDragging: false,
       isCursorOverPoint: false,
-      draggingFeature: null
+      draggedLayer: '',
+      draggedCoords: null
     };
   }
 
@@ -37,12 +38,6 @@ class MapComponent extends Component {
     });
 
     this.map = map;
-
-    map.on('moveend', () => {
-      const center = map.getCenter();
-      this.props.setStateValue('mapCenter', [center.lng, center.lat]);
-      this.props.setStateValue('mapZoom', map.getZoom());
-    });
 
     map.on('load', () => {
 
@@ -158,7 +153,8 @@ class MapComponent extends Component {
         }
       }, 10000);
 
-      // Click and drag behaviors
+      // Set event listeners
+
       map.on('click', (e) => this.onClick(e));
 
       map.on('mousemove', (e) => {
@@ -178,6 +174,12 @@ class MapComponent extends Component {
       });
 
       map.on('mousedown', (e) => this.mouseDown(e), true);
+
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        this.props.setStateValue('mapCenter', [center.lng, center.lat]);
+        this.props.setStateValue('mapZoom', map.getZoom());
+      });
     });
   }
 
@@ -261,6 +263,7 @@ class MapComponent extends Component {
       }
     }
 
+    // No need to re-update until the state says so
     this.props.setStateValue('needMapUpdate', false);
     this.props.setStateValue('needMapRepan', false);
   }
@@ -284,32 +287,6 @@ class MapComponent extends Component {
     }
   }
 
-  get emptyData() {
-    return {
-      type: 'FeatureCollection',
-      features: []
-    };
-  }
-
-  get selectableLayers() {
-    return [
-      'rail-label',
-      'poi-scalerank1',
-      'poi-parks-scalerank1',
-      'poi-scalerank2',
-      'poi-parks-scalerank2',
-      'poi-scalerank3',
-      'poi-parks-scalerank3',
-      'poi-scalerank4-l1',
-      'poi-scalerank4-l15',
-      'poi-parks_scalerank4',
-    ];
-  }
-
-  get movableLayers() {
-    return ['marker', 'fromMarker'];
-  }
-
   mouseDown(e) {
     if (!this.state.isDragging && !this.state.isCursorOverPoint) return;
 
@@ -322,7 +299,7 @@ class MapComponent extends Component {
 
     const mouseMoveFn = (e) => this.onMove(e);
 
-    this.setState({isDragging: true, draggingFeature: features[0], mouseMoveFn: mouseMoveFn});
+    this.setState({isDragging: true, draggedLayer: features[0].layer.id, mouseMoveFn: mouseMoveFn});
 
     // Mouse events
     this.map.on('mousemove', mouseMoveFn);
@@ -332,17 +309,18 @@ class MapComponent extends Component {
   onMove(e) {
     if (!this.state.isDragging) return;
 
-    const layerId = this.state.draggingFeature.layer.id;
+    const layerId = this.state.draggedLayer;
     if (this.movableLayers.indexOf(layerId) < 0) return;
 
-    var coords = e.lngLat;
+    var coords = [e.lngLat.lng, e.lngLat.lat];
+    this.setState({draggedCoords: coords});
 
     // Set a UI indicator for dragging.
     this.map.getCanvas().style.cursor = 'grabbing';
 
     const geometry = {
       type: 'Point',
-      coordinates: [coords.lng, coords.lat]
+      coordinates: coords
     };
 
     this.map.getSource(layerId).setData(geometry);
@@ -350,10 +328,11 @@ class MapComponent extends Component {
     this.props.setStateValue('placeInfo', null);
     this.props.setStateValue('searchLocation', null);
     this.props.setStateValue(this.layerToKey(layerId), {
-      place_name: 'Dropped pin',
+      place_name: '__loading',
       geometry: geometry
     });
     this.props.setStateValue('route', undefined); // Will make the route disappear without triggering a call to the API
+    this.props.setStateValue('routeStatus', 'idle');
     this.props.triggerMapUpdate();
   }
 
@@ -362,19 +341,23 @@ class MapComponent extends Component {
 
     this.map.getCanvas().style.cursor = '';
 
-    this.setState({isDragging: false});
-
     // Unbind mouse events
     this.map.off('mousemove', this.state.mouseMoveFn);
 
-    // TODO here, trigger an event that will call the geocoding API for a place/address from the dropped pin.
+    this.props.getReverseGeocode(
+      this.layerToKey(this.state.draggedLayer),
+      this.state.draggedCoords,
+      this.props.accessToken
+    );
+
+    this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
 
     this.props.setStateValue('route', null); // retrigger API call
     this.props.triggerMapUpdate();
   }
 
   onClick(e) {
-    var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers}); // TODO add POI layers
+    var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers});
     if (!features.length) {
       return;
     }
@@ -406,6 +389,32 @@ class MapComponent extends Component {
     else if (this.props.mode === 'directions' && layer === 'marker') return 'directionsTo';
     else if (this.props.mode === 'directions' && layer === 'fromMarker') return 'directionsFrom';
   }
+
+  get emptyData() {
+    return {
+      type: 'FeatureCollection',
+      features: []
+    };
+  }
+
+  get selectableLayers() {
+    return [
+      'rail-label',
+      'poi-scalerank1',
+      'poi-parks-scalerank1',
+      'poi-scalerank2',
+      'poi-parks-scalerank2',
+      'poi-scalerank3',
+      'poi-parks-scalerank3',
+      'poi-scalerank4-l1',
+      'poi-scalerank4-l15',
+      'poi-parks_scalerank4',
+    ];
+  }
+
+  get movableLayers() {
+    return ['marker', 'fromMarker'];
+  }
 }
 
 MapComponent.propTypes = {
@@ -427,7 +436,8 @@ MapComponent.propTypes = {
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
   getRoute: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func
+  triggerMapUpdate: React.PropTypes.func,
+  getReverseGeocode: React.PropTypes.func
 }
 
 const mapStateToProps = (state) => {
@@ -454,7 +464,8 @@ const mapDispatchToProps = (dispatch) => {
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
-    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan))
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken))
   };
 };
 

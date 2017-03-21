@@ -32,3 +32,10 @@ export const getPlaceInfo = (wikidataId) => ({
   type: 'GET_PLACE_INFO',
   id: wikidataId
 });
+
+export const getReverseGeocode = (key, coordinates, accessToken) => ({
+  type: 'GET_REVERSE_GEOCODE',
+  key,
+  coordinates,
+  accessToken
+})
