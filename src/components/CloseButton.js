@@ -1,34 +1,32 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 class CloseButton extends Component {
   render() {
     return (
       this.props.show
-      ?
-      <div
+      ? <div
         className='absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer'
         onClick={this.props.onClick}
       >
         <svg className={'icon ' + (this.props.large ? 'icon--l ' : ' ') + this.props.color}><use xlinkHref='#icon-close'></use></svg>
       </div>
-      :
-      null
+      : null
     );
   }
 }
 
 CloseButton.propTypes = {
-  show: React.PropTypes.bool,
-  onClick: React.PropTypes.func,
   color: React.PropTypes.string,
-  large: React.PropTypes.bool
-}
+  large: React.PropTypes.bool,
+  onClick: React.PropTypes.func,
+  show: React.PropTypes.bool,
+};
 
 CloseButton.defaultProps = {
-  show: true,
-  onClick: () => {},
   color: 'color-gray',
-  large: false
-}
+  large: false,
+  onClick: () => {},
+  show: true,
+};
 
 export default CloseButton;

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 class ModalityButtons extends Component {
   render() {
@@ -23,10 +23,10 @@ class ModalityButtons extends Component {
 ModalityButtons.propTypes = {
   modality: React.PropTypes.string,
   onSetModality: React.PropTypes.func
-}
+};
 
 ModalityButtons.defaultProps = {
   modality: 'car'
-}
+};
 
 export default ModalityButtons;

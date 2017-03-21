@@ -22,9 +22,9 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     const fromCoordinates = action.directionsFrom.geometry.coordinates.join(',');
     const toCoordinates = action.directionsTo.geometry.coordinates.join(',');
 
-    const url = baseUrl + profile + '/' + fromCoordinates + ';' + toCoordinates +
-      '?access_token=' + action.accessToken +
-      '&overview=full';
+    const url = baseUrl + profile + '/' + fromCoordinates + ';' + toCoordinates
+      + '?access_token=' + action.accessToken
+      + '&overview=full';
 
     // Fetch
     fetch(url, {method: 'get'})
@@ -42,22 +42,23 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         }
       })
       .then(data => {
-        if (data.code !== 'Ok') return Promise.reject();
-
-        // Success
-        next({
-          type: 'SET_ROUTE',
-          data: data
-        });
-        next({
-          type: 'SET_STATE_VALUE',
-          key: 'routeStatus',
-          value: 'idle'
-        });
-        next({
-          type: 'TRIGGER_MAP_UPDATE',
-          needMapRepan: true
-        });
+        if (data.code !== 'Ok') Promise.reject();
+        else {
+          // Success
+          next({
+            type: 'SET_ROUTE',
+            data: data
+          });
+          next({
+            type: 'SET_STATE_VALUE',
+            key: 'routeStatus',
+            value: 'idle'
+          });
+          next({
+            type: 'TRIGGER_MAP_UPDATE',
+            needMapRepan: true
+          });
+        }
       })
       .catch(() => next({
         type: 'SET_STATE_VALUE',
@@ -103,9 +104,9 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
   }
 
   case 'GET_REVERSE_GEOCODE': {
-    const url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' +
-      action.coordinates.join(',') + '.json' +
-      '?access_token=' + action.accessToken;
+    const url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
+      + action.coordinates.join(',') + '.json'
+      + '?access_token=' + action.accessToken;
 
     fetch(url, {method: 'get'})
       .then(res => {
@@ -120,27 +121,27 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         // Success
         if (data.features && data.features.length > 0) {
           next({
-            type: 'SET_STATE_VALUE',
-            key: action.key,
-            value: {
-              place_name: data.features[0].place_name,
-              geometry: {
-                type: 'Point',
-                coordinates: action.coordinates
+            'type': 'SET_STATE_VALUE',
+            'key': action.key,
+            'value': {
+              'place_name': data.features[0].place_name,
+              'geometry': {
+                'type': 'Point',
+                'coordinates': action.coordinates
               }
             }
           });
-        } else return Promise.reject();
+        } else Promise.reject();
       })
       .catch(() => {
         next({
-          type: 'SET_STATE_VALUE',
-          key: action.key,
-          value: {
-            place_name: 'Dropped pin',
-            geometry: {
-              type: 'Point',
-              coordinates: action.coordinates
+          'type': 'SET_STATE_VALUE',
+          'key': action.key,
+          'value': {
+            'place_name': 'Dropped pin',
+            'geometry': {
+              'type': 'Point',
+              'coordinates': action.coordinates
             }
           }
         });

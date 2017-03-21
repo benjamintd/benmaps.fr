@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ImageWithFallback from './ImageWithFallback';
 import directionsIcon from '../assets/directions.svg';
 import md5 from 'blueimp-md5';
@@ -41,8 +41,11 @@ class PlaceInfo extends Component {
       return {
         thumb,
         full
-      }
-    }
+      };
+    } else return {
+      thumb: '',
+      full: ''
+    };
   }
 
   getPhoneNumber() {
@@ -55,7 +58,7 @@ class PlaceInfo extends Component {
           </div>
           <span className='txt-truncate'>{claim[0]}</span>
         </div>
-      )
+      );
     } else return null;
   }
 
@@ -69,7 +72,7 @@ class PlaceInfo extends Component {
           </div>
           <span className='txt-truncate'>{claim[0]}</span>
         </div>
-      )
+      );
     } else return null;
   }
 
@@ -83,24 +86,24 @@ class PlaceInfo extends Component {
           </div>
           <a href={claim[0]} target='_blank' className='txt-truncate'>{claim[0]}</a>
         </div>
-      )
+      );
     } else return null;
   }
 
   get styles() {
     return {
-      placeInfo: 'place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
-      infoRow: 'h36 py6 pr12 flex-parent flex-parent--row flex-parent--center-cross',
+      directionsIcon: 'bg-white hmin48 wmin48 m12 round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross',
       icon: 'flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
+      infoRow: 'h36 py6 pr12 flex-parent flex-parent--row flex-parent--center-cross',
       mainInfo: 'p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main',
-      directionsIcon: 'bg-white hmin48 wmin48 m12 round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross'
-    }
+      placeInfo: 'place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
+    };
   }
 }
 
 PlaceInfo.propTypes = {
+  clickDirections: React.PropTypes.func,
   info: React.PropTypes.object,
-  clickDirections: React.PropTypes.func
-}
+};
 
 export default PlaceInfo;

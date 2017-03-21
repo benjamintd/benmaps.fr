@@ -33,7 +33,7 @@ const reducer = (state = defaultState, action) => {
 
   case 'SET_STATE_VALUE': {
     const modifiedState = {};
-    modifiedState[action.key] = action.value
+    modifiedState[action.key] = action.value;
     return Object.assign({}, state, modifiedState);
   }
 
@@ -46,7 +46,7 @@ const reducer = (state = defaultState, action) => {
   case 'SET_USER_LOCATION':
     return Object.assign({}, state, {
       userLocation: {
-        place_name: 'My location',
+        'place_name': 'My location',
         center: action.coordinates,
         geometry: {
           type: 'Point',
@@ -72,7 +72,7 @@ const reducer = (state = defaultState, action) => {
       const route = action.data.routes[0];
 
       const geojsonLine = polyline.toGeoJSON(route.geometry);
-      route.geometry = geojsonLine
+      route.geometry = geojsonLine;
 
       return Object.assign({}, state, {
         route: route

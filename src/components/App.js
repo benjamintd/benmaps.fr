@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import MapComponent from './Map';
 import Search from './Search';
@@ -12,10 +12,8 @@ class App extends Component {
         <div className='relative m12 m24-mm w420-mm flex-parent flex-parent--column'>
           {
             this.props.mode === 'directions'
-            ?
-            <Directions/>
-            :
-            <Search/>
+            ? <Directions/>
+            : <Search/>
           }
         </div>
       </div>
@@ -27,7 +25,7 @@ App.propTypes = {
   mode: React.PropTypes.string,
   route: React.PropTypes.object,
   routeStatus: React.PropTypes.string
-}
+};
 
 const mapStateToProps = (state) => {
   return {
