@@ -38,4 +38,4 @@ export const getReverseGeocode = (key, coordinates, accessToken) => ({
   key,
   coordinates,
   accessToken
-})
+});

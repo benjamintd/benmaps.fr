@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 class PlaceName extends Component {
   render() {
     var parts = this.props.location.place_name.split(', ');
-    if (parts.length < 1) return;
+    if (parts.length < 1) return null;
     var main = parts[0];
     var rest = parts.slice(1).join(', ');
 
@@ -20,21 +20,19 @@ class PlaceName extends Component {
       <div className='txt-truncate w-full'>
         {
           main === '__loading'
-          ?
-          <div className={'loading loading--s ' + (this.props.colors === 'light' ? 'loading--dark' : '')}></div>
-          :
-          <div className={'inline pr6 ' + mainColor}>{main}</div>
+          ? <div className={'loading loading--s ' + (this.props.colors === 'light' ? 'loading--dark' : '')}></div>
+          : <div className={'inline pr6 ' + mainColor}>{main}</div>
         }
-        <div className={'inline txt-s ' +restColor}>{rest}</div>
+        <div className={'inline txt-s ' + restColor}>{rest}</div>
       </div>
     );
   }
 }
 
 PlaceName.propTypes = {
+  colors: React.PropTypes.string,
   location: React.PropTypes.object,
-  colors: React.PropTypes.string
-}
+};
 
 
 export default PlaceName;

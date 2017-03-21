@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
 import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import PlaceInfo from './PlaceInfo';
 import directionsIcon from '../assets/directions.svg';
-import {triggerMapUpdate, setMode, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
+import {triggerMapUpdate, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
 
 class Search extends Component {
   closeSearch() {
@@ -28,17 +28,15 @@ class Search extends Component {
           <svg className='icon color-gray'><use xlinkHref='#icon-search'></use></svg>
         </div>
         {
-          (this.props.searchLocation === null) // no place was selected yet
-          ?
-          <Geocoder
+          (this.props.searchLocation === null)// no place was selected yet
+          ? <Geocoder
             onSelect={(data) => this.onSelect(data)}
             searchString={this.props.searchString}
             writeSearch={(value) => this.props.writeSearch(value)}
             resultsClass={this.styles.results}
             inputClass={this.styles.input}
           />
-          :
-          <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
+          : <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
             <div className='w-full w420-mm pr42 txt-truncate'>
               <PlaceName location={this.props.searchLocation}/>
             </div>
@@ -57,10 +55,8 @@ class Search extends Component {
 
         {
           (this.props.searchLocation && this.props.placeInfo)
-          ?
-          <PlaceInfo info={this.props.placeInfo} clickDirections={() => this.clickDirections()}/>
-          :
-          null
+          ? <PlaceInfo info={this.props.placeInfo} clickDirections={() => this.clickDirections()}/>
+          : null
         }
       </div>
     );
@@ -78,40 +74,40 @@ class Search extends Component {
       icon: 'absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
       input: 'input px42 h42 border--transparent',
       results: 'results bg-white shadow-darken25 mt6 border-darken10'
-    }
+    };
   }
 }
 
 Search.propTypes = {
-  searchString: React.PropTypes.string,
-  searchLocation: React.PropTypes.object,
-  placeInfo: React.PropTypes.object,
   getPlaceInfo: React.PropTypes.func,
-  writeSearch: React.PropTypes.func,
-  setSearchLocation: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func,
+  placeInfo: React.PropTypes.object,
+  searchLocation: React.PropTypes.object,
+  searchString: React.PropTypes.string,
+  setDirectionsLocation: React.PropTypes.func,
   setMode: React.PropTypes.func,
   setPlaceInfo: React.PropTypes.func,
-  setDirectionsLocation: React.PropTypes.func
-}
+  setSearchLocation: React.PropTypes.func,
+  triggerMapUpdate: React.PropTypes.func,
+  writeSearch: React.PropTypes.func,
+};
 
 const mapStateToProps = (state) => {
   return {
-    searchString: state.searchString,
+    placeInfo: state.placeInfo,
     searchLocation: state.searchLocation,
-    placeInfo: state.placeInfo
+    searchString: state.searchString,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    writeSearch: (input) => dispatch(setStateValue('searchString', input)),
+    getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),
+    setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
+    setMode: (mode) => dispatch(setStateValue('mode', mode)),
+    setPlaceInfo: (info) => dispatch(setStateValue('placeInfo', info)),
     setSearchLocation: (location) => dispatch(setStateValue('searchLocation', location)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
-    setMode: (mode) => dispatch(setStateValue('mode', mode)),
-    setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
-    getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),
-    setPlaceInfo: (info) => dispatch(setStateValue('placeInfo', info))
+    writeSearch: (input) => dispatch(setStateValue('searchString', input)),
   };
 };
 

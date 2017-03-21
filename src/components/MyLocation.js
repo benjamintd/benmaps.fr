@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import PlaceName from './PlaceName';
 
 class MyLocation extends Component {
@@ -20,13 +20,13 @@ class MyLocation extends Component {
 }
 
 MyLocation.propTypes = {
+  onClick: React.PropTypes.func,
   userLocation: React.PropTypes.object,
-  onClick: React.PropTypes.func
-}
+};
 
 MyLocation.defaultProps = {
   onClick: () => {},
-  userLocation: { place_name: 'My Location'}
-}
+  userLocation: {'place_name': 'My Location'}
+};
 
 export default MyLocation;

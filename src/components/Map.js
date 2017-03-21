@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
 import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index'
+import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
 
 class MapComponent extends Component {
   constructor(props) {
@@ -29,12 +29,12 @@ class MapComponent extends Component {
     mapboxgl.accessToken = this.props.accessToken;
 
     const map = new mapboxgl.Map({
-        container: 'map',
-        style: this.props.style,
-        center: this.props.center,
-        zoom: this.props.zoom,
-        minZoom: 2,
-        maxZoom: 21
+      container: 'map',
+      style: this.props.style,
+      center: this.props.center,
+      zoom: this.props.zoom,
+      minZoom: 2,
+      maxZoom: 21
     });
 
     this.map = map;
@@ -127,7 +127,7 @@ class MapComponent extends Component {
         this.map.getSource('geolocation').setData(geometry);
         this.props.setUserLocation(geometry.coordinates);
         this.moveTo(geometry, 13);
-      }
+      };
 
       // Create geolocation control
       const geolocateControl = new mapboxgl.GeolocateControl();
@@ -158,7 +158,7 @@ class MapComponent extends Component {
       map.on('click', (e) => this.onClick(e));
 
       map.on('mousemove', (e) => {
-        var features = map.queryRenderedFeatures(e.point, { layers: this.movableLayers.concat(this.selectableLayers) });
+        var features = map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
 
         if (features.length) {
           map.getCanvas().style.cursor = 'pointer';
@@ -290,7 +290,7 @@ class MapComponent extends Component {
   mouseDown(e) {
     if (!this.state.isDragging && !this.state.isCursorOverPoint) return;
 
-    var features = this.map.queryRenderedFeatures(e.point, { layers: this.movableLayers });
+    var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers});
     if (!features.length) return;
 
 
@@ -328,8 +328,8 @@ class MapComponent extends Component {
     this.props.setStateValue('placeInfo', null);
     this.props.setStateValue('searchLocation', null);
     this.props.setStateValue(this.layerToKey(layerId), {
-      place_name: '__loading',
-      geometry: geometry
+      'place_name': '__loading',
+      'geometry': geometry
     });
     this.props.setStateValue('route', undefined); // Will make the route disappear without triggering a call to the API
     this.props.setStateValue('routeStatus', 'idle');
@@ -375,10 +375,10 @@ class MapComponent extends Component {
 
     if (key) {
       this.props.setStateValue(key, {
-        type: 'Feature',
-        place_name: feature.properties.name,
-        properties: {},
-        geometry: feature.geometry
+        'type': 'Feature',
+        'place_name': feature.properties.name,
+        'properties': {},
+        'geometry': feature.geometry
       });
       this.props.triggerMapUpdate();
     }
@@ -388,6 +388,7 @@ class MapComponent extends Component {
     if (this.props.mode === 'search' && layer === 'marker') return 'searchLocation';
     else if (this.props.mode === 'directions' && layer === 'marker') return 'directionsTo';
     else if (this.props.mode === 'directions' && layer === 'fromMarker') return 'directionsFrom';
+    else return '';
   }
 
   get emptyData() {
@@ -419,53 +420,53 @@ class MapComponent extends Component {
 
 MapComponent.propTypes = {
   accessToken: React.PropTypes.string,
-  style: React.PropTypes.string,
   center: React.PropTypes.array,
-  zoom: React.PropTypes.number,
-  map: React.PropTypes.object,
-  mode: React.PropTypes.string,
-  route: React.PropTypes.object,
-  userLocation: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
-  searchLocation: React.PropTypes.object,
   directionsFrom: React.PropTypes.object,
   directionsTo: React.PropTypes.object,
+  getReverseGeocode: React.PropTypes.func,
+  getRoute: React.PropTypes.func,
+  map: React.PropTypes.object,
   modality: React.PropTypes.string,
-  needMapUpdate: React.PropTypes.bool,
+  mode: React.PropTypes.string,
   needMapRepan: React.PropTypes.bool,
+  needMapUpdate: React.PropTypes.bool,
+  route: React.PropTypes.object,
+  routeStatus: React.PropTypes.string,
+  searchLocation: React.PropTypes.object,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
-  getRoute: React.PropTypes.func,
+  style: React.PropTypes.string,
   triggerMapUpdate: React.PropTypes.func,
-  getReverseGeocode: React.PropTypes.func
-}
+  userLocation: React.PropTypes.object,
+  zoom: React.PropTypes.number,
+};
 
 const mapStateToProps = (state) => {
   return {
     accessToken: state.mapboxAccessToken,
-    style: state.mapStyle,
     center: state.mapCenter,
-    zoom: state.mapZoom,
-    searchLocation: state.searchLocation,
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
-    userLocation: state.userLocation,
     modality: state.modality,
     mode: state.mode,
-    needMapUpdate: state.needMapUpdate,
     needMapRepan: state.needMapRepan,
+    needMapUpdate: state.needMapUpdate,
     route: state.route,
-    routeStatus: state.routeStatus
+    routeStatus: state.routeStatus,
+    searchLocation: state.searchLocation,
+    style: state.mapStyle,
+    userLocation: state.userLocation,
+    zoom: state.mapZoom,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken)),
+    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
-    getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
-    getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken))
   };
 };
 

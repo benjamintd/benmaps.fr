@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 class RoutePanel extends Component {
@@ -25,11 +25,11 @@ class RoutePanel extends Component {
             {(this.props.route.distance / 1000).toFixed(1)} km
           </div>
         </div>
-      )
+      );
     } else if (this.props.routeStatus === 'pending') {
-      return <div className='loading loading--s'/>
+      return <div className='loading loading--s'/>;
     } else if (this.props.routeStatus === 'error') {
-      return <div className='txt-s txt-m-mm animation-subtle-shake px18'>Sorry, no route found for these locations.</div>
+      return <div className='txt-s txt-m-mm animation-subtle-shake px18'>Sorry, no route found for these locations.</div>;
     } else return null;
   }
 
@@ -52,16 +52,16 @@ class RoutePanel extends Component {
 }
 
 RoutePanel.propTypes = {
+  modality: React.PropTypes.string,
   route: React.PropTypes.object,
   routeStatus: React.PropTypes.string.isRequired,
-  modality: React.PropTypes.string
-}
+};
 
 const mapStateToProps = (state) => {
   return {
+    modality: state.modality,
     route: state.route,
     routeStatus: state.routeStatus,
-    modality: state.modality
   };
 };
 
