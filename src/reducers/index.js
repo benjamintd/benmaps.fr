@@ -2,7 +2,7 @@ import polyline from '@mapbox/polyline';
 
 const defaultState = {
   // Mapbox Access Token
-  mapboxAccessToken: 'pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng',
+  mapboxAccessToken: process.env.REACT_APP_MAPBOX_TOKEN,
   // Map
   mapStyle: 'mapbox://styles/benjamintd/cj06a6mi5004p2sroifies8t9',
   mapCenter: [-122.4, 37.8],
