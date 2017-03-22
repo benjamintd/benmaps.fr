@@ -2,7 +2,7 @@
 
 [A Google-like interface for Mapbox maps](https://benjamintd.github.io/mapbox-maps/)
 
-<img width="600" alt="Mapbox Maps" src="https://cloud.githubusercontent.com/assets/11202803/24183171/ef155710-0e83-11e7-8f43-4eaa0a890c7f.png">
+[<img width="600" alt="Mapbox Maps" src="https://cloud.githubusercontent.com/assets/11202803/24183171/ef155710-0e83-11e7-8f43-4eaa0a890c7f.png">](https://benjamintd.github.io/mapbox-maps/)
 
 ------
 

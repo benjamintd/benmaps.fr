@@ -5,10 +5,12 @@ import md5 from 'blueimp-md5';
 
 class PlaceInfo extends Component {
   render() {
+    console.log(window);
+    if (window.innerHeight < 500) return null;
     return (
       <div className={this.styles.placeInfo}>
         <ImageWithFallback
-          className='place-image w-full h120'
+          className='place-image w-full h72 h120-mm'
           primary={this.getImageUrl().thumb}
           secondary={this.getImageUrl().full}
           alt={this.props.info.description}
@@ -16,7 +18,7 @@ class PlaceInfo extends Component {
         <div className='my-bg-blue flex-parent flex-parent--row'>
           <div className={this.styles.mainInfo}>
             <div className='color-white pl42 pr12 txt-h4 txt-bold'>{this.props.info.label}</div>
-            <div className='color-lighten75 pl42 pr12 txt-s'>{this.props.info.description}</div>
+            <div className={'color-lighten75 pl42 pr12 txt-s ' + (window.innerWidth < 600 ? 'hide-visually' : '')}>{this.props.info.description}</div>
           </div>
           <div onClick={this.props.clickDirections} className={this.styles.directionsIcon}>
             <img src={directionsIcon} alt='directions'/>
@@ -56,7 +58,7 @@ class PlaceInfo extends Component {
           <div className={this.styles.icon}>
             <svg className='icon my-blue'><use xlinkHref='#icon-info'></use></svg>
           </div>
-          <span className='txt-truncate'>{claim[0]}</span>
+          <span>{claim[0]}</span>
         </div>
       );
     } else return null;
@@ -64,7 +66,7 @@ class PlaceInfo extends Component {
 
   getAddress() {
     const claim = this.props.info.claims['P969'];
-    if (claim && claim.length > 0) {
+    if (claim && claim.length > 0 && window.innerWidth > 600) {
       return (
         <div className={this.styles.infoRow}>
           <div className={this.styles.icon}>
@@ -92,9 +94,9 @@ class PlaceInfo extends Component {
 
   get styles() {
     return {
-      directionsIcon: 'bg-white hmin48 wmin48 m12 round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross',
+      directionsIcon: 'bg-white hmin42 wmin42 hmin48-mm wmin48-mm hmax42 wmax42 hmax48-mm wmax48-mm m6 m12-mm round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross',
       icon: 'flex-parent flex-parent--center-cross flex-parent--center-main w42 h42',
-      infoRow: 'h36 py6 pr12 flex-parent flex-parent--row flex-parent--center-cross',
+      infoRow: 'h24 h36-mm py6 pr12 flex-parent flex-parent--row flex-parent--center-cross',
       mainInfo: 'p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main',
       placeInfo: 'place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
     };
