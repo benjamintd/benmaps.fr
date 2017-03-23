@@ -53,6 +53,7 @@ class Directions extends Component {
                     writeSearch={(value) => this.props.writeSearchFrom(value)}
                     resultsClass={'mt48 ' + this.styles.results}
                     inputClass={this.styles.input}
+                    inputPlaceholder='Choose starting point...'
                   />
                 }
                 <CloseButton
@@ -73,6 +74,7 @@ class Directions extends Component {
                     writeSearch={(value) => this.props.writeSearchTo(value)}
                     resultsClass={'mt6 ' + this.styles.results}
                     inputClass={this.styles.input}
+                    inputPlaceholder='Choose destination...'
                   />
                 }
                 <CloseButton
@@ -106,8 +108,8 @@ class Directions extends Component {
   setDirectionsLocation(kind) {
     return (location) => {
       this.props.setDirectionsLocation(kind, location);
-      if (kind === 'to') this.props.writeSearchTo('');
-      if (kind === 'from') this.props.writeSearchFrom('');
+      if (kind === 'to') this.props.writeSearchTo(location.place_name);
+      if (kind === 'from') this.props.writeSearchFrom(location.place_name);
       this.props.triggerMapUpdate('repan');
     };
   }

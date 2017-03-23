@@ -125,12 +125,12 @@ var Geocoder = React.createClass({
     this.props.onSelect(place);
     this.setState({focus: listLocation});
     // focus on the input after click to maintain key traversal
-    ReactDOM.findDOMNode(this.refs.input).focus(); // eslint-disable-line
+    this.input.focus();
     return false;
   },
   render() {
     var input = <input
-      ref='input'
+      ref={(input) => { this.input = input; }}
       className={this.props.inputClass}
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
