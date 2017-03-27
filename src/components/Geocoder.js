@@ -1,7 +1,6 @@
 // forked from https://github.com/mapbox/react-geocoder
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
 import xhr from 'xhr';
@@ -19,7 +18,8 @@ var Geocoder = React.createClass({
       source: 'mapbox.places',
       bbox: '',
       types: '',
-      onSuggest: function () {}
+      onSuggest: function () {},
+      focusOnMount: true
     };
   },
   getInitialState() {
@@ -125,12 +125,12 @@ var Geocoder = React.createClass({
     this.props.onSelect(place);
     this.setState({focus: listLocation});
     // focus on the input after click to maintain key traversal
-    ReactDOM.findDOMNode(this.refs.input).focus(); // eslint-disable-line
+    this.input.focus();
     return false;
   },
   render() {
     var input = <input
-      ref='input'
+      ref={(input) => { this.input = input; }}
       className={this.props.inputClass}
       onInput={this.onInput}
       onKeyDown={this.onKeyDown}
@@ -163,6 +163,9 @@ var Geocoder = React.createClass({
         {this.props.inputPosition === 'bottom' && input}
       </div>
     );
+  },
+  componentDidMount() {
+    if (this.props.focusOnMount) this.input.focus();
   }
 });
 

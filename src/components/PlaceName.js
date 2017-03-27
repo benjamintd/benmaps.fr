@@ -17,7 +17,7 @@ class PlaceName extends Component {
     }
 
     return (
-      <div className='txt-truncate w-full'>
+      <div className='txt-truncate w-full' onClick={() => this.props.onClick()}>
         {
           main === '__loading'
           ? <div className={'loading loading--s ' + (this.props.colors === 'light' ? 'loading--dark' : '')}></div>
@@ -32,7 +32,11 @@ class PlaceName extends Component {
 PlaceName.propTypes = {
   colors: React.PropTypes.string,
   location: React.PropTypes.object,
+  onClick: React.PropTypes.func
 };
 
+PlaceName.defaultProps = {
+  onClick: function () {}
+};
 
 export default PlaceName;

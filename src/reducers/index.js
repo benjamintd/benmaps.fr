@@ -46,7 +46,7 @@ const reducer = (state = defaultState, action) => {
   case 'SET_USER_LOCATION':
     return Object.assign({}, state, {
       userLocation: {
-        'place_name': 'My location',
+        'place_name': 'My Location',
         center: action.coordinates,
         geometry: {
           type: 'Point',

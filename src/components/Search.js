@@ -8,19 +8,6 @@ import directionsIcon from '../assets/directions.svg';
 import {triggerMapUpdate, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
 
 class Search extends Component {
-  closeSearch() {
-    this.props.writeSearch('');
-    this.props.setSearchLocation(null);
-    this.props.setPlaceInfo(null);
-    this.props.triggerMapUpdate();
-  }
-
-  clickDirections() {
-    this.props.setMode('directions');
-    this.props.writeSearch('');
-    this.props.setDirectionsLocation('to', this.props.searchLocation);
-  }
-
   render() {
     return (
       <div className={this.styles.main}>
@@ -32,13 +19,24 @@ class Search extends Component {
           ? <Geocoder
             onSelect={(data) => this.onSelect(data)}
             searchString={this.props.searchString}
-            writeSearch={(value) => this.props.writeSearch(value)}
+            writeSearch={(value) => {
+              this.props.triggerMapUpdate();
+              this.props.writeSearch(value);
+            }}
             resultsClass={this.styles.results}
             inputClass={this.styles.input}
+            focusOnMount={true}
           />
           : <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
             <div className='w-full w420-mm pr42 txt-truncate'>
-              <PlaceName location={this.props.searchLocation}/>
+              <PlaceName
+                location={this.props.searchLocation}
+                onClick={() => {
+                  this.props.writeSearch(this.props.searchLocation.place_name);
+                  this.props.setSearchLocation(null);
+                  this.props.setPlaceInfo(null);
+                }}
+              />
             </div>
             <div
               className={'mr30 cursor-pointer right ' + this.styles.icon}
@@ -63,9 +61,23 @@ class Search extends Component {
   }
 
   onSelect(data) {
+    this.props.writeSearch(data.place_name);
     this.props.setSearchLocation(data);
     this.props.triggerMapUpdate('repan');
     if (data.properties.wikidata) this.props.getPlaceInfo(data.properties.wikidata);
+  }
+
+  closeSearch() {
+    this.props.writeSearch('');
+    this.props.setSearchLocation(null);
+    this.props.setPlaceInfo(null);
+    this.props.triggerMapUpdate();
+  }
+
+  clickDirections() {
+    this.props.setMode('directions');
+    this.props.writeSearch(this.props.searchLocation.place_name);
+    this.props.setDirectionsLocation('to', this.props.searchLocation);
   }
 
   get styles() {
