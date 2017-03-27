@@ -1,7 +1,6 @@
 // forked from https://github.com/mapbox/react-geocoder
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
 import xhr from 'xhr';
@@ -19,7 +18,8 @@ var Geocoder = React.createClass({
       source: 'mapbox.places',
       bbox: '',
       types: '',
-      onSuggest: function () {}
+      onSuggest: function () {},
+      focusOnMount: true
     };
   },
   getInitialState() {
@@ -163,6 +163,9 @@ var Geocoder = React.createClass({
         {this.props.inputPosition === 'bottom' && input}
       </div>
     );
+  },
+  componentDidMount() {
+    if (this.props.focusOnMount) this.input.focus();
   }
 });
 

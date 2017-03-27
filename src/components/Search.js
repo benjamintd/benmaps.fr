@@ -25,6 +25,7 @@ class Search extends Component {
             }}
             resultsClass={this.styles.results}
             inputClass={this.styles.input}
+            focusOnMount={true}
           />
           : <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
             <div className='w-full w420-mm pr42 txt-truncate'>

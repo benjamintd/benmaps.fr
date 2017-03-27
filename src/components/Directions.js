@@ -45,42 +45,59 @@ class Directions extends Component {
                 {
                   this.props.directionsFrom
                   ? <div className={this.styles.placeName}>
-                    <PlaceName location={this.props.directionsFrom} colors='light'/>
+                    <PlaceName
+                      location={this.props.directionsFrom}
+                      colors='light'
+                      onClick={() => {
+                        this.props.writeSearchFrom(this.props.directionsFrom.place_name);
+                        this.props.setDirectionsLocation('from', null);
+                        this.props.setRoute(null);
+                        this.props.setStateValue('routeStatus', 'idle');
+                      }}
+                    />
                   </div>
                   : <Geocoder
                     onSelect={this.setDirectionsLocation('from')}
                     searchString={this.props.directionsFromString}
-                    writeSearch={(value) => this.props.writeSearchFrom(value)}
+                    writeSearch={(value) => {
+                      this.props.writeSearchFrom(value);
+                      this.props.triggerMapUpdate();
+                    }}
                     resultsClass={'mt48 ' + this.styles.results}
                     inputClass={this.styles.input}
                     inputPlaceholder='Choose starting point...'
+                    focusOnMount={true}
                   />
                 }
-                <CloseButton
-                  onClick={() => this.resetSearch('from')}
-                  color='color-lighten50'
-                />
               </div>
 
               <div className={this.styles.row}>
                 {
                   this.props.directionsTo
                   ? <div className={this.styles.placeName}>
-                    <PlaceName location={this.props.directionsTo} colors='light'/>
+                    <PlaceName
+                      location={this.props.directionsTo}
+                      colors='light'
+                      onClick={() => {
+                        this.props.writeSearchTo(this.props.directionsTo.place_name);
+                        this.props.setDirectionsLocation('to', null);
+                        this.props.setRoute(null);
+                        this.props.setStateValue('routeStatus', 'idle');
+                      }}
+                    />
                   </div>
                   : <Geocoder
                     onSelect={this.setDirectionsLocation('to')}
                     searchString={this.props.directionsToString}
-                    writeSearch={(value) => this.props.writeSearchTo(value)}
+                    writeSearch={(value) => {
+                      this.props.writeSearchTo(value);
+                      this.props.triggerMapUpdate();
+                    }}
                     resultsClass={'mt6 ' + this.styles.results}
                     inputClass={this.styles.input}
                     inputPlaceholder='Choose destination...'
                   />
                 }
-                <CloseButton
-                  onClick={() => this.resetSearch('to')}
-                  color='color-lighten50'
-                />
               </div>
 
             </div>
@@ -142,6 +159,7 @@ class Directions extends Component {
   }
 
   showUserLocation() {
+    console.log(this.props.directionsFromString)
     return (
       (
         (!this.props.directionsFrom && !this.props.directionsTo)
