@@ -10,7 +10,7 @@ class PlaceInfo extends Component {
     return (
       <div className={this.styles.placeInfo}>
         <ImageWithFallback
-          className='place-image w-full h72 h120-mm'
+          className='cover w-full h72 h120-mm'
           primary={this.getImageUrl().thumb}
           secondary={this.getImageUrl().full}
           alt={this.props.info.description}
@@ -18,7 +18,7 @@ class PlaceInfo extends Component {
         <div className='my-bg-blue flex-parent flex-parent--row'>
           <div className={this.styles.mainInfo}>
             <div className='color-white pl42 pr12 txt-h4 txt-bold'>{this.props.info.label}</div>
-            <div className={'color-lighten75 pl42 pr12 txt-s ' + (window.innerWidth < 600 ? 'hide-visually' : '')}>{this.props.info.description}</div>
+            <div className={'color-lighten75 pl42 pr12 txt-s ' + (window.innerWidth < 640 ? 'hide-visually' : '')}>{this.props.info.description}</div>
           </div>
           <div onClick={this.props.clickDirections} className={this.styles.directionsIcon}>
             <img src={directionsIcon} alt='directions'/>
@@ -66,7 +66,7 @@ class PlaceInfo extends Component {
 
   getAddress() {
     const claim = this.props.info.claims['P969'];
-    if (claim && claim.length > 0 && window.innerWidth > 600) {
+    if (claim && claim.length > 0 && window.innerWidth > 640) {
       return (
         <div className={this.styles.infoRow}>
           <div className={this.styles.icon}>

@@ -20,6 +20,7 @@
     "eslint-config-mourner": "^2.0.1",
     "mapbox-gl": "^0.33.1",
     "react": "^15.4.2",
+    "react-addons-css-transition-group": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",

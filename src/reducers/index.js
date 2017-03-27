@@ -8,6 +8,7 @@ const defaultState = {
   mapCenter: [-122.4, 37.8],
   mapZoom: 10,
   // Mode
+  style: 'streets',
   mode: 'search',
   modality: 'car',
   // Search
@@ -15,6 +16,7 @@ const defaultState = {
   searchLocation: null,
   needMapUpdate: false,
   needMapRepan: false,
+  needMapRestyle: false,
   placeInfo: null,
   // User
   userLocation: null,

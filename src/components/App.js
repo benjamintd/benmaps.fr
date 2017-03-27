@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import MapComponent from './Map';
 import Search from './Search';
 import Directions from './Directions';
+import StyleSwitch from './StyleSwitch';
 
 class App extends Component {
   render() {
@@ -16,6 +17,13 @@ class App extends Component {
             : <Search/>
           }
         </div>
+        {
+          (window.innerWidth > 640)
+          ? <div className='style-switch absolute bottom mb36 mx12 border border--2 border--white shadow-darken25'>
+            <StyleSwitch/>
+          </div>
+          : null
+        }
       </div>
     );
   }
