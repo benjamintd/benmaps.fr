@@ -18,6 +18,7 @@
     "@turf/distance": "^3.13.0",
     "blueimp-md5": "^2.7.0",
     "eslint-config-mourner": "^2.0.1",
+    "lodash": "^4.17.4",
     "mapbox-gl": "^0.33.1",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",

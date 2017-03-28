@@ -10,7 +10,8 @@ class StyleSwitch extends Component {
         id='style-switch'
         className='bg-black w-full h-full'
         onClick={() => {
-          this.props.setStateValue('mapStyle', 'mapbox://styles/benjamintd/cj0rl9bgb007x2slfylddijho');
+          if (this.props.mapStyle === 'streets') this.props.setStateValue('mapStyle', 'satellite');
+          else if (this.props.mapStyle === 'satellite') this.props.setStateValue('mapStyle', 'streets');
           this.props.setStateValue('needMapRestyle', true);
           this.props.triggerMapUpdate();
         }}
@@ -27,7 +28,8 @@ class StyleSwitch extends Component {
   }
 
   get imgUrl() {
-    var base = 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/';
+    var style = this.props.mapStyle === 'streets' ? 'mapbox/satellite-v9/' : 'benjamintd/cj0szkyh5009i2slfhsmxhtni/';
+    var base = 'https://api.mapbox.com/styles/v1/' + style + 'static/';
     var coords = this.props.center.join(',') + ',' + Math.max(0, this.props.zoom - 4);
     var size = '56x100@2x';
 
@@ -43,7 +45,7 @@ StyleSwitch.propTypes = {
   accessToken: React.PropTypes.string,
   center: React.PropTypes.array,
   setStateValue: React.PropTypes.func,
-  style: React.PropTypes.string,
+  mapStyle: React.PropTypes.string,
   triggerMapUpdate: React.PropTypes.func,
   zoom: React.PropTypes.number,
 };
@@ -52,7 +54,7 @@ const mapStateToProps = (state) => {
   return {
     accessToken: state.mapboxAccessToken,
     center: state.mapCenter,
-    style: state.mapAltStyle,
+    mapStyle: state.mapStyle,
     zoom: state.mapZoom,
   };
 };

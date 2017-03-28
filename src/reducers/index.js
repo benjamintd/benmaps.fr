@@ -4,11 +4,10 @@ const defaultState = {
   // Mapbox Access Token
   mapboxAccessToken: process.env.REACT_APP_MAPBOX_TOKEN,
   // Map
-  mapStyle: 'mapbox://styles/benjamintd/cj06a6mi5004p2sroifies8t9',
   mapCenter: [-122.4, 37.8],
   mapZoom: 10,
+  mapStyle: 'streets',
   // Mode
-  style: 'streets',
   mode: 'search',
   modality: 'car',
   // Search

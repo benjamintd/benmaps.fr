@@ -5,7 +5,6 @@ import md5 from 'blueimp-md5';
 
 class PlaceInfo extends Component {
   render() {
-    console.log(window);
     if (window.innerHeight < 500) return null;
     return (
       <div className={this.styles.placeInfo}>
