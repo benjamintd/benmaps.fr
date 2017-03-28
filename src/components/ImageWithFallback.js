@@ -8,6 +8,8 @@ var ImageWithFallback = React.createClass({
   },
 
   render() {
+    if (this.props.primary === '' && this.props.secondary === '') return null;
+
     if (this.state.status === 'primary') {
       return <img
         className={this.props.className}
