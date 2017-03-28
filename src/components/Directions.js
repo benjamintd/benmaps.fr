@@ -82,6 +82,8 @@ class Directions extends Component {
                         this.props.writeSearchTo(this.props.directionsTo.place_name);
                         this.props.setDirectionsLocation('to', null);
                         this.props.setRoute(null);
+                        this.props.setStateValue('searchLocation', null);
+                        this.props.setStateValue('searchString', '');
                         this.props.setStateValue('routeStatus', 'idle');
                       }}
                     />
@@ -159,7 +161,6 @@ class Directions extends Component {
   }
 
   showUserLocation() {
-    console.log(this.props.directionsFromString)
     return (
       (
         (!this.props.directionsFrom && !this.props.directionsTo)

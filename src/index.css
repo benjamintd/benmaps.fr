@@ -35,12 +35,35 @@ body {
   margin-top: 48px!important;
 }
 
-.place-image {
+.cover {
   object-fit: cover;
+}
+
+.style-switch {
+  width: 60px;
+  height: 60px;
 }
 
 .animation-subtle-shake {
   animation: subtle-shake 0.5s ease-in-out;
+}
+
+.style-switch-enter {
+  opacity: 0.01;
+}
+
+.style-switch-enter.style-switch-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.style-switch-leave {
+  opacity: 1;
+}
+
+.style-switch-leave.style-switch-leave-active {
+  opacity: 0.01;
+  transition: opacity 500ms ease-in;
 }
 
 @keyframes subtle-shake {

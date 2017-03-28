@@ -5,6 +5,9 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
+import _ from 'lodash';
+import streetsStyle from '../styles/streets.json';
+import satelliteStyle from '../styles/satellite.json';
 import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
 
 class MapComponent extends Component {
@@ -30,7 +33,7 @@ class MapComponent extends Component {
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: this.props.style,
+      style: this.getStyle(streetsStyle),
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
@@ -40,153 +43,21 @@ class MapComponent extends Component {
     this.map = map;
 
     map.on('load', () => {
-
-      // Add sources
-
-      map.addSource('route', {
-        type: 'geojson',
-        data: this.emptyData
-      });
-
-      map.addSource('marker', {
-        type: 'geojson',
-        data: this.emptyData
-      });
-
-      map.addSource('geolocation', {
-        type: 'geojson',
-        data: this.emptyData
-      });
-
-      map.addSource('fromMarker', {
-        type: 'geojson',
-        data: this.emptyData
-      });
-
-
-      // Add and style layers
-
-      map.addLayer({
-        'id': 'route',
-        'source': 'route',
-        'type': 'line',
-        'paint': {
-          'line-color': '#2abaf7',
-          'line-width': 5.5
-        },
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-      }, 'bridge-oneway-arrows-white');
-      map.addLayer({
-        'id': 'route-casing',
-        'source': 'route',
-        'type': 'line',
-        'paint': {
-          'line-color': '#2779b5',
-          'line-width': 6.5
-        },
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-      }, 'route');
-
-      map.addLayer({
-        'id': 'marker',
-        'source': 'marker',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'pin',
-          'icon-offset': [0, -20]
-        },
-      });
-
-      map.addLayer({
-        'id': 'fromMarker',
-        'source': 'fromMarker',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'fromLocation'
-        },
-      }, 'marker');
-
-      map.addLayer({
-        'id': 'geolocation',
-        'source': 'geolocation',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'geolocation'
-        },
-      }, 'fromMarker');
-
-      // helper to set geolocation
-      const setGeolocation = (data) => {
-        const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
-        this.map.getSource('geolocation').setData(geometry);
-        this.props.setUserLocation(geometry.coordinates);
-        this.moveTo(geometry, 13);
-      };
-
-      // Create geolocation control
-      const geolocateControl = new mapboxgl.GeolocateControl();
-      geolocateControl.on('geolocate', setGeolocation);
-      map.addControl(geolocateControl, 'bottom-right');
-
-      // Initial ask for location and display on the map
-      if (this.props.userLocation) {
-        this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
-        this.moveTo(this.props.userLocation, 13);
-      } else if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(setGeolocation);
-      }
-
-      // Regularly poll the user location and update the map
-      window.setInterval(() => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((data) => {
-            const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
-            this.map.getSource('geolocation').setData(geometry);
-            this.props.setUserLocation(geometry.coordinates);
-          });
-        }
-      }, 10000);
-
-      // Set event listeners
-
-      map.on('click', (e) => this.onClick(e));
-
-      map.on('mousemove', (e) => {
-        var features = map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
-
-        if (features.length) {
-          map.getCanvas().style.cursor = 'pointer';
-          if (this.movableLayers.indexOf(features[0].layer.id) > -1) {
-            this.setState({isCursorOverPoint: true});
-            this.map.dragPan.disable();
-          }
-        } else {
-          map.getCanvas().style.cursor = '';
-          this.setState({isCursorOverPoint: false});
-          map.dragPan.enable();
-        }
-      });
-
-      map.on('mousedown', (e) => this.mouseDown(e), true);
-
-      map.on('moveend', () => {
-        const center = map.getCenter();
-        this.props.setStateValue('mapCenter', [center.lng, center.lat]);
-        this.props.setStateValue('mapZoom', map.getZoom());
-      });
+      this.onLoad();
     });
   }
 
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
+    if (this.props.needMapRestyle) {
+      if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(satelliteStyle));
+      else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(streetsStyle));
+    }
+
     // This is where we update the layers and map bbox
+    this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
+
 
     // Search mode
     if (this.props.mode === 'search') {
@@ -266,6 +137,7 @@ class MapComponent extends Component {
     // No need to re-update until the state says so
     this.props.setStateValue('needMapUpdate', false);
     this.props.setStateValue('needMapRepan', false);
+    this.props.setStateValue('needMapRestyle', false);
   }
 
   moveTo(location, zoom) {
@@ -365,9 +237,12 @@ class MapComponent extends Component {
     var feature = features[0];
 
     let key;
-    if (this.props.mode === 'search') key = 'searchLocation';
-    else if (!this.props.directionsFrom) key = 'directionsFrom';
-    else {
+    if (this.props.mode === 'search') {
+      this.props.setStateValue('placeInfo', null);
+      key = 'searchLocation';
+    } else if (!this.props.directionsFrom) {
+      key = 'directionsFrom';
+    } else {
       this.props.setStateValue('route', null);
       this.props.setStateValue('searchLocation', null);
       key = 'directionsTo';
@@ -382,6 +257,159 @@ class MapComponent extends Component {
       });
       this.props.triggerMapUpdate();
     }
+  }
+
+  onLoad() {
+    // helper to set geolocation
+    const setGeolocation = (data) => {
+      const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
+      this.map.getSource('geolocation').setData(geometry);
+      this.props.setUserLocation(geometry.coordinates);
+      this.moveTo(geometry, 13);
+    };
+
+    // Create geolocation control
+    const geolocateControl = new mapboxgl.GeolocateControl();
+    geolocateControl.on('geolocate', setGeolocation);
+    this.map.addControl(geolocateControl, 'bottom-right');
+
+    // Initial ask for location and display on the map
+    if (this.props.userLocation) {
+      this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
+      this.moveTo(this.props.userLocation, 13);
+    } else if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(setGeolocation);
+    }
+
+    // Regularly poll the user location and update the map
+    window.setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((data) => {
+          const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
+          this.map.getSource('geolocation').setData(geometry);
+          this.props.setUserLocation(geometry.coordinates);
+        });
+      }
+    }, 10000);
+
+    // Set event listeners
+
+    this.map.on('click', (e) => this.onClick(e));
+
+    this.map.on('mousemove', (e) => {
+      var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
+
+      if (features.length) {
+        this.map.getCanvas().style.cursor = 'pointer';
+        if (this.movableLayers.indexOf(features[0].layer.id) > -1) {
+          this.setState({isCursorOverPoint: true});
+          this.map.dragPan.disable();
+        }
+      } else {
+        this.map.getCanvas().style.cursor = '';
+        this.setState({isCursorOverPoint: false});
+        this.map.dragPan.enable();
+      }
+    });
+
+    this.map.on('mousedown', (e) => this.mouseDown(e), true);
+
+    this.map.on('moveend', () => {
+      const center = this.map.getCenter();
+      this.props.setStateValue('mapCenter', [center.lng, center.lat]);
+      this.props.setStateValue('mapZoom', this.map.getZoom());
+    });
+  }
+
+  getStyle(style) {
+    let s = _.cloneDeep(style);
+
+    s.sources.route = {
+      type: 'geojson',
+      data: this.emptyData
+    };
+
+    s.sources.marker = {
+      type: 'geojson',
+      data: this.emptyData
+    };
+
+    s.sources.geolocation = {
+      type: 'geojson',
+      data: this.emptyData
+    };
+
+    s.sources.fromMarker = {
+      type: 'geojson',
+      data: this.emptyData
+    };
+
+    // Index to insert the route layers
+    var i;
+    if (style.name === 'MapboxMaps') {
+      i = s.layers.map(el => el.id).indexOf('bridge-oneway-arrows-white');
+    } else {
+      i = s.layers.map(el => el.id).indexOf('waterway-label');
+    }
+
+    s.layers.splice(i, 0,
+      {
+        'id': 'route-casing',
+        'source': 'route',
+        'type': 'line',
+        'paint': {
+          'line-color': '#2779b5',
+          'line-width': 6.5
+        },
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+      },
+      {
+        'id': 'route',
+        'source': 'route',
+        'type': 'line',
+        'paint': {
+          'line-color': '#2abaf7',
+          'line-width': 5.5
+        },
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+      }
+    );
+
+    s.layers = s.layers.concat([
+      {
+        'id': 'geolocation',
+        'source': 'geolocation',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'geolocation'
+        },
+      },
+      {
+        'id': 'marker',
+        'source': 'marker',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'pin',
+          'icon-offset': [0, -20]
+        },
+      },
+      {
+        'id': 'fromMarker',
+        'source': 'fromMarker',
+        'type': 'symbol',
+        'layout': {
+          'icon-image': 'fromLocation'
+        },
+      }
+    ]);
+
+    return s;
   }
 
   layerToKey(layer) {
@@ -409,7 +437,7 @@ class MapComponent extends Component {
       'poi-parks-scalerank3',
       'poi-scalerank4-l1',
       'poi-scalerank4-l15',
-      'poi-parks_scalerank4',
+      'poi-parks-scalerank4',
     ];
   }
 
@@ -426,9 +454,11 @@ MapComponent.propTypes = {
   getReverseGeocode: React.PropTypes.func,
   getRoute: React.PropTypes.func,
   map: React.PropTypes.object,
+  mapStyle: React.PropTypes.string,
   modality: React.PropTypes.string,
   mode: React.PropTypes.string,
   needMapRepan: React.PropTypes.bool,
+  needMapRestyle: React.PropTypes.bool,
   needMapUpdate: React.PropTypes.bool,
   route: React.PropTypes.object,
   routeStatus: React.PropTypes.string,
@@ -447,14 +477,15 @@ const mapStateToProps = (state) => {
     center: state.mapCenter,
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
+    mapStyle: state.mapStyle,
     modality: state.modality,
     mode: state.mode,
     needMapRepan: state.needMapRepan,
+    needMapRestyle: state.needMapRestyle,
     needMapUpdate: state.needMapUpdate,
     route: state.route,
     routeStatus: state.routeStatus,
     searchLocation: state.searchLocation,
-    style: state.mapStyle,
     userLocation: state.userLocation,
     zoom: state.mapZoom,
   };
