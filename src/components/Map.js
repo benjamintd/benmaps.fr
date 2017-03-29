@@ -50,11 +50,6 @@ class MapComponent extends Component {
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    if (this.props.needMapRestyle) {
-      if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(satelliteStyle));
-      else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(streetsStyle));
-    }
-
     // This is where we update the layers and map bbox
     this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
 
@@ -134,9 +129,15 @@ class MapComponent extends Component {
       }
     }
 
-    // No need to re-update until the state says so
-    this.props.setStateValue('needMapUpdate', false);
-    this.props.setStateValue('needMapRepan', false);
+    if (this.props.needMapRestyle) {
+      if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(satelliteStyle));
+      else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(streetsStyle));
+    } else {
+      // No need to re-update until the state says so
+      this.props.setStateValue('needMapUpdate', false);
+      this.props.setStateValue('needMapRepan', false);
+    }
+
     this.props.setStateValue('needMapRestyle', false);
   }
 

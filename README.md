@@ -1,24 +1,21 @@
 # Mapbox Maps
 
-[A Google-like interface for Mapbox maps](https://benjamintd.github.io/mapbox-maps/)
+[A user-friendly interface for Mapbox maps](https://benjamintd.github.io/mapbox-maps/)
 
-[<img width="600" alt="Mapbox Maps" src="https://cloud.githubusercontent.com/assets/11202803/24183171/ef155710-0e83-11e7-8f43-4eaa0a890c7f.png">](https://benjamintd.github.io/mapbox-maps/)
-
+![screen shot 2017-03-29 at 5 11 20 pm](https://cloud.githubusercontent.com/assets/11202803/24481982/098cf8f8-14a3-11e7-8f91-c4f8061aece8.png)
 ------
 
-## Weekend project: building Google Maps from scratch
+## Weekend project: building a replacement for Google Maps from scratch
 
 **tl;dr** Working at a mapping company, I was tired of still opening Google maps when looking for a place or directions. So I built an minimal, open version of Google Maps web. It uses open-source libraries and Mapbox services.
 
 ### Why this project?
 
-My day job involves maps. Lots of them. Yet I still open Google Maps on the web whenever I look for a place or need traffic directions. At Mapbox, we have all the building blocks that allow to build this ourselves, so I decided to go for it. My goal was to create a web application as close to Google's as possible, with enough features to be able to switch my personal usage to it completely.
+My day job involves maps. Lots of them. Yet I still open Google Maps on the web whenever I look for a place or need traffic directions. At Mapbox, we have all the building blocks that allow to build this ourselves. My goal was to create a web application with enough features to be able to switch my personal usage to it completely.
 
 It was also a great way to learn React and Redux, the new Assembly CSS framework, and finally be on the consumer side of the APIs I build at work.
 
-The cartography, colors, markers, and overall design has been intentionally chosen to match Google's. Although I'm probably infringing on a few [design patents](http://pdfpiw.uspto.gov/50/209/D06/1.pdf), this is intended as a tribute more than anything.
-
-I think Google Maps is one of the most transformative and best designed tech around - both on web and mobile. I wanted to show that it's possible to build a similar experience assembling Mapbox legos, from scratch, in a few days.
+I wanted to show that it's possible to build a similar experience as Google Maps assembling Mapbox legos, from scratch, in a few days.
 
 ### Tech
 
