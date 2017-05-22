@@ -90,6 +90,23 @@ const reducer = (state = defaultState, action) => {
     }
   }
 
+  case 'SET_CONTEXT_MENU': {
+    return Object.assign({}, state, {
+      contextMenuCoordinates: action.coordinates,
+      contextMenuLocation: action.location,
+      contextMenuActive: true
+    });
+  }
+
+  case 'RESET_CONTEXT_MENU': {
+    return Object.assign({}, state, {
+      contextMenuCoordinates: null,
+      contextMenuLocation: null,
+      contextMenuPlace: null,
+      contextMenuActive: false
+    });
+  }
+
   default:
     return state;
   }

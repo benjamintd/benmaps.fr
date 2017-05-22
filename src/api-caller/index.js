@@ -108,6 +108,12 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       + action.coordinates.join(',') + '.json'
       + '?access_token=' + action.accessToken;
 
+    next({
+      'type': 'SET_STATE_VALUE',
+      'key': action.key,
+      'value': {'place_name': '__loading'}
+    });
+
     fetch(url, {method: 'get'})
       .then(res => {
         if (res.ok) {

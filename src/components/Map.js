@@ -8,7 +8,15 @@ import turfDistance from '@turf/distance';
 import _ from 'lodash';
 import streetsStyle from '../styles/streets.json';
 import satelliteStyle from '../styles/satellite.json';
-import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
+import {
+  setStateValue,
+  setUserLocation,
+  triggerMapUpdate,
+  getRoute,
+  getReverseGeocode,
+  setContextMenu,
+  resetContextMenu
+} from '../actions/index';
 
 class MapComponent extends Component {
   constructor(props) {
@@ -261,27 +269,18 @@ class MapComponent extends Component {
   }
 
   onContextMenu(e) {
-    let coords = [e.lngLat.lng, e.lngLat.lat];
-    this.props.setStateValue('contextMenuCoordinates', coords);
-    this.props.setStateValue('contextMenuLocation', [e.point.x, e.point.y]);
-    this.props.setStateValue('contextMenuPlace', null);
+    let coordinates = [e.lngLat.lng, e.lngLat.lat];
+    let location = [e.point.x, e.point.y];
     this.props.getReverseGeocode(
       'contextMenuPlace',
-      coords,
+      coordinates,
       this.props.accessToken
     );
-    this.props.setStateValue('contextMenuActive', true);
+    this.props.setContextMenu(coordinates, location);
 
     this.map
-      .once('move', () => this.removeContextMenu())
-      .once('click', () => this.removeContextMenu());
-  }
-
-  removeContextMenu() {
-    this.props.setStateValue('contextMenuActive', false);
-    this.props.setStateValue('contextMenuCoordinates', null);
-    this.props.setStateValue('contextMenuLocation', null);
-    this.props.setStateValue('contextMenuPlace', null);
+      .once('move', () => this.props.resetContextMenu())
+      .once('click', () => this.props.resetContextMenu());
   }
 
   onLoad() {
@@ -319,13 +318,9 @@ class MapComponent extends Component {
 
     // Set event listeners
 
-    this.map.on('click', (e) => {
-      this.onClick(e);
-    });
+    this.map.on('click', (e) => this.onClick(e));
 
-    this.map.on('contextmenu', (e) => {
-      this.onContextMenu(e);
-    });
+    this.map.on('contextmenu', (e) => this.onContextMenu(e));
 
     this.map.on('mousemove', (e) => {
       var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
@@ -343,7 +338,7 @@ class MapComponent extends Component {
       }
     });
 
-    this.map.on('mousedown', (e) => this.mouseDown(e), true);
+    this.map.on('mousedown', (e) => this.mouseDown(e));
 
     this.map.on('moveend', () => {
       const center = this.map.getCenter();
@@ -491,9 +486,11 @@ MapComponent.propTypes = {
   needMapRepan: React.PropTypes.bool,
   needMapRestyle: React.PropTypes.bool,
   needMapUpdate: React.PropTypes.bool,
+  resetContextMenu: React.PropTypes.func,
   route: React.PropTypes.object,
   routeStatus: React.PropTypes.string,
   searchLocation: React.PropTypes.object,
+  setContextMenu: React.PropTypes.func,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
   style: React.PropTypes.string,
@@ -526,6 +523,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
+    resetContextMenu: () => dispatch(resetContextMenu()),
+    setContextMenu: (coordinates, location) => dispatch(setContextMenu(coordinates, location)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),

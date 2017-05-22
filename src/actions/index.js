@@ -39,3 +39,13 @@ export const getReverseGeocode = (key, coordinates, accessToken) => ({
   coordinates,
   accessToken
 });
+
+export const setContextMenu = (coordinates, location) => ({
+  type: 'SET_CONTEXT_MENU',
+  coordinates,
+  location
+});
+
+export const resetContextMenu = () => ({
+  type: 'RESET_CONTEXT_MENU'
+});
