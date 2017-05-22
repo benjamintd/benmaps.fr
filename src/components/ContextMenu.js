@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
-import {setStateValue} from '../actions/index';
+import {setStateValue, triggerMapUpdate, resetContextMenu} from '../actions/index';
 
 class ContextMenu extends Component {
   render() {
     let style = {
-      left: Math.min(window.innerWidth - 240, this.props.location[0]) + 'px',
-      top: Math.min(window.innerHeight - 240, this.props.location[1]) + 'px'
+      left: Math.min(window.innerWidth - 240, this.props.position[0]) + 'px',
+      top: Math.min(window.innerHeight - 240, this.props.position[1]) + 'px'
     };
 
     return (
@@ -39,14 +39,26 @@ class ContextMenu extends Component {
 
   search() {
     console.log('search ' + this.props.coordinates);
+    this.props.setStateValue('mode', 'search');
+    this.props.setStateValue('searchLocation', this.props.place);
+    this.props.triggerMapUpdate();
+    this.props.resetContextMenu();
   }
 
   directionsTo() {
     console.log('directions to ' + this.props.coordinates);
+    this.props.setStateValue('mode', 'directions');
+    this.props.setStateValue('directionsTo', this.props.place);
+    this.props.triggerMapUpdate();
+    this.props.resetContextMenu();
   }
 
   directionsFrom() {
     console.log('directions from ' + this.props.coordinates);
+    this.props.setStateValue('mode', 'directions');
+    this.props.setStateValue('directionsFrom', this.props.place);
+    this.props.triggerMapUpdate();
+    this.props.resetContextMenu();
   }
 
   reset() {
@@ -57,22 +69,27 @@ class ContextMenu extends Component {
 ContextMenu.propTypes = {
   active: React.PropTypes.bool,
   coordinates: React.PropTypes.array,
-  location: React.PropTypes.array,
+  position: React.PropTypes.array,
   place: React.PropTypes.object,
+  resetContextMenu: React.PropTypes.func,
+  setStateValue: React.PropTypes.func,
+  triggerMapUpdate: React.PropTypes.func
 };
 
 const mapStateToProps = (state) => {
   return {
     active: state.contextMenuActive,
     coordinates: state.contextMenuCoordinates,
-    location: state.contextMenuLocation,
+    position: state.contextMenuPosition,
     place: state.contextMenuPlace,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setStateValue: (key, value) => dispatch(setStateValue(key, value))
+    resetContextMenu: () => dispatch(resetContextMenu()),
+    setStateValue: (key, value) => dispatch(setStateValue(key, value)),
+    triggerMapUpdate: (needMapRepan) => dispatch(triggerMapUpdate(needMapRepan))
   };
 };
 

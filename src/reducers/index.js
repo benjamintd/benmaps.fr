@@ -30,7 +30,7 @@ const defaultState = {
   // Context menu
   contextMenuActive: false,
   contextMenuCoordinates: null,
-  contextMenuLocation: null,
+  contextMenuPosition: null,
   contextMenuPlace: null
 };
 
@@ -93,7 +93,7 @@ const reducer = (state = defaultState, action) => {
   case 'SET_CONTEXT_MENU': {
     return Object.assign({}, state, {
       contextMenuCoordinates: action.coordinates,
-      contextMenuLocation: action.location,
+      contextMenuPosition: action.position,
       contextMenuActive: true
     });
   }
@@ -101,7 +101,7 @@ const reducer = (state = defaultState, action) => {
   case 'RESET_CONTEXT_MENU': {
     return Object.assign({}, state, {
       contextMenuCoordinates: null,
-      contextMenuLocation: null,
+      contextMenuPosition: null,
       contextMenuPlace: null,
       contextMenuActive: false
     });
