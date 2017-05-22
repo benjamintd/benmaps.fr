@@ -19,13 +19,13 @@ class TrafficSwitch extends Component {
   toggle(e, trafficInStyle) {
     var checked = e.target.checked;
     if (checked && !trafficInStyle) {
-      // this.props.setStateValue('mapStyle', this.props.mapStyle + '-traffic');
-      // this.props.setStateValue('needMapRestyle', true);
-      // this.props.triggerMapUpdate();
+      this.props.setStateValue('mapStyle', this.props.mapStyle + '-traffic');
+      this.props.setStateValue('needMapRestyle', true);
+      this.props.triggerMapUpdate();
     } else if (!checked && trafficInStyle) {
-      // this.props.setStateValue('mapStyle', this.props.mapStyle.split('-')[0]);
-      // this.props.setStateValue('needMapRestyle', true);
-      // this.props.triggerMapUpdate();
+      this.props.setStateValue('mapStyle', this.props.mapStyle.split('-')[0]);
+      this.props.setStateValue('needMapRestyle', true);
+      this.props.triggerMapUpdate();
     }
   }
 
