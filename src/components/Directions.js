@@ -183,7 +183,7 @@ class Directions extends Component {
 
   get styles() {
     return {
-      directions: 'relative my-bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
+      directions: 'relative bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column',
       input: 'input directions-input border--transparent color-white px48 h42 w-full',
       placeName: 'txt-truncate w-full color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross',
       results: 'absolute w-full bg-white shadow-darken5 border-darken10',

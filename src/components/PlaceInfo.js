@@ -14,7 +14,7 @@ class PlaceInfo extends Component {
           secondary={this.getImageUrl().full}
           alt={this.props.info.description}
         />
-        <div className='my-bg-blue flex-parent flex-parent--row'>
+        <div className='bg-blue flex-parent flex-parent--row'>
           <div className={this.styles.mainInfo}>
             <div className='color-white pl42 pr12 txt-h4 txt-bold'>{this.props.info.label}</div>
             <div className={'color-lighten75 pl42 pr12 txt-s ' + (window.innerWidth < 640 ? 'hide-visually' : '')}>{this.props.info.description}</div>
