@@ -8,7 +8,15 @@ import turfDistance from '@turf/distance';
 import _ from 'lodash';
 import streetsStyle from '../styles/streets.json';
 import satelliteStyle from '../styles/satellite.json';
-import {setStateValue, setUserLocation, triggerMapUpdate, getRoute, getReverseGeocode} from '../actions/index';
+import {
+  setStateValue,
+  setUserLocation,
+  triggerMapUpdate,
+  getRoute,
+  getReverseGeocode,
+  setContextMenu,
+  resetContextMenu
+} from '../actions/index';
 
 class MapComponent extends Component {
   constructor(props) {
@@ -260,6 +268,21 @@ class MapComponent extends Component {
     }
   }
 
+  onContextMenu(e) {
+    let coordinates = [e.lngLat.lng, e.lngLat.lat];
+    let location = [e.point.x, e.point.y];
+    this.props.getReverseGeocode(
+      'contextMenuPlace',
+      coordinates,
+      this.props.accessToken
+    );
+    this.props.setContextMenu(coordinates, location);
+
+    this.map
+      .once('move', () => this.props.resetContextMenu())
+      .once('click', () => this.props.resetContextMenu());
+  }
+
   onLoad() {
     // helper to set geolocation
     const setGeolocation = (data) => {
@@ -297,6 +320,8 @@ class MapComponent extends Component {
 
     this.map.on('click', (e) => this.onClick(e));
 
+    this.map.on('contextmenu', (e) => this.onContextMenu(e));
+
     this.map.on('mousemove', (e) => {
       var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});
 
@@ -313,7 +338,7 @@ class MapComponent extends Component {
       }
     });
 
-    this.map.on('mousedown', (e) => this.mouseDown(e), true);
+    this.map.on('mousedown', (e) => this.mouseDown(e));
 
     this.map.on('moveend', () => {
       const center = this.map.getCenter();
@@ -461,9 +486,11 @@ MapComponent.propTypes = {
   needMapRepan: React.PropTypes.bool,
   needMapRestyle: React.PropTypes.bool,
   needMapUpdate: React.PropTypes.bool,
+  resetContextMenu: React.PropTypes.func,
   route: React.PropTypes.object,
   routeStatus: React.PropTypes.string,
   searchLocation: React.PropTypes.object,
+  setContextMenu: React.PropTypes.func,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
   style: React.PropTypes.string,
@@ -496,6 +523,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
+    resetContextMenu: () => dispatch(resetContextMenu()),
+    setContextMenu: (coordinates, location) => dispatch(setContextMenu(coordinates, location)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),

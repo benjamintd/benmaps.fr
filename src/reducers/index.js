@@ -26,7 +26,12 @@ const defaultState = {
   directionsTo: null,
   route: null,
   routeStatus: 'idle',
-  lastQueried: 0
+  lastQueried: 0,
+  // Context menu
+  contextMenuActive: false,
+  contextMenuCoordinates: null,
+  contextMenuPosition: null,
+  contextMenuPlace: null
 };
 
 const reducer = (state = defaultState, action) => {
@@ -83,6 +88,23 @@ const reducer = (state = defaultState, action) => {
         routeStatus: 'error'
       });
     }
+  }
+
+  case 'SET_CONTEXT_MENU': {
+    return Object.assign({}, state, {
+      contextMenuCoordinates: action.coordinates,
+      contextMenuPosition: action.position,
+      contextMenuActive: true
+    });
+  }
+
+  case 'RESET_CONTEXT_MENU': {
+    return Object.assign({}, state, {
+      contextMenuCoordinates: null,
+      contextMenuPosition: null,
+      contextMenuPlace: null,
+      contextMenuActive: false
+    });
   }
 
   default:

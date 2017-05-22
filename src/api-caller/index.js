@@ -108,6 +108,12 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       + action.coordinates.join(',') + '.json'
       + '?access_token=' + action.accessToken;
 
+    next({
+      'type': 'SET_STATE_VALUE',
+      'key': action.key,
+      'value': {'place_name': '__loading'}
+    });
+
     fetch(url, {method: 'get'})
       .then(res => {
         if (res.ok) {
@@ -120,7 +126,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       .then(data => {
         // Success
         if (data.features && data.features.length > 0) {
-          next({
+          return next({
             'type': 'SET_STATE_VALUE',
             'key': action.key,
             'value': {
@@ -131,7 +137,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
               }
             }
           });
-        } else Promise.reject();
+        } else return Promise.reject();
       })
       .catch(() => {
         next({
