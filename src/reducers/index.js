@@ -26,7 +26,12 @@ const defaultState = {
   directionsTo: null,
   route: null,
   routeStatus: 'idle',
-  lastQueried: 0
+  lastQueried: 0,
+  // Context menu
+  contextMenuActive: false,
+  contextMenuCoordinates: null,
+  contextMenuLocation: null,
+  contextMenuPlace: null
 };
 
 const reducer = (state = defaultState, action) => {

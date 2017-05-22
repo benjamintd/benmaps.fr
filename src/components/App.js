@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import ContextMenu from './ContextMenu';
 import MapComponent from './Map';
 import Search from './Search';
 import Directions from './Directions';
@@ -12,7 +13,7 @@ class App extends Component {
         <MapComponent/>
         <div className='relative m12 m24-mm w420-mm flex-parent flex-parent--column'>
           {
-            this.props.mode === 'directions'
+            (this.props.mode === 'directions')
             ? <Directions/>
             : <Search/>
           }
@@ -24,19 +25,26 @@ class App extends Component {
           </div>
           : null
         }
+        {
+          (this.props.contextMenuActive === true)
+          ? <ContextMenu/>
+          : null
+        }
       </div>
     );
   }
 }
 
 App.propTypes = {
+  contextMenuActive: React.PropTypes.bool,
   mode: React.PropTypes.string,
   route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string
+  routeStatus: React.PropTypes.string,
 };
 
 const mapStateToProps = (state) => {
   return {
+    contextMenuActive: state.contextMenuActive,
     mode: state.mode,
     route: state.route,
     routeStatus: state.routeStatus

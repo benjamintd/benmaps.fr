@@ -260,6 +260,30 @@ class MapComponent extends Component {
     }
   }
 
+  onContextMenu(e) {
+    let coords = [e.lngLat.lng, e.lngLat.lat];
+    this.props.setStateValue('contextMenuCoordinates', coords);
+    this.props.setStateValue('contextMenuLocation', [e.point.x, e.point.y]);
+    this.props.setStateValue('contextMenuPlace', null);
+    this.props.getReverseGeocode(
+      'contextMenuPlace',
+      coords,
+      this.props.accessToken
+    );
+    this.props.setStateValue('contextMenuActive', true);
+
+    this.map
+      .once('move', () => this.removeContextMenu())
+      .once('click', () => this.removeContextMenu());
+  }
+
+  removeContextMenu() {
+    this.props.setStateValue('contextMenuActive', false);
+    this.props.setStateValue('contextMenuCoordinates', null);
+    this.props.setStateValue('contextMenuLocation', null);
+    this.props.setStateValue('contextMenuPlace', null);
+  }
+
   onLoad() {
     // helper to set geolocation
     const setGeolocation = (data) => {
@@ -295,7 +319,13 @@ class MapComponent extends Component {
 
     // Set event listeners
 
-    this.map.on('click', (e) => this.onClick(e));
+    this.map.on('click', (e) => {
+      this.onClick(e);
+    });
+
+    this.map.on('contextmenu', (e) => {
+      this.onContextMenu(e);
+    });
 
     this.map.on('mousemove', (e) => {
       var features = this.map.queryRenderedFeatures(e.point, {layers: this.movableLayers.concat(this.selectableLayers)});

@@ -120,7 +120,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
       .then(data => {
         // Success
         if (data.features && data.features.length > 0) {
-          next({
+          return next({
             'type': 'SET_STATE_VALUE',
             'key': action.key,
             'value': {
@@ -131,7 +131,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
               }
             }
           });
-        } else Promise.reject();
+        } else return Promise.reject();
       })
       .catch(() => {
         next({
