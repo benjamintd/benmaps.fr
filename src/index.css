@@ -36,6 +36,11 @@ body {
   height: 60px;
 }
 
+.icon-switch {
+  height: 24px !important;
+  width: 24px !important;
+}
+
 .animation-subtle-shake {
   animation: subtle-shake 0.5s ease-in-out;
 }
