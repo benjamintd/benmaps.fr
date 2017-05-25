@@ -15,14 +15,6 @@ body {
   width: 100%;
 }
 
-.my-bg-blue {
-  background-color: #3a94ff;
-}
-
-.my-blue {
-  color: #3a94ff;
-}
-
 .directions-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: rgba(255, 255, 255, 0.6);
 }
@@ -42,6 +34,11 @@ body {
 .style-switch {
   width: 60px;
   height: 60px;
+}
+
+.icon-switch {
+  height: 24px !important;
+  width: 24px !important;
 }
 
 .animation-subtle-shake {

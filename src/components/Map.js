@@ -5,9 +5,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import _ from 'lodash';
-import streetsStyle from '../styles/streets.json';
-import satelliteStyle from '../styles/satellite.json';
+import style from '../styles/style.json';
 import {
   setStateValue,
   setUserLocation,
@@ -41,7 +39,7 @@ class MapComponent extends Component {
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: this.getStyle(streetsStyle),
+      style: style,
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
@@ -138,8 +136,7 @@ class MapComponent extends Component {
     }
 
     if (this.props.needMapRestyle) {
-      if (this.props.mapStyle === 'satellite') this.map.setStyle(this.getStyle(satelliteStyle));
-      else if (this.props.mapStyle === 'streets') this.map.setStyle(this.getStyle(streetsStyle));
+      this.updateStyle(this.props.mapStyle);
     } else {
       // No need to re-update until the state says so
       this.props.setStateValue('needMapUpdate', false);
@@ -345,97 +342,41 @@ class MapComponent extends Component {
       this.props.setStateValue('mapCenter', [center.lng, center.lat]);
       this.props.setStateValue('mapZoom', this.map.getZoom());
     });
+
+    // Update the style if needed
+    this.updateStyle(this.props.mapStyle);
   }
 
-  getStyle(style) {
-    let s = _.cloneDeep(style);
-
-    s.sources.route = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    s.sources.marker = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    s.sources.geolocation = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    s.sources.fromMarker = {
-      type: 'geojson',
-      data: this.emptyData
-    };
-
-    // Index to insert the route layers
-    var i;
-    if (style.name === 'MapboxMaps') {
-      i = s.layers.map(el => el.id).indexOf('bridge-oneway-arrows-white');
+  updateStyle(styleString) {
+    if (styleString.indexOf('traffic') > -1) {
+      this.map.getStyle().layers.forEach(layer => {
+        if (layer.source === 'traffic') this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+        // TODO here, change the color of motorways and trunks to white
+      });
     } else {
-      i = s.layers.map(el => el.id).indexOf('waterway-label');
+      this.map.getStyle().layers.forEach(layer => {
+        if (layer.source === 'traffic') this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+        // TODO here, change the color of motorways and trunks back to orange/yellow (look in the `style` variable?)
+      });
     }
 
-    s.layers.splice(i, 0,
-      {
-        'id': 'route-casing',
-        'source': 'route',
-        'type': 'line',
-        'paint': {
-          'line-color': '#2779b5',
-          'line-width': 6.5
-        },
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-      },
-      {
-        'id': 'route',
-        'source': 'route',
-        'type': 'line',
-        'paint': {
-          'line-color': '#2abaf7',
-          'line-width': 5.5
-        },
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-      }
-    );
+    if (styleString.indexOf('satellite') > -1) {
+      this.map.setLayoutProperty('satellite', 'visibility', 'visible');
+      // TODO add labels and stuff?
+      // timeout to have a smooth transition, no flash
+      setTimeout(() => {
+        this.map.getStyle().layers.forEach(layer => {
+          if (layer.source === 'composite') this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+        });
+      }, 300);
+    } else {
+      this.map.getStyle().layers.forEach(layer => {
+        if (layer.source === 'composite') this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      });
+      this.map.setLayoutProperty('satellite', 'visibility', 'none');
+    }
 
-    s.layers = s.layers.concat([
-      {
-        'id': 'geolocation',
-        'source': 'geolocation',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'geolocation'
-        },
-      },
-      {
-        'id': 'marker',
-        'source': 'marker',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'pin',
-          'icon-offset': [0, -20]
-        },
-      },
-      {
-        'id': 'fromMarker',
-        'source': 'fromMarker',
-        'type': 'symbol',
-        'layout': {
-          'icon-image': 'fromLocation'
-        },
-      }
-    ]);
-
-    return s;
+    return styleString;
   }
 
   layerToKey(layer) {
@@ -461,8 +402,7 @@ class MapComponent extends Component {
       'poi-parks-scalerank2',
       'poi-scalerank3',
       'poi-parks-scalerank3',
-      'poi-scalerank4-l1',
-      'poi-scalerank4-l15',
+      'poi-scalerank4',
       'poi-parks-scalerank4',
     ];
   }
@@ -493,7 +433,6 @@ MapComponent.propTypes = {
   setContextMenu: React.PropTypes.func,
   setStateValue: React.PropTypes.func,
   setUserLocation: React.PropTypes.func,
-  style: React.PropTypes.string,
   triggerMapUpdate: React.PropTypes.func,
   userLocation: React.PropTypes.object,
   zoom: React.PropTypes.number,
