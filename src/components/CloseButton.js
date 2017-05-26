@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
 class CloseButton extends Component {
@@ -16,10 +17,10 @@ class CloseButton extends Component {
 }
 
 CloseButton.propTypes = {
-  color: React.PropTypes.string,
-  large: React.PropTypes.bool,
-  onClick: React.PropTypes.func,
-  show: React.PropTypes.bool,
+  color: PropTypes.string,
+  large: PropTypes.bool,
+  onClick: PropTypes.func,
+  show: PropTypes.bool,
 };
 
 CloseButton.defaultProps = {

@@ -1,11 +1,12 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
 
-var ImageWithFallback = React.createClass({
+class ImageWithFallback extends Component {
   getInitialState() {
     return {
       status: 'primary'
     };
-  },
+  }
 
   render() {
     if (this.props.primary === '' && this.props.secondary === '') return null;
@@ -25,14 +26,14 @@ var ImageWithFallback = React.createClass({
         alt={this.props.alt}
       />;
     } else return null;
-  },
-
-  propTypes: {
-    alt: React.PropTypes.string,
-    className: React.PropTypes.string,
-    primary: React.PropTypes.string,
-    secondary: React.PropTypes.string,
   }
-});
+}
+
+ImageWithFallback.propTypes = {
+  alt: PropTypes.string,
+  className: PropTypes.string,
+  primary: PropTypes.string,
+  secondary: PropTypes.string,
+};
 
 export default ImageWithFallback;

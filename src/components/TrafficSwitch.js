@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {triggerMapUpdate, setStateValue} from '../actions/index';
+import {triggerMapUpdate, setStateValues} from '../actions/index';
 
 class TrafficSwitch extends Component {
   render() {
@@ -19,12 +20,18 @@ class TrafficSwitch extends Component {
   toggle(e, trafficInStyle) {
     var checked = e.target.checked;
     if (checked && !trafficInStyle) {
-      this.props.setStateValue('mapStyle', this.props.mapStyle + '-traffic');
-      this.props.setStateValue('needMapRestyle', true);
+      this.props.setStateValues({
+        mapStyle: this.props.mapStyle + '-traffic',
+        needMapRestyle: true
+      });
+
       this.props.triggerMapUpdate();
     } else if (!checked && trafficInStyle) {
-      this.props.setStateValue('mapStyle', this.props.mapStyle.split('-')[0]);
-      this.props.setStateValue('needMapRestyle', true);
+      this.props.setStateValues({
+        mapStyle: this.props.mapStyle.split('-')[0],
+        needMapRestyle: true
+      });
+
       this.props.triggerMapUpdate();
     }
   }
@@ -35,9 +42,9 @@ class TrafficSwitch extends Component {
 }
 
 TrafficSwitch.propTypes = {
-  setStateValue: React.PropTypes.func,
-  mapStyle: React.PropTypes.string,
-  triggerMapUpdate: React.PropTypes.func,
+  setStateValues: PropTypes.func,
+  mapStyle: PropTypes.string,
+  triggerMapUpdate: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {
@@ -48,10 +55,12 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setStateValue: (k, v) => dispatch(setStateValue(k, v)),
+    setStateValues: (obj) => dispatch(setStateValues(obj)),
     triggerMapUpdate: (v) => dispatch(triggerMapUpdate(v))
   };
 };
+
+export {TrafficSwitch};
 
 export default connect(
   mapStateToProps,

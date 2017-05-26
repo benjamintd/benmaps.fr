@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
@@ -67,13 +68,13 @@ class ContextMenu extends Component {
 }
 
 ContextMenu.propTypes = {
-  active: React.PropTypes.bool,
-  coordinates: React.PropTypes.array,
-  position: React.PropTypes.array,
-  place: React.PropTypes.object,
-  resetContextMenu: React.PropTypes.func,
-  setStateValue: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func
+  active: PropTypes.bool,
+  coordinates: PropTypes.array,
+  position: PropTypes.array,
+  place: PropTypes.object,
+  resetContextMenu: PropTypes.func,
+  setStateValue: PropTypes.func,
+  triggerMapUpdate: PropTypes.func
 };
 
 const mapStateToProps = (state) => {

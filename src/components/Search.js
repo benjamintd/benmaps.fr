@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Geocoder from './Geocoder';
@@ -5,7 +6,7 @@ import PlaceName from './PlaceName';
 import CloseButton from './CloseButton';
 import PlaceInfo from './PlaceInfo';
 import directionsIcon from '../assets/directions.svg';
-import {triggerMapUpdate, setDirectionsLocation, getPlaceInfo, setStateValue} from '../actions/index';
+import {triggerMapUpdate, setDirectionsLocation, getPlaceInfo, resetStateKeys, setStateValue} from '../actions/index';
 
 class Search extends Component {
   render() {
@@ -33,8 +34,7 @@ class Search extends Component {
                 location={this.props.searchLocation}
                 onClick={() => {
                   this.props.writeSearch(this.props.searchLocation.place_name);
-                  this.props.setSearchLocation(null);
-                  this.props.setPlaceInfo(null);
+                  this.props.resetStateKeys(['searchLocation', 'placeInfo']);
                 }}
               />
             </div>
@@ -68,9 +68,7 @@ class Search extends Component {
   }
 
   closeSearch() {
-    this.props.writeSearch('');
-    this.props.setSearchLocation(null);
-    this.props.setPlaceInfo(null);
+    this.props.resetStateKeys(['searchString', 'searchLocation', 'placeInfo']);
     this.props.triggerMapUpdate();
   }
 
@@ -91,16 +89,17 @@ class Search extends Component {
 }
 
 Search.propTypes = {
-  getPlaceInfo: React.PropTypes.func,
-  placeInfo: React.PropTypes.object,
-  searchLocation: React.PropTypes.object,
-  searchString: React.PropTypes.string,
-  setDirectionsLocation: React.PropTypes.func,
-  setMode: React.PropTypes.func,
-  setPlaceInfo: React.PropTypes.func,
-  setSearchLocation: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func,
-  writeSearch: React.PropTypes.func,
+  getPlaceInfo: PropTypes.func,
+  placeInfo: PropTypes.object,
+  resetStateKeys: PropTypes.func,
+  searchLocation: PropTypes.object,
+  searchString: PropTypes.string,
+  setDirectionsLocation: PropTypes.func,
+  setMode: PropTypes.func,
+  setPlaceInfo: PropTypes.func,
+  setSearchLocation: PropTypes.func,
+  triggerMapUpdate: PropTypes.func,
+  writeSearch: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {
@@ -114,6 +113,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),
+    resetStateKeys: (keys) => dispatch(resetStateKeys(keys)),
     setDirectionsLocation: (kind, location) => dispatch(setDirectionsLocation(kind, location)),
     setMode: (mode) => dispatch(setStateValue('mode', mode)),
     setPlaceInfo: (info) => dispatch(setStateValue('placeInfo', info)),
