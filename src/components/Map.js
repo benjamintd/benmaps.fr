@@ -235,10 +235,17 @@ class MapComponent extends Component {
 
   onClick(e) {
     var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers});
+
     if (!features.length) {
+      // No feature is selected, reset the search location on click on the map
+      if (this.props.mode === 'search') {
+        this.props.resetStateKeys(['placeInfo', 'searchString', 'searchLocation']);
+        this.props.triggerMapUpdate();
+      }
       return;
     }
 
+    // We have a selected feature
     var feature = features[0];
 
     let key;
