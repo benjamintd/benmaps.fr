@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {triggerMapUpdate, setStateValue} from '../actions/index';
+import {triggerMapUpdate, setStateValues} from '../actions/index';
 
 class StyleSwitch extends Component {
   render() {
@@ -16,8 +16,10 @@ class StyleSwitch extends Component {
 
           if (this.props.mapStyle.indexOf('traffic') > -1) newStyle += '-traffic';
 
-          this.props.setStateValue('mapStyle', newStyle);
-          this.props.setStateValue('needMapRestyle', true);
+          this.props.setStateValues({
+            mapStyle: newStyle,
+            needMapRestyle: true
+          });
           this.props.triggerMapUpdate();
         }}
       >
@@ -43,7 +45,7 @@ class StyleSwitch extends Component {
 StyleSwitch.propTypes = {
   accessToken: PropTypes.string,
   center: PropTypes.array,
-  setStateValue: PropTypes.func,
+  setStateValues: PropTypes.func,
   mapStyle: PropTypes.string,
   triggerMapUpdate: PropTypes.func,
   zoom: PropTypes.number,
@@ -60,7 +62,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setStateValue: (k, v) => dispatch(setStateValue(k, v)),
+    setStateValues: (obj) => dispatch(setStateValues(obj)),
     triggerMapUpdate: (v) => dispatch(triggerMapUpdate(v))
   };
 };
