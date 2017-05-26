@@ -4,6 +4,16 @@ export const setStateValue = (key, value) => ({
   value
 });
 
+export const setStateValues = (modifiedState) => ({
+  type: 'SET_STATE_VALUES',
+  modifiedState
+});
+
+export const resetStateKeys = (keys) => ({
+  type: 'RESET_STATE_KEYS',
+  keys
+});
+
 export const triggerMapUpdate = (needMapRepan) => ({
   type: 'TRIGGER_MAP_UPDATE',
   needMapRepan: !!needMapRepan || false

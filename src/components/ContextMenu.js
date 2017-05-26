@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
-import {setStateValue, triggerMapUpdate, resetContextMenu} from '../actions/index';
+import {setStateValues, triggerMapUpdate, resetContextMenu} from '../actions/index';
 
 class ContextMenu extends Component {
   render() {
@@ -39,24 +40,30 @@ class ContextMenu extends Component {
 
   search() {
     console.log('search ' + this.props.coordinates);
-    this.props.setStateValue('mode', 'search');
-    this.props.setStateValue('searchLocation', this.props.place);
+    this.props.setStateValues({
+      mode: 'search',
+      searchLocation: this.props.place
+    });
     this.props.triggerMapUpdate();
     this.props.resetContextMenu();
   }
 
   directionsTo() {
     console.log('directions to ' + this.props.coordinates);
-    this.props.setStateValue('mode', 'directions');
-    this.props.setStateValue('directionsTo', this.props.place);
+    this.props.setStateValues({
+      mode: 'directions',
+      directionsTo: this.props.place
+    });
     this.props.triggerMapUpdate();
     this.props.resetContextMenu();
   }
 
   directionsFrom() {
     console.log('directions from ' + this.props.coordinates);
-    this.props.setStateValue('mode', 'directions');
-    this.props.setStateValue('directionsFrom', this.props.place);
+    this.props.setStateValues({
+      mode: 'directions',
+      directionsFrom: this.props.place
+    });
     this.props.triggerMapUpdate();
     this.props.resetContextMenu();
   }
@@ -67,13 +74,13 @@ class ContextMenu extends Component {
 }
 
 ContextMenu.propTypes = {
-  active: React.PropTypes.bool,
-  coordinates: React.PropTypes.array,
-  position: React.PropTypes.array,
-  place: React.PropTypes.object,
-  resetContextMenu: React.PropTypes.func,
-  setStateValue: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func
+  active: PropTypes.bool,
+  coordinates: PropTypes.array,
+  position: PropTypes.array,
+  place: PropTypes.object,
+  resetContextMenu: PropTypes.func,
+  setStateValues: PropTypes.func,
+  triggerMapUpdate: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
@@ -88,7 +95,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     resetContextMenu: () => dispatch(resetContextMenu()),
-    setStateValue: (key, value) => dispatch(setStateValue(key, value)),
+    setStateValues: (obj) => dispatch(setStateValues(obj)),
     triggerMapUpdate: (needMapRepan) => dispatch(triggerMapUpdate(needMapRepan))
   };
 };

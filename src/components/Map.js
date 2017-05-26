@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
@@ -13,7 +14,8 @@ import {
   getRoute,
   getReverseGeocode,
   setContextMenu,
-  resetContextMenu
+  resetContextMenu,
+  resetStateKeys
 } from '../actions/index';
 
 class MapComponent extends Component {
@@ -203,14 +205,11 @@ class MapComponent extends Component {
 
     this.map.getSource(layerId).setData(geometry);
 
-    this.props.setStateValue('placeInfo', null);
-    this.props.setStateValue('searchLocation', null);
+    this.props.resetStateKeys(['placeInfo', 'searchLocation', 'route', 'routeStatus']);
     this.props.setStateValue(this.layerToKey(layerId), {
       'place_name': '__loading',
       'geometry': geometry
     });
-    this.props.setStateValue('route', undefined); // Will make the route disappear without triggering a call to the API
-    this.props.setStateValue('routeStatus', 'idle');
     this.props.triggerMapUpdate();
   }
 
@@ -230,27 +229,33 @@ class MapComponent extends Component {
 
     this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
 
-    this.props.setStateValue('route', null); // retrigger API call
+    this.props.resetStateKeys(['route']); // retrigger API call
     this.props.triggerMapUpdate();
   }
 
   onClick(e) {
     var features = this.map.queryRenderedFeatures(e.point, {layers: this.selectableLayers});
+
     if (!features.length) {
+      // No feature is selected, reset the search location on click on the map
+      if (this.props.mode === 'search') {
+        this.props.resetStateKeys(['placeInfo', 'searchString', 'searchLocation']);
+        this.props.triggerMapUpdate();
+      }
       return;
     }
 
+    // We have a selected feature
     var feature = features[0];
 
     let key;
     if (this.props.mode === 'search') {
-      this.props.setStateValue('placeInfo', null);
+      this.props.resetStateKeys(['placeInfo']);
       key = 'searchLocation';
     } else if (!this.props.directionsFrom) {
       key = 'directionsFrom';
     } else {
-      this.props.setStateValue('route', null);
-      this.props.setStateValue('searchLocation', null);
+      this.props.resetStateKeys(['route', 'searchLocation']);
       key = 'directionsTo';
     }
 
@@ -413,29 +418,30 @@ class MapComponent extends Component {
 }
 
 MapComponent.propTypes = {
-  accessToken: React.PropTypes.string,
-  center: React.PropTypes.array,
-  directionsFrom: React.PropTypes.object,
-  directionsTo: React.PropTypes.object,
-  getReverseGeocode: React.PropTypes.func,
-  getRoute: React.PropTypes.func,
-  map: React.PropTypes.object,
-  mapStyle: React.PropTypes.string,
-  modality: React.PropTypes.string,
-  mode: React.PropTypes.string,
-  needMapRepan: React.PropTypes.bool,
-  needMapRestyle: React.PropTypes.bool,
-  needMapUpdate: React.PropTypes.bool,
-  resetContextMenu: React.PropTypes.func,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
-  searchLocation: React.PropTypes.object,
-  setContextMenu: React.PropTypes.func,
-  setStateValue: React.PropTypes.func,
-  setUserLocation: React.PropTypes.func,
-  triggerMapUpdate: React.PropTypes.func,
-  userLocation: React.PropTypes.object,
-  zoom: React.PropTypes.number,
+  accessToken: PropTypes.string,
+  center: PropTypes.array,
+  directionsFrom: PropTypes.object,
+  directionsTo: PropTypes.object,
+  getReverseGeocode: PropTypes.func,
+  getRoute: PropTypes.func,
+  map: PropTypes.object,
+  mapStyle: PropTypes.string,
+  modality: PropTypes.string,
+  mode: PropTypes.string,
+  needMapRepan: PropTypes.bool,
+  needMapRestyle: PropTypes.bool,
+  needMapUpdate: PropTypes.bool,
+  resetContextMenu: PropTypes.func,
+  resetStateKeys: PropTypes.func,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
+  searchLocation: PropTypes.object,
+  setContextMenu: PropTypes.func,
+  setStateValue: PropTypes.func,
+  setUserLocation: PropTypes.func,
+  triggerMapUpdate: PropTypes.func,
+  userLocation: PropTypes.object,
+  zoom: PropTypes.number,
 };
 
 const mapStateToProps = (state) => {
@@ -467,6 +473,7 @@ const mapDispatchToProps = (dispatch) => {
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),
     setUserLocation: (coordinates) => dispatch(setUserLocation(coordinates)),
     triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    resetStateKeys: (keys) => dispatch(resetStateKeys(keys))
   };
 };
 

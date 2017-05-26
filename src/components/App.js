@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import ContextMenu from './ContextMenu';
-import MapComponent from './Map';
+import Map from './Map';
 import Search from './Search';
 import Directions from './Directions';
 import StyleSwitch from './StyleSwitch';
@@ -11,7 +12,7 @@ class App extends Component {
   render() {
     return (
       <div className='root'>
-        <MapComponent/>
+        <Map/>
         <div className='relative m12 m24-mm w420-mm flex-parent flex-parent--column'>
           {
             (this.props.mode === 'directions')
@@ -42,10 +43,10 @@ class App extends Component {
 }
 
 App.propTypes = {
-  contextMenuActive: React.PropTypes.bool,
-  mode: React.PropTypes.string,
-  route: React.PropTypes.object,
-  routeStatus: React.PropTypes.string,
+  contextMenuActive: PropTypes.bool,
+  mode: PropTypes.string,
+  route: PropTypes.object,
+  routeStatus: PropTypes.string,
 };
 
 const mapStateToProps = (state) => {

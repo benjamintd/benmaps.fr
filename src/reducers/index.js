@@ -43,6 +43,18 @@ const reducer = (state = defaultState, action) => {
     return Object.assign({}, state, modifiedState);
   }
 
+  case 'SET_STATE_VALUES': {
+    return Object.assign({}, state, action.modifiedState);
+  }
+
+  case 'RESET_STATE_KEYS': {
+    const modifiedState = {};
+    action.keys.forEach(k => {
+      modifiedState[k] = defaultState[k];
+    });
+    return Object.assign({}, state, modifiedState);
+  }
+
   case 'TRIGGER_MAP_UPDATE':
     return Object.assign({}, state, {
       needMapUpdate: true,

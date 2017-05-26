@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
 class PlaceName extends Component {
@@ -37,10 +38,10 @@ class PlaceName extends Component {
 }
 
 PlaceName.propTypes = {
-  colors: React.PropTypes.string,
-  className: React.PropTypes.string,
-  location: React.PropTypes.object,
-  onClick: React.PropTypes.func
+  colors: PropTypes.string,
+  className: PropTypes.string,
+  location: PropTypes.object,
+  onClick: PropTypes.func
 };
 
 PlaceName.defaultProps = {

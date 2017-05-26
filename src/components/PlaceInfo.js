@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ImageWithFallback from './ImageWithFallback';
 import directionsIcon from '../assets/directions.svg';
@@ -31,9 +32,9 @@ class PlaceInfo extends Component {
   }
 
   getImageUrl() {
+    // see https://commons.wikimedia.org/wiki/Commons:FAQ for how images are stored
     const claim = this.props.info.claims['P18'];
     if (claim && claim.length > 0) {
-      // see https://commons.wikimedia.org/wiki/Commons:FAQ for how images are stored
       const imageName = claim[0].replace(/ /g, '_');
       const baseUrl = 'https://upload.wikimedia.org/wikipedia/commons/';
       const hash = md5(imageName);
@@ -103,8 +104,8 @@ class PlaceInfo extends Component {
 }
 
 PlaceInfo.propTypes = {
-  clickDirections: React.PropTypes.func,
-  info: React.PropTypes.object,
+  clickDirections: PropTypes.func,
+  info: PropTypes.object,
 };
 
 export default PlaceInfo;
