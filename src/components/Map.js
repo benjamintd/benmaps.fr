@@ -294,6 +294,13 @@ class MapComponent extends Component {
       this.moveTo(geometry, 13);
     };
 
+    // Create scale control
+    const scaleControl = new mapboxgl.ScaleControl({
+      maxWidth: 80,
+      unit: 'metric'
+    });
+    this.map.addControl(scaleControl, 'bottom-right');
+
     // Create geolocation control
     const geolocateControl = new mapboxgl.GeolocateControl();
     geolocateControl.on('geolocate', setGeolocation);

@@ -2,9 +2,11 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
 class ImageWithFallback extends Component {
-  getInitialState() {
-    return {
-      status: 'primary'
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      status: 'primary',
     };
   }
 

@@ -42,7 +42,7 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
         }
       })
       .then(data => {
-        if (data.code !== 'Ok') Promise.reject();
+        if (data.code !== 'Ok') return Promise.reject();
         else {
           // Success
           next({
@@ -58,6 +58,8 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
             type: 'TRIGGER_MAP_UPDATE',
             needMapRepan: true
           });
+
+          return Promise.resolve();
         }
       })
       .catch(() => next({

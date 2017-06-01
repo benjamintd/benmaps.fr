@@ -326,7 +326,7 @@
             ],
             "layout": {},
             "paint": {
-                "fill-color": "hsl(40, 46%, 89%)",
+                "fill-color": "hsl(0, 0%, 92%)",
                 "fill-opacity": 1
             }
         },
