@@ -1,6 +1,6 @@
 // forked from https://github.com/mapbox/react-geocoder
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
 import xhr from 'xhr';
@@ -9,44 +9,27 @@ import xhr from 'xhr';
  * Geocoder component: connects to Mapbox.com Geocoding API
  * and provides an autocompleting interface for finding locations.
  */
-var Geocoder = React.createClass({
-  getDefaultProps() {
-    return {
-      endpoint: 'https://api.tiles.mapbox.com',
-      inputPosition: 'top',
-      inputPlaceholder: 'Search',
-      source: 'mapbox.places',
-      bbox: '',
-      types: '',
-      onSuggest: function () {},
-      focusOnMount: true
-    };
-  },
-  getInitialState() {
-    return {
+class Geocoder extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
       results: [],
       focus: null,
       loading: false,
       searchTime: new Date()
     };
-  },
-  propTypes: {
-    endpoint: PropTypes.string,
-    source: PropTypes.string,
-    inputPosition: PropTypes.string,
-    inputPlaceholder: PropTypes.string,
-    inputClass: PropTypes.string,
-    resultsClass: PropTypes.string,
-    onSelect: PropTypes.func.isRequired,
-    onSuggest: PropTypes.func,
-    accessToken: PropTypes.string.isRequired,
-    proximity: PropTypes.string,
-    bbox: PropTypes.string,
-    focusOnMount: PropTypes.bool,
-    types: PropTypes.string,
-    searchString: PropTypes.string,
-    writeSearch: PropTypes.func
-  },
+
+    this.onInput = this.onInput.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onResult = this.onResult.bind(this);
+  }
+
+  componentDidMount() {
+    if (this.props.focusOnMount) this.input.focus();
+  }
+
   onInput(e) {
     this.setState({loading: true});
     var value = e.target.value;
@@ -68,7 +51,8 @@ var Geocoder = React.createClass({
         this.onResult);
     }
     this.props.writeSearch(value);
-  },
+  }
+
   moveFocus(dir) {
     if (this.state.loading) return;
     this.setState({
@@ -78,12 +62,14 @@ var Geocoder = React.createClass({
             this.state.results.length - 1,
             this.state.focus + dir))
     });
-  },
+  }
+
   acceptFocus() {
     if (this.state.focus !== null) {
       this.props.onSelect(this.state.results[this.state.focus]);
     }
-  },
+  }
+
   onKeyDown(e) {
     switch (e.which) {
       // up
@@ -106,7 +92,8 @@ var Geocoder = React.createClass({
     default:
       break;
     }
-  },
+  }
+
   onResult(err, res, body, searchTime) {
     // searchTime is compared with the last search to set the state
     // to ensure that a slow xhr response does not scramble the
@@ -120,14 +107,16 @@ var Geocoder = React.createClass({
       });
       this.props.onSuggest(this.state.results);
     }
-  },
+  }
+
   clickOption(place, listLocation) {
     this.props.onSelect(place);
     this.setState({focus: listLocation});
     // focus on the input after click to maintain key traversal
     this.input.focus();
     return false;
-  },
+  }
+
   render() {
     var input = <input
       ref={(input) => { this.input = input; }}
@@ -141,7 +130,7 @@ var Geocoder = React.createClass({
 
     return (
       <div className='w-full'>
-        {this.props.inputPosition === 'top' && input}
+        {input}
         {this.state.results.length > 0 && this.props.searchString !== '' && (
           <ul className={this.props.resultsClass}>
             {this.state.results.map((result, i) => (
@@ -163,11 +152,37 @@ var Geocoder = React.createClass({
         {this.props.inputPosition === 'bottom' && input}
       </div>
     );
-  },
-  componentDidMount() {
-    if (this.props.focusOnMount) this.input.focus();
   }
-});
+}
+
+Geocoder.propTypes = {
+  endpoint: PropTypes.string,
+  source: PropTypes.string,
+  inputPosition: PropTypes.string,
+  inputPlaceholder: PropTypes.string,
+  inputClass: PropTypes.string,
+  resultsClass: PropTypes.string,
+  onSelect: PropTypes.func.isRequired,
+  onSuggest: PropTypes.func,
+  accessToken: PropTypes.string.isRequired,
+  proximity: PropTypes.string,
+  bbox: PropTypes.string,
+  focusOnMount: PropTypes.bool,
+  types: PropTypes.string,
+  searchString: PropTypes.string,
+  writeSearch: PropTypes.func
+};
+
+Geocoder.defaultProps = {
+  endpoint: 'https://api.tiles.mapbox.com',
+  inputPosition: 'top',
+  inputPlaceholder: 'Search',
+  source: 'mapbox.places',
+  bbox: '',
+  types: '',
+  onSuggest: function () {},
+  focusOnMount: true
+};
 
 function search(endpoint, source, accessToken, proximity, bbox, types, query, callback) {
   var searchTime = new Date();
@@ -184,6 +199,8 @@ function search(endpoint, source, accessToken, proximity, bbox, types, query, ca
     callback(err, res, body, searchTime);
   });
 }
+
+
 
 const mapStateToProps = (state) => {
   return {
