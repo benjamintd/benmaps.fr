@@ -98,7 +98,7 @@ class MapComponent extends Component {
       // We have origin and destination but no route yet
       if (this.props.directionsFrom && this.props.directionsTo && this.props.route === null) {
         // Do not retry when the previous request errored
-        if (this.props.routeStatus !== 'error') {
+        if (this.props.routeStatus !== 'error' && this.props.routeStatus !== 'paused') {
           // Trigger the API call to directions
           this.props.getRoute(
             this.props.directionsFrom,
@@ -206,6 +206,7 @@ class MapComponent extends Component {
     this.map.getSource(layerId).setData(geometry);
 
     this.props.resetStateKeys(['placeInfo', 'searchLocation', 'route', 'routeStatus']);
+    this.props.setStateValue('routeStatus', 'paused'); // pause route updates
     this.props.setStateValue(this.layerToKey(layerId), {
       'place_name': '__loading',
       'geometry': geometry
@@ -229,7 +230,7 @@ class MapComponent extends Component {
 
     this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
 
-    this.props.resetStateKeys(['route']); // retrigger API call
+    this.props.resetStateKeys(['route', 'routeStatus']); // retrigger API call
     this.props.triggerMapUpdate();
   }
 
