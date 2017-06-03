@@ -39,7 +39,6 @@ class ContextMenu extends Component {
   }
 
   search() {
-    console.log('search ' + this.props.coordinates);
     this.props.setStateValues({
       mode: 'search',
       searchLocation: this.props.place
@@ -49,7 +48,6 @@ class ContextMenu extends Component {
   }
 
   directionsTo() {
-    console.log('directions to ' + this.props.coordinates);
     this.props.setStateValues({
       mode: 'directions',
       directionsTo: this.props.place
@@ -59,7 +57,6 @@ class ContextMenu extends Component {
   }
 
   directionsFrom() {
-    console.log('directions from ' + this.props.coordinates);
     this.props.setStateValues({
       mode: 'directions',
       directionsFrom: this.props.place

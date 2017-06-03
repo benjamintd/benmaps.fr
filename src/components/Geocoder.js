@@ -185,6 +185,8 @@ Geocoder.defaultProps = {
 };
 
 function search(endpoint, source, accessToken, proximity, bbox, types, query, callback) {
+  // Usually asynchronous calls would happen in the API caller,
+  // but the results here are independent from the apps' state
   var searchTime = new Date();
   var uri = endpoint + '/geocoding/v5/'
     + source + '/' + encodeURIComponent(query) + '.json'
