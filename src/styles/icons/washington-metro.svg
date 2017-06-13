@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17">
+  <title>washington-metro</title>
+  <rect width="17" height="17" rx="2" ry="2" fill="#fff" opacity="0.75"/>
+  <rect x="1" y="1" width="15" height="15" rx="1" ry="1" fill="#595959"/>
+  <path d="M3,3H6.5l2,8,2-8H14V14H12V6L9.5,14h-2L5,6v8H3V3Z" fill="#fff"/>
+</svg>

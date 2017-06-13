@@ -47,15 +47,40 @@ This is open-source and MIT licensed. All you need to get this working is a [Map
 ```sh
 git clone git@github.com:benjamintd/mapbox-maps.git
 cd mapbox-maps
-echo "export REACT_APP_MAPBOX_TOKEN=<your access token>" > .env
 npm install
+```
+Then you should create a `.env` file at the root that contains the following variables:
+
+```sh
+REACT_APP_MAPBOX_TOKEN=<your access token>
+PUBLIC_URL=https://<your base url>
+```
+
+If you deploy to github pages, the url should look something like `https://benjamintd.github.io/mapbox-maps`.
+
+Then you can start the development server with:
+
+```sh
 npm start
 ```
 
+The server will start on port 3000.
+
 Feel free to fork and contribute, or open issues if you notice a bug or missing feature.
+
+### Icons and sprites
+
+The style uses [sprites](https://www.mapbox.com/help/define-sprite/) for icons on the map. The spritesheet is generated automatically from the `styles/icons` directory with the module `@mapbox/spritezero-cli`. If you want to generate a new spritesheet from the icons stored in that directory, run the following commands:
+
+```sh
+$ npm run build-sprites
+```
+
+The spritesheet is generated automatically when building the project in whole (`npm run build` or `npm run deploy`).
 
 ### What's next?
 
 - Adding tests, I've been lazy
 - More traffic-related features
+- Turn-by-turn directions
 - Ads (just kidding)

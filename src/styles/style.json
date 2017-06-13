@@ -35,7 +35,7 @@
             "data": {"type": "FeatureCollection", "features": []}
         }
     },
-    "sprite": "mapbox://sprites/benjamintd/cj2wkuwc000582spd6gz9cf00",
+    "sprite": "This is set at runtime in the Map component.",
     "glyphs": "mapbox://fonts/benjamintd/{fontstack}/{range}.pbf",
     "layers": [
         {
