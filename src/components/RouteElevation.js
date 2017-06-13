@@ -22,14 +22,14 @@ class RouteElevation extends Component {
       let upsAndDowns = this.upsAndDowns();
       return (
         <div>
-        <div className='txt-s color-darken50'>
-          <svg className='icon inline-block align-middle'><use xlinkHref='#icon-arrow-up'></use></svg>{upsAndDowns[0]}m -
-          <svg className='icon inline-block align-middle'><use xlinkHref='#icon-arrow-down'></use></svg>{upsAndDowns[1]}m
-        </div>
-        <AreaChart width={420} margin={{top: 12, right: 42, left: 42, bottom: 12}} height={100} data={this.state.elevations.map(e => ({e: e}))}>
-          <YAxis orientation="right"/>
-          <Area type="monotone" dataKey="e" stroke="#2abaf7" fill='#2abaf7' fillOpacity={0.5} strokeWidth={2} dot={null} />
-        </AreaChart>
+          <div className='txt-s color-darken50 px42'>
+            <svg className='icon inline-block align-middle'><use xlinkHref='#icon-arrow-up'></use></svg>{upsAndDowns[0]}m -
+            <svg className='icon inline-block align-middle'><use xlinkHref='#icon-arrow-down'></use></svg>{upsAndDowns[1]}m
+          </div>
+          <AreaChart width={420} margin={{top: 0, right: 42, left: 42, bottom: 12}} height={100} data={this.state.elevations.map(e => ({e: e}))}>
+            <YAxis orientation="right"/>
+            <Area type="monotone" dataKey="e" stroke="#2abaf7" fill='#2abaf7' fillOpacity={0.5} strokeWidth={2} dot={null} />
+          </AreaChart>
         </div>
       );
     }

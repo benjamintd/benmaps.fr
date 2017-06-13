@@ -35,7 +35,7 @@
             "data": {"type": "FeatureCollection", "features": []}
         }
     },
-    "sprite": "mapbox://sprites/benjamintd/cj2wkuwc000582spd6gz9cf00",
+    "sprite": "This is set at runtime in the Map component.",
     "glyphs": "mapbox://fonts/benjamintd/{fontstack}/{range}.pbf",
     "layers": [
         {
@@ -6792,11 +6792,6 @@
                 "all",
                 [
                     "!=",
-                    "type",
-                    "building:part"
-                ],
-                [
-                    "!=",
                     "underground",
                     "true"
                 ]
@@ -6812,7 +6807,7 @@
                         [
                             {
                                 "zoom": 15,
-                                "value": 0
+                                "value": 1
                             },
                             0
                         ],
@@ -6825,29 +6820,57 @@
                         ],
                         [
                             {
-                                "value": 0,
+                                "value": 1,
                                 "zoom": 16
+                            },
+                            1
+                        ],
+                        [
+                            {
+                                "value": 1000,
+                                "zoom": 16
+                            },
+                            1000
+                        ]
+                    ],
+                    "default": 10
+                },
+                "fill-extrusion-base": {
+                    "base": 1,
+                    "type": "exponential",
+                    "property": "min_height",
+                    "stops": [
+                        [
+                            {
+                                "zoom": 15,
+                                "value": 1
                             },
                             0
                         ],
                         [
                             {
-                                "value": 100,
-                                "zoom": 16
+                                "value": 1000,
+                                "zoom": 15
                             },
-                            100
+                            0
                         ],
                         [
                             {
-                                "value": 300,
+                                "value": 1,
                                 "zoom": 16
                             },
-                            300
+                            1
+                        ],
+                        [
+                            {
+                                "value": 1000,
+                                "zoom": 16
+                            },
+                            1000
                         ]
                     ],
-                    "default": 10
+                    "default": 0
                 },
-                "fill-extrusion-base": 0,
                 "fill-extrusion-opacity": 0.66
             }
         },

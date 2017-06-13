@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="14" viewBox="0 0 56 14">
+  <title>motorway-exits</title>
+  <g>
+    <rect x="0.5" y="0.5" width="55" height="13" fill="#0e8c38"/>
+    <path d="M55,1V13H1V1H55m1-1H0V14H56V0h0Z" fill="#fff"/>
+  </g>
+</svg>

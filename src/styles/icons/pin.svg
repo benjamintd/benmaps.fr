@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="19"
+   height="35.535786"
+   viewBox="0 0 19 35.535787"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="pin.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4148">
+      <stop
+         style="stop-color:#de5153;stop-opacity:1"
+         offset="0"
+         id="stop4150" />
+      <stop
+         style="stop-color:#c84245;stop-opacity:1"
+         offset="1"
+         id="stop4152" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4148"
+       id="linearGradient4154"
+       x1="307.2529"
+       y1="245.05081"
+       x2="305.77448"
+       y2="590.8446"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.06212665,0,0,0.06061755,-9.3687287,-5.4884375)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="-12.568546"
+     inkscape:cy="6.8983511"
+     inkscape:document-units="px"
+     inkscape:current-layer="g4164"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     units="px"
+     inkscape:window-width="2560"
+     inkscape:window-height="1342"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       position="9.6280165,26.074564"
+       orientation="1,0"
+       id="guide4148" />
+    <sodipodi:guide
+       position="11.71875,25.736608"
+       orientation="0,1"
+       id="guide4150" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-286.36599,-385.27496)">
+    <g
+       id="g4164"
+       transform="matrix(0.1144333,0,0,0.11340134,269.11327,344.06783)">
+      <ellipse
+         style="opacity:1;fill:#ffffff;fill-opacity:0.70329672;stroke:none;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="path5310"
+         cx="235.45482"
+         cy="458.77539"
+         rx="71.122902"
+         ry="74.880905" />
+      <path
+         style="opacity:1;fill:url(#linearGradient4154);fill-opacity:1;stroke:#8a2121;stroke-width:0.53708798;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 9.6113281 0.84765625 C 4.5136107 0.8476279 0.22379684 4.7033131 0.26953125 9.8085938 C 0.33266525 16.856309 5.8270826 27.651176 9.6054688 35.236328 C 12.916736 27.400086 18.612729 18.131671 18.730469 9.8085938 C 18.730431 4.834752 14.708997 0.84769367 9.6113281 0.84765625 z M 9.625 3.8554688 A 6.0490281 5.9020924 0 0 1 15.673828 9.7578125 A 6.0490281 5.9020924 0 0 1 9.625 15.660156 A 6.0490281 5.9020924 0 0 1 3.5761719 9.7578125 A 6.0490281 5.9020924 0 0 1 9.625 3.8554688 z "
+         transform="matrix(8.738715,0,0,8.818238,150.7666,363.37428)"
+         id="path4136" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="26" height="14" viewBox="0 0 26 14">
+  <title>motorway-exits</title>
+  <g>
+    <rect x="0.5" y="0.5" width="25" height="13" fill="#0e8c38"/>
+    <path d="M25,1V13H1V1H25m1-1H0V14H26V0h0Z" fill="#fff"/>
+  </g>
+  <text transform="translate(2.62 10.18)" font-size="9" fill="#3a3836" font-family="DIN Offc Pro" font-weight="700">WW4</text>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="14" viewBox="0 0 17 14">
+  <title>gb-national-rail</title>
+  <rect width="17" height="14" rx="2" ry="2" fill="#fff" opacity="0.75"/>
+  <rect x="1" y="1" width="15" height="12" rx="1" ry="1" fill="#f23d3d"/>
+  <polygon points="15 6 15 5 12 5 7.26 3 5 3 9.67 5 2 5 2 6 9.67 6 5 8 2 8 2 9 5 9 9.67 11 12 11 7.26 9 15 9 15 8 7.26 8 12 6 15 6" fill="#fff"/>
+</svg>

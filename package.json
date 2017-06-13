@@ -2,8 +2,9 @@
   "name": "mapbox-maps",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://benjamintd.github.io/mapbox-maps",
+  "homepage": "https://benjamintd.github.io/mapbox-maps",
   "devDependencies": {
+    "@mapbox/spritezero-cli": "^2.0.0",
     "enzyme": "^2.8.2",
     "eslint": "^3.17.1",
     "eslint-config-mourner": "^2.0.1",
@@ -22,7 +23,7 @@
     "blueimp-md5": "^2.7.0",
     "cheap-ruler": "^2.5.0",
     "lodash": "^4.17.4",
-    "mapbox-gl": "^0.37.0",
+    "mapbox-gl": "^0.38.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.0",
     "react-dom": "^15.4.2",
@@ -34,13 +35,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run build-sprites && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "lint": "eslint src/**/*.js",
     "fix": "eslint --fix src/**/*.js",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "build-sprites": "node_modules/@mapbox/spritezero-cli/bin/spritezero public/sprite src/styles/icons && node_modules/@mapbox/spritezero-cli/bin/spritezero public/sprite@2x src/styles/icons --retina"
   },
   "description": "A Google-like interface to Mapbox maps.",
   "main": "src/index.js",

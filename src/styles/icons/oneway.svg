@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="13" height="8" viewBox="0 0 13 8">
+  <title>oneway-large copy</title>
+  <rect width="13" height="8" fill="none"/>
+  <path d="M8,7.5A0.5,0.5,0,0,1,7.5,7V5.5H2a1.5,1.5,0,0,1,0-3H7.5V1A0.5,0.5,0,0,1,8.3.6l4,3a0.5,0.5,0,0,1,0,.8l-4,3A0.5,0.5,0,0,1,8,7.5Z" fill="#fff" opacity="0.75"/>
+  <path d="M12,4L8,1V3H2A1,1,0,0,0,2,5H8V7Z" fill="#71768e"/>
+</svg>

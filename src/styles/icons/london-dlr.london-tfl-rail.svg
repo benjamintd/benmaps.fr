@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="39" height="16" viewBox="0 0 39 16">
+  <title>london-dlr.london-tfl-rail</title>
+  <path d="M36.6,5.5a8,8,0,0,0-15.19,0H17.6A8,8,0,0,0,2.4,5.5H0v5H2.4a8,8,0,0,0,15.19,0H21.4a8,8,0,0,0,15.19,0H39v-5H36.6Z" fill="#fff" opacity="0.75"/>
+  <circle cx="10" cy="8" r="4" fill="#fff"/>
+  <path d="M10,1a7,7,0,1,0,7,7A7,7,0,0,0,10,1Zm0,11a4,4,0,1,1,4-4A4,4,0,0,1,10,12Z" fill="#32a5a5"/>
+  <rect x="1" y="6.5" width="18" height="3" fill="#4862cc"/>
+  <circle cx="29" cy="8" r="4" fill="#fff"/>
+  <path d="M29,1a7,7,0,1,0,7,7A7,7,0,0,0,29,1Zm0,11a4,4,0,1,1,4-4A4,4,0,0,1,29,12Z" fill="#4862cc"/>
+  <rect x="20" y="6.5" width="18" height="3" fill="#4862cc"/>
+</svg>

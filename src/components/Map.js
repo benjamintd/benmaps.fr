@@ -6,7 +6,6 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
-import style from '../styles/style.json';
 import {
   setStateValue,
   setUserLocation,
@@ -17,6 +16,16 @@ import {
   resetContextMenu,
   resetStateKeys
 } from '../actions/index';
+
+import style from '../styles/style.json';
+// Set the sprite URL in the style. It has to be a full, absolute URL.
+let spriteUrl;
+if (process.env.NODE_ENV === 'production') {
+  spriteUrl = process.env.PUBLIC_URL + '/sprite';
+} else { // Dev server runs on port 3000
+  spriteUrl = 'http://localhost:3000/sprite';
+}
+style.sprite = spriteUrl;
 
 class MapComponent extends Component {
   constructor(props) {
