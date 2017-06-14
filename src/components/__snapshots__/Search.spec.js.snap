@@ -1,0 +1,102 @@
+exports[`test renders correctly with search location 1`] = `
+<div
+  className="absolute h42 w-full w420-mm bg-white shadow-darken25 flex-parent flex-parent--row flex-parent--space-between-main">
+  <div
+    className="absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42">
+    <svg
+      className="icon color-gray">
+      <use
+        xlinkHref="#icon-search" />
+    </svg>
+  </div>
+  <div
+    className="input px42 h42 border--transparent flex-parent flex-parent--center-cross flex-parent--center-main">
+    <div
+      className="w-full w420-mm pr42 txt-truncate">
+      <div
+        className="txt-truncate w-full"
+        onClick={[Function]}>
+        <div
+          className="inline pr6 color-black">
+          Paris
+        </div>
+        <div
+          className="inline txt-s color-darken50">
+          France
+        </div>
+      </div>
+    </div>
+    <div
+      className="mr30 cursor-pointer right absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42"
+      id="search-directions"
+      onClick={[Function]}>
+      <img
+        alt="directions"
+        src="directions.svg" />
+    </div>
+  </div>
+  <div
+    className="absolute right flex-parent flex-parent--center-cross flex-parent--center-main w42 h42 cursor-pointer"
+    onClick={[Function]}>
+    <svg
+      className="icon  color-gray">
+      <use
+        xlinkHref="#icon-close" />
+    </svg>
+  </div>
+  <div
+    className="place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column">
+    <img
+      alt="Capital city of France"
+      className="cover w-full h72 h120-mm"
+      onError={[Function]}
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/A/640px-A" />
+    <div
+      className="bg-blue flex-parent flex-parent--row">
+      <div
+        className="p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main">
+        <div
+          className="color-white pl42 pr12 txt-h4 txt-bold">
+          Paris
+        </div>
+        <div
+          className="color-lighten75 pl42 pr12 txt-s ">
+          Capital city of France
+        </div>
+      </div>
+      <div
+        className="bg-white hmin42 wmin42 hmin48-mm wmin48-mm hmax42 wmax42 hmax48-mm wmax48-mm m6 m12-mm round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross"
+        onClick={[Function]}>
+        <img
+          alt="directions"
+          src="directions.svg" />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`test renders correctly without search location 1`] = `
+<div
+  className="absolute h42 w-full w420-mm bg-white shadow-darken25 flex-parent flex-parent--row flex-parent--space-between-main">
+  <div
+    className="absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42">
+    <svg
+      className="icon color-gray">
+      <use
+        xlinkHref="#icon-search" />
+    </svg>
+  </div>
+  <div
+    className="w-full">
+    <input
+      className="input px42 h42 border--transparent"
+      onChange={[Function]}
+      onInput={[Function]}
+      onKeyDown={[Function]}
+      placeholder="Search"
+      type="text"
+      value="" />
+  </div>
+</div>
+`;

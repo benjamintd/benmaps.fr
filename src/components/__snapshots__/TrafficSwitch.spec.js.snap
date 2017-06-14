@@ -1,0 +1,16 @@
+exports[`test renders correctly 1`] = `
+<label
+  className="switch-container align-middle px3 bg-lighten75">
+  <input
+    checked={false}
+    onChange={[Function]}
+    type="checkbox" />
+  <div
+    className="switch switch--blue" />
+  <svg
+    className="icon icon-switch color-blue">
+    <use
+      xlinkHref="#icon-street" />
+  </svg>
+</label>
+`;

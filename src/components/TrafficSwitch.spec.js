@@ -1,18 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import renderer from 'react-test-renderer';
 import {shallow} from 'enzyme';
 import {TrafficSwitch} from './TrafficSwitch';
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
+it('renders correctly', () => {
 
-  ReactDOM.render(<TrafficSwitch
-    triggerMapUpdate={() => {}}
-    mapStyle='streets'
-    setStateValues={() => {}}
-  />, div);
+  const component = renderer.create(
+    <TrafficSwitch
+      triggerMapUpdate={() => {}}
+      mapStyle='streets'
+      setStateValues={() => {}}
+    />
+  );
 
-  expect(true).toBe(true);
+  let tree = component.toJSON();
+  expect(tree).toMatchSnapshot();
 });
 
 it('switches style on change event', () => {

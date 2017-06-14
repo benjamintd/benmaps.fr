@@ -68,7 +68,6 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export {StyleSwitch};
-
 export default connect(
   mapStateToProps,
   mapDispatchToProps

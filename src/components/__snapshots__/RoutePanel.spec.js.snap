@@ -1,0 +1,73 @@
+exports[`test bike route renders correctly 1`] = `
+<div
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  <div
+    className="flex-parent flex-parent--row flex-parent--center-cross">
+    <div
+      className="w48 hmin48 flex-parent flex-parent--center-main flex-parent--center-cross">
+      <svg
+        className="icon color-gray">
+        <use
+          xlinkHref="#icon-bike" />
+      </svg>
+    </div>
+    <div
+      className="bottom pr12">
+      17 minutes 
+      
+    </div>
+    <div
+      className="bottom color-gray">
+      2.6
+       km
+    </div>
+  </div>
+  <div
+    className="loading--s" />
+</div>
+`;
+
+exports[`test error route renders correctly 1`] = `
+<div
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  <div
+    className="txt-s txt-m-mm animation-subtle-shake px18">
+    Sorry, no route found for these locations.
+  </div>
+</div>
+`;
+
+exports[`test pending route renders correctly 1`] = `
+<div
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  <div
+    className="loading loading--s" />
+</div>
+`;
+
+exports[`test walking route renders correctly 1`] = `
+<div
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  <div
+    className="flex-parent flex-parent--row flex-parent--center-cross">
+    <div
+      className="w48 hmin48 flex-parent flex-parent--center-main flex-parent--center-cross">
+      <svg
+        className="icon color-gray">
+        <use
+          xlinkHref="#icon-walk" />
+      </svg>
+    </div>
+    <div
+      className="bottom pr12">
+      8 days, 4 hours and 41 minutes 
+      
+    </div>
+    <div
+      className="bottom color-gray">
+      982.4
+       km
+    </div>
+  </div>
+</div>
+`;
