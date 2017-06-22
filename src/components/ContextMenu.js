@@ -21,6 +21,9 @@ class ContextMenu extends Component {
             onClick={() => this.search()}
           />
           <p>{this.formatCoordinates()}</p>
+          <p className="txt-xs color-darken50 select-none">
+            lon<span className='inline-block w48'></span>lat
+          </p>
         </div>
         <div onClick={() => this.directionsFrom()} className='px12 py6 bg-darken10-on-hover cursor-pointer'>
           directions from this place

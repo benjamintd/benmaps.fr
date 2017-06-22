@@ -248,7 +248,7 @@ class MapComponent extends Component {
 
     if (!features.length) {
       // No feature is selected, reset the search location on click on the map
-      if (this.props.mode === 'search') {
+      if (this.props.mode === 'search' && !this.props.contextMenuActive) {
         this.props.resetStateKeys(['placeInfo', 'searchString', 'searchLocation']);
         this.props.triggerMapUpdate();
       }
@@ -437,6 +437,7 @@ class MapComponent extends Component {
 MapComponent.propTypes = {
   accessToken: PropTypes.string,
   center: PropTypes.array,
+  contextMenuActive: PropTypes.bool,
   directionsFrom: PropTypes.object,
   directionsTo: PropTypes.object,
   getReverseGeocode: PropTypes.func,
@@ -465,6 +466,7 @@ const mapStateToProps = (state) => {
   return {
     accessToken: state.mapboxAccessToken,
     center: state.mapCenter,
+    contextMenuActive: state.contextMenuActive,
     directionsFrom: state.directionsFrom,
     directionsTo: state.directionsTo,
     mapStyle: state.mapStyle,
