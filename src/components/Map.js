@@ -47,7 +47,7 @@ class MapComponent extends Component {
 
   componentDidMount() {
     mapboxgl.accessToken = this.props.accessToken;
-
+    console.log('center', this.props.center);
     const map = new mapboxgl.Map({
       container: 'map',
       style: style,
@@ -56,7 +56,7 @@ class MapComponent extends Component {
       minZoom: 2,
       maxZoom: 21
     });
-
+    console.log('center', this.props.center);
     this.map = map;
 
     map.on('load', () => {
