@@ -106,6 +106,14 @@ const reducer = (state = defaultState, action) => {
     return Object.assign({}, state, {
       contextMenuCoordinates: action.coordinates,
       contextMenuPosition: action.position,
+      contextMenuPlace: {
+        'place_name': '__loading', // will trigger the spinner
+        center: action.coordinates,
+        geometry: {
+          type: 'Point',
+          coordinates: action.coordinates
+        }
+      },
       contextMenuActive: true
     });
   }

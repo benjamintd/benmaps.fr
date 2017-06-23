@@ -12,6 +12,7 @@ import './index.css';
 
 const persistedState = localStorage.getItem('persistedState') ? JSON.parse(localStorage.getItem('persistedState')) : {};
 const initialState = Object.assign({}, defaultState, persistedState);
+console.log(initialState);
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -23,7 +24,7 @@ let store = createStore(
 
 store.subscribe(()=>{
   const state = store.getState();
-  const keys = ['userLocation'];
+  const keys = ['userLocation', 'mapCenter'];
   const persistedState = {};
   keys.forEach((key) => {
     persistedState[key] = state[key];

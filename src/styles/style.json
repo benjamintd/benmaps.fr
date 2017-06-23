@@ -6783,6 +6783,55 @@
             }
         },
         {
+            "id": "building-line",
+            "type": "line",
+            "source": "composite",
+            "source-layer": "building",
+            "filter": [
+                "all",
+                [
+                    "!=",
+                    "type",
+                    "building:part"
+                ],
+                [
+                    "==",
+                    "underground",
+                    "false"
+                ]
+            ],
+            "layout": {},
+            "paint": {
+                "line-color": "hsl(230, 4%, 79%)",
+                "line-opacity": {
+                    "base": 1,
+                    "stops": [
+                        [
+                            15.5,
+                            0
+                        ],
+                        [
+                            16,
+                            1
+                        ]
+                    ]
+                },
+                "line-width": {
+                    "base": 1.5,
+                    "stops": [
+                        [
+                            15,
+                            0.5
+                        ],
+                        [
+                            20,
+                            1.5
+                        ]
+                    ]
+                }
+            }
+        },
+        {
             "id": "building",
             "type": "fill-extrusion",
             "source": "composite",
@@ -6872,55 +6921,6 @@
                     "default": 0
                 },
                 "fill-extrusion-opacity": 0.66
-            }
-        },
-        {
-            "id": "building-line",
-            "type": "line",
-            "source": "composite",
-            "source-layer": "building",
-            "filter": [
-                "all",
-                [
-                    "!=",
-                    "type",
-                    "building:part"
-                ],
-                [
-                    "==",
-                    "underground",
-                    "false"
-                ]
-            ],
-            "layout": {},
-            "paint": {
-                "line-color": "hsl(230, 4%, 79%)",
-                "line-opacity": {
-                    "base": 1,
-                    "stops": [
-                        [
-                            15.5,
-                            0
-                        ],
-                        [
-                            16,
-                            1
-                        ]
-                    ]
-                },
-                "line-width": {
-                    "base": 1.5,
-                    "stops": [
-                        [
-                            15,
-                            0.5
-                        ],
-                        [
-                            20,
-                            1.5
-                        ]
-                    ]
-                }
             }
         },
         {

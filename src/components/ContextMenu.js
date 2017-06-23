@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PlaceName from './PlaceName';
-import {setStateValues, triggerMapUpdate, resetContextMenu} from '../actions/index';
+import {setStateValues, triggerMapUpdate, resetContextMenu, getReverseGeocode} from '../actions/index';
 
 class ContextMenu extends Component {
   render() {
@@ -21,11 +21,14 @@ class ContextMenu extends Component {
             onClick={() => this.search()}
           />
           <p>{this.formatCoordinates()}</p>
+          <p className="txt-xs color-darken50 select-none">
+            lon<span className='inline-block w48'></span>lat
+          </p>
         </div>
-        <div onClick={() => this.directionsFrom()} className='px12 py6 bg-darken10-on-hover cursor-pointer'>
+        <div onClick={() => this.setDirections('directionsFrom')} className='px12 py6 bg-darken10-on-hover cursor-pointer'>
           directions from this place
         </div>
-        <div onClick={() => this.directionsTo()} className='px12 py6 bg-darken10-on-hover cursor-pointer'>
+        <div onClick={() => this.setDirections('directionsTo')} className='px12 py6 bg-darken10-on-hover cursor-pointer'>
           directions to this place
         </div>
       </div>
@@ -47,32 +50,34 @@ class ContextMenu extends Component {
     this.props.resetContextMenu();
   }
 
-  directionsTo() {
-    this.props.setStateValues({
-      mode: 'directions',
-      directionsTo: this.props.place
-    });
+  setDirections(k) {
+    var newState = {
+      mode: 'directions'
+    };
+    newState[k] = this.props.place;
+    this.props.setStateValues(newState);
+
+    // If the place is still loading, we delegate to the directions to get the
+    // geocode. This will trigger a second request but we don't have cancel
+    // actions yet. This is better than a spinner forever spinning.
+    if (this.props.place.place_name === '__loading') {
+      console.log(this.props);
+      this.props.getReverseGeocode(
+        k,
+        this.props.coordinates.slice(),
+        this.props.accessToken
+      );
+    }
     this.props.triggerMapUpdate();
     this.props.resetContextMenu();
-  }
-
-  directionsFrom() {
-    this.props.setStateValues({
-      mode: 'directions',
-      directionsFrom: this.props.place
-    });
-    this.props.triggerMapUpdate();
-    this.props.resetContextMenu();
-  }
-
-  reset() {
-
   }
 }
 
 ContextMenu.propTypes = {
+  accessToken: PropTypes.string,
   active: PropTypes.bool,
   coordinates: PropTypes.array,
+  getReverseGeocode: PropTypes.func,
   position: PropTypes.array,
   place: PropTypes.object,
   resetContextMenu: PropTypes.func,
@@ -82,6 +87,7 @@ ContextMenu.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
+    accessToken: state.mapboxAccessToken,
     active: state.contextMenuActive,
     coordinates: state.contextMenuCoordinates,
     position: state.contextMenuPosition,
@@ -91,6 +97,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    getReverseGeocode: (key, coordinates, token) => dispatch(getReverseGeocode(key, coordinates, token)),
     resetContextMenu: () => dispatch(resetContextMenu()),
     setStateValues: (obj) => dispatch(setStateValues(obj)),
     triggerMapUpdate: (needMapRepan) => dispatch(triggerMapUpdate(needMapRepan))
