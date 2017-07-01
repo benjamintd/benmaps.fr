@@ -19,7 +19,6 @@
     "@turf/bbox": "^3.13.0",
     "@turf/bbox-polygon": "^3.13.0",
     "@turf/buffer": "^3.13.0",
-    "@turf/distance": "^3.13.0",
     "blueimp-md5": "^2.7.0",
     "cheap-ruler": "^2.5.0",
     "lodash": "^4.17.4",

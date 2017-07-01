@@ -14,8 +14,12 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
 
     const baseUrl = 'https://api.mapbox.com/directions/v5/mapbox/';
 
-    let profile = 'driving-traffic';
-    if (action.modality === 'car') profile = 'driving-traffic';
+    let profile = 'driving-traffic'; // default
+    let annotationsParam = '';
+    if (action.modality === 'car') {
+      profile = 'driving-traffic';
+      annotationsParam = '&annotations=congestion';
+    }
     if (action.modality === 'bike') profile = 'cycling';
     if (action.modality === 'walk') profile = 'walking';
 
@@ -24,7 +28,8 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
 
     const url = baseUrl + profile + '/' + fromCoordinates + ';' + toCoordinates
       + '?access_token=' + action.accessToken
-      + '&overview=full';
+      + '&overview=full'
+      + annotationsParam;
 
     // Fetch
     fetch(url, {method: 'get'})
@@ -33,11 +38,6 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
           return res.json();
         } else { // 4xx or 5xx response
           var err = new Error(res.statusText);
-          next({
-            type: 'SET_STATE_VALUE',
-            key: 'routeStatus',
-            value: 'error'
-          });
           return Promise.reject(err);
         }
       })

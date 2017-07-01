@@ -89,8 +89,18 @@ const reducer = (state = defaultState, action) => {
     if (action.data.routes.length > 0 && state.directionsFrom && state.directionsTo) {
       const route = action.data.routes[0];
 
-      const geojsonLine = polyline.toGeoJSON(route.geometry);
-      route.geometry = geojsonLine;
+      let congestion;
+      if (route.legs[0] && route.legs[0].annotation && route.legs[0].annotation.congestion) {
+        congestion = route.legs[0].annotation.congestion;
+      }
+
+      const line = polyline.toGeoJSON(route.geometry);
+
+      if (!congestion) {
+        route.geometry = line;
+      } else {
+        route.geometry = congestionSegments(line, congestion);
+      }
 
       return Object.assign({}, state, {
         route: route
@@ -131,6 +141,28 @@ const reducer = (state = defaultState, action) => {
     return state;
   }
 };
+
+function congestionSegments(line, congestionArray) {
+  let featureCollection = {
+    type: 'FeatureCollection',
+    features: []
+  };
+  const coordinates = line.coordinates;
+  for (var i = 0; i < coordinates.length - 1; i++) {
+    let segment = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: coordinates.slice(i, i + 2)
+      },
+      properties: {
+        congestion: congestionArray[i]
+      }
+    };
+    featureCollection.features.push(segment);
+  }
+  return featureCollection;
+}
 
 export default reducer;
 export {reducer, defaultState};
