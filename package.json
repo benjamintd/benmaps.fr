@@ -20,6 +20,7 @@
     "@turf/bbox": "^3.13.0",
     "@turf/bbox-polygon": "^3.13.0",
     "@turf/buffer": "^3.13.0",
+    "@turf/distance": "^4.5.2",
     "blueimp-md5": "^2.7.0",
     "cheap-ruler": "^2.5.0",
     "lodash": "^4.17.4",
@@ -42,7 +43,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "build-sprites": "node_modules/@mapbox/spritezero-cli/bin/spritezero public/sprite src/styles/icons && node_modules/@mapbox/spritezero-cli/bin/spritezero public/sprite@2x src/styles/icons --retina"
+    "build-sprites": "spritezero public/sprite src/styles/icons && spritezero public/sprite@2x src/styles/icons --retina"
   },
   "description": "A Google-like interface to Mapbox maps.",
   "main": "src/index.js",
