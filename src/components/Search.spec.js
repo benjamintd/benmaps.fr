@@ -5,7 +5,6 @@ import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {defaultState} from '../reducers/index';
 import reducer from '../reducers/index';
-
 import {Search} from './Search';
 import ConnectedSearch from './Search';
 import {placeInfo, searchLocation} from './fixtures/Search.fixtures.js';

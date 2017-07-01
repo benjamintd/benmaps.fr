@@ -6,6 +6,7 @@
   "devDependencies": {
     "@mapbox/spritezero-cli": "^2.0.0",
     "enzyme": "^2.8.2",
+    "enzyme-to-json": "^1.5.1",
     "eslint": "^3.17.1",
     "eslint-config-mourner": "^2.0.1",
     "eslint-plugin-jest": "^20.0.3",

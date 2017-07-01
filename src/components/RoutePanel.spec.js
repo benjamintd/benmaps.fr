@@ -1,6 +1,5 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-
 import {RoutePanel} from './RoutePanel';
 import {bikeRoute, walkingRoute} from './fixtures/RoutePanel.fixtures.js';
 
