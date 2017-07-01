@@ -6761,8 +6761,27 @@
             "source": "route",
             "type": "line",
             "paint": {
-                "line-color": "#2779b5",
-                "line-width": 6.5
+                "line-color": {
+                    "base": 1,
+                    "type": "categorical",
+                    "property": "congestion",
+                    "default": "#1f70ab",
+                    "stops": [
+                        [
+                            "moderate",
+                            "hsl(28, 70%, 48%)"
+                        ],
+                        [
+                            "heavy",
+                            "hsl(0, 76%, 42%)"
+                        ],
+                        [
+                            "severe",
+                            "hsl(349, 83%, 20%)"
+                        ]
+                    ]
+                },
+                "line-width": 9
             },
             "layout": {
                 "line-join": "round",
@@ -6774,8 +6793,27 @@
             "source": "route",
             "type": "line",
             "paint": {
-                "line-color": "#2abaf7",
-                "line-width": 5.5
+                "line-color": {
+                    "base": 1,
+                    "type": "categorical",
+                    "property": "congestion",
+                    "default": "#2abaf7",
+                    "stops": [
+                        [
+                            "moderate",
+                            "hsl(29, 100%, 65%)"
+                        ],
+                        [
+                            "heavy",
+                            "hsl(0, 76%, 59%)"
+                        ],
+                        [
+                            "severe",
+                            "hsl(350, 100%, 30%)"
+                        ]
+                    ]
+                },
+                "line-width": 7.5
             },
             "layout": {
                 "line-join": "round",

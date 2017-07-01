@@ -61,7 +61,6 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export {TrafficSwitch};
-
 export default connect(
   mapStateToProps,
   mapDispatchToProps

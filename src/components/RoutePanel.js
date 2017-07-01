@@ -77,4 +77,5 @@ const mapStateToProps = (state) => {
   };
 };
 
+export {RoutePanel};
 export default connect(mapStateToProps)(RoutePanel);

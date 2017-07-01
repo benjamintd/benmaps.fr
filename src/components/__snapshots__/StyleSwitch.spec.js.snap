@@ -1,0 +1,11 @@
+exports[`test renders correctly 1`] = `
+<div
+  className="bg-black w-full h-full cursor-pointer"
+  id="style-switch"
+  onClick={[Function]}>
+  <img
+    alt="switch style"
+    className="cover relative top w-full h-full"
+    src="https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/123,-37,10/56x100@2x?access_token=abc&attribution=false" />
+</div>
+`;

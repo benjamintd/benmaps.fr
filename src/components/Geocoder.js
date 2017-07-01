@@ -27,7 +27,7 @@ class Geocoder extends Component {
   }
 
   componentDidMount() {
-    if (this.props.focusOnMount) this.input.focus();
+    if (this.props.focusOnMount && this.input) this.input.focus();
   }
 
   onInput(e) {
@@ -126,7 +126,8 @@ class Geocoder extends Component {
       value={this.props.searchString}
       onChange={this.onInput}
       placeholder={this.props.inputPlaceholder}
-      type='text' />;
+      type='text'
+    />;
 
     return (
       <div className='w-full'>

@@ -10,42 +10,53 @@ import {triggerMapUpdate, setDirectionsLocation, getPlaceInfo, resetStateKeys, s
 
 class Search extends Component {
   render() {
+    let SearchBar;
+
+    if (this.props.searchLocation === null) { // no place was selected yet
+      SearchBar = (
+        <Geocoder
+          onSelect={(data) => this.onSelect(data)}
+          searchString={this.props.searchString}
+          writeSearch={(value) => {
+            this.props.triggerMapUpdate();
+            this.props.writeSearch(value);
+          }}
+          resultsClass={this.styles.results}
+          inputClass={this.styles.input}
+          focusOnMount={true}
+        />
+      );
+
+    } else { // There is a selected place
+      SearchBar = (
+        <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
+          <div className='w-full w420-mm pr42 txt-truncate'>
+            <PlaceName
+              location={this.props.searchLocation}
+              onClick={() => {
+                this.props.writeSearch(this.props.searchLocation.place_name);
+                this.props.resetStateKeys(['searchLocation', 'placeInfo']);
+              }}
+            />
+          </div>
+          <div
+            id='search-directions'
+            className={'mr30 cursor-pointer right ' + this.styles.icon}
+            onClick={() => this.clickDirections()}
+          >
+            <img src={directionsIcon} alt='directions'/>
+          </div>
+        </div>
+      );
+
+    }
+
     return (
       <div className={this.styles.main}>
         <div className={this.styles.icon}>
           <svg className='icon color-gray'><use xlinkHref='#icon-search'></use></svg>
         </div>
-        {
-          (this.props.searchLocation === null)// no place was selected yet
-          ? <Geocoder
-            onSelect={(data) => this.onSelect(data)}
-            searchString={this.props.searchString}
-            writeSearch={(value) => {
-              this.props.triggerMapUpdate();
-              this.props.writeSearch(value);
-            }}
-            resultsClass={this.styles.results}
-            inputClass={this.styles.input}
-            focusOnMount={true}
-          />
-          : <div className={this.styles.input + ' flex-parent flex-parent--center-cross flex-parent--center-main'}>
-            <div className='w-full w420-mm pr42 txt-truncate'>
-              <PlaceName
-                location={this.props.searchLocation}
-                onClick={() => {
-                  this.props.writeSearch(this.props.searchLocation.place_name);
-                  this.props.resetStateKeys(['searchLocation', 'placeInfo']);
-                }}
-              />
-            </div>
-            <div
-              className={'mr30 cursor-pointer right ' + this.styles.icon}
-              onClick={() => this.clickDirections()}
-            >
-              <img src={directionsIcon} alt='directions'/>
-            </div>
-          </div>
-        }
+        {SearchBar}
         <CloseButton
           show={(this.props.searchString !== '' || this.props.searchLocation !== null)}
           onClick={() => this.closeSearch()}
@@ -123,6 +134,7 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
+export {Search};
 export default connect(
   mapStateToProps,
   mapDispatchToProps
