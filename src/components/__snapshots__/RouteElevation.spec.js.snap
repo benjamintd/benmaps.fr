@@ -23,7 +23,7 @@ exports[`test renders correctly 1`] = `
     data={
       Array [
         Object {
-          "e": 10,
+          "e": 0,
         },
         Object {
           "e": 30,

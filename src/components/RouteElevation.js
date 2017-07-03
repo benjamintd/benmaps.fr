@@ -26,7 +26,7 @@ class RouteElevation extends Component {
             <svg className='icon inline-block align-middle'><use xlinkHref='#icon-arrow-up'></use></svg>{upsAndDowns[0]}m -
             <svg className='icon inline-block align-middle'><use xlinkHref='#icon-arrow-down'></use></svg>{upsAndDowns[1]}m
           </div>
-          <AreaChart width={420} margin={{top: 0, right: 42, left: 42, bottom: 12}} height={100} data={this.state.elevations.map(e => ({e: e}))}>
+          <AreaChart width={420} margin={{top: 0, right: 42, left: 42, bottom: 12}} height={100} data={this.state.elevations.map(e => ({e: Math.max(e, 0)}))}>
             <YAxis orientation="right"/>
             <Area type="monotone" dataKey="e" stroke="#2abaf7" fill='#2abaf7' fillOpacity={0.5} strokeWidth={2} dot={null} />
           </AreaChart>
@@ -111,11 +111,13 @@ class RouteElevation extends Component {
     let ups = 0;
     let downs = 0;
 
-    elevations.reduce((a, b) => {
-      if (b > a) ups += b - a;
-      else downs += a - b;
-      return b;
-    }, 0);
+    elevations
+      .map(e => Math.max(e, 0))
+      .reduce((a, b) => {
+        if (b > a) ups += b - a;
+        else downs += a - b;
+        return b;
+      }, 0);
 
     return [ups, downs];
   }
