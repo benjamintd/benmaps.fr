@@ -6,6 +6,7 @@ import turfBbox from '@turf/bbox';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfBuffer from '@turf/buffer';
 import turfDistance from '@turf/distance';
+import {push} from 'react-router-redux';
 import {
   setStateValue,
   setUserLocation,
@@ -361,8 +362,10 @@ class MapComponent extends Component {
 
     this.map.on('moveend', () => {
       const center = this.map.getCenter();
+      const zoom = this.map.getZoom();
       this.props.setStateValue('mapCenter', [center.lng, center.lat]);
-      this.props.setStateValue('mapZoom', this.map.getZoom());
+      this.props.setStateValue('mapZoom', zoom);
+      this.props.pushHistory(['', center.lng.toFixed(6), center.lat.toFixed(6), zoom.toFixed(2)].join('/'));
     });
 
     // Update the style if needed
@@ -449,6 +452,7 @@ MapComponent.propTypes = {
   needMapRepan: PropTypes.bool,
   needMapRestyle: PropTypes.bool,
   needMapUpdate: PropTypes.bool,
+  pushHistory: PropTypes.func,
   resetContextMenu: PropTypes.func,
   resetStateKeys: PropTypes.func,
   route: PropTypes.object,
@@ -464,22 +468,22 @@ MapComponent.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    accessToken: state.mapboxAccessToken,
-    center: state.mapCenter,
-    contextMenuActive: state.contextMenuActive,
-    directionsFrom: state.directionsFrom,
-    directionsTo: state.directionsTo,
-    mapStyle: state.mapStyle,
-    modality: state.modality,
-    mode: state.mode,
-    needMapRepan: state.needMapRepan,
-    needMapRestyle: state.needMapRestyle,
-    needMapUpdate: state.needMapUpdate,
-    route: state.route,
-    routeStatus: state.routeStatus,
-    searchLocation: state.searchLocation,
-    userLocation: state.userLocation,
-    zoom: state.mapZoom,
+    accessToken: state.app.mapboxAccessToken,
+    center: state.app.mapCenter,
+    contextMenuActive: state.app.contextMenuActive,
+    directionsFrom: state.app.directionsFrom,
+    directionsTo: state.app.directionsTo,
+    mapStyle: state.app.mapStyle,
+    modality: state.app.modality,
+    mode: state.app.mode,
+    needMapRepan: state.app.needMapRepan,
+    needMapRestyle: state.app.needMapRestyle,
+    needMapUpdate: state.app.needMapUpdate,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus,
+    searchLocation: state.app.searchLocation,
+    userLocation: state.app.userLocation,
+    zoom: state.app.mapZoom,
   };
 };
 
@@ -487,6 +491,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getReverseGeocode: (key, coordinates, accessToken) => dispatch(getReverseGeocode(key, coordinates, accessToken)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) => dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
+    pushHistory: (url) => dispatch(push(url)),
     resetContextMenu: () => dispatch(resetContextMenu()),
     setContextMenu: (coordinates, location) => dispatch(setContextMenu(coordinates, location)),
     setStateValue: (key, value) => dispatch(setStateValue(key, value)),

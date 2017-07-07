@@ -53,10 +53,10 @@ StyleSwitch.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    accessToken: state.mapboxAccessToken,
-    center: state.mapCenter,
-    mapStyle: state.mapStyle,
-    zoom: state.mapZoom,
+    accessToken: state.app.mapboxAccessToken,
+    center: state.app.mapCenter,
+    mapStyle: state.app.mapStyle,
+    zoom: state.app.mapZoom,
   };
 };
 

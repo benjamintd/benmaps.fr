@@ -70,10 +70,10 @@ RoutePanel.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    mapboxAccessToken: state.mapboxAccessToken,
-    modality: state.modality,
-    route: state.route,
-    routeStatus: state.routeStatus,
+    mapboxAccessToken: state.app.mapboxAccessToken,
+    modality: state.app.modality,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus,
   };
 };
 

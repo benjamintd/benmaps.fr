@@ -87,11 +87,11 @@ ContextMenu.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    accessToken: state.mapboxAccessToken,
-    active: state.contextMenuActive,
-    coordinates: state.contextMenuCoordinates,
-    position: state.contextMenuPosition,
-    place: state.contextMenuPlace,
+    accessToken: state.app.mapboxAccessToken,
+    active: state.app.contextMenuActive,
+    coordinates: state.app.contextMenuCoordinates,
+    position: state.app.contextMenuPosition,
+    place: state.app.contextMenuPlace,
   };
 };
 
