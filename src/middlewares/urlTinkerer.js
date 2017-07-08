@@ -129,7 +129,7 @@ function parseUrl(url) {
 }
 
 function toUrl(props) {
-  var res = [''];
+  var res = [baseUrl()];
   if (props.coords) {
     res.push('@' + [
       props.coords[0].toFixed(6),
@@ -145,6 +145,14 @@ function toUrl(props) {
   }
 
   return res.join('/');
+}
+
+function baseUrl() {
+  if (process.env.NODE_ENV === 'production') {
+    return new URL(process.env.PUBLIC_URL).pathname;
+  } else {
+    return '';
+  }
 }
 
 export default urlTinkerer;
