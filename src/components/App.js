@@ -7,8 +7,14 @@ import Search from './Search';
 import Directions from './Directions';
 import StyleSwitch from './StyleSwitch';
 import TrafficSwitch from './TrafficSwitch';
+import {setStateFromURL} from '../actions/index';
 
 class App extends Component {
+
+  componentWillMount() {
+    this.props.setStateFromURL();
+  }
+
   render() {
     return (
       <div className='root'>
@@ -47,6 +53,8 @@ App.propTypes = {
   mode: PropTypes.string,
   route: PropTypes.object,
   routeStatus: PropTypes.string,
+  setStateFromURL: PropTypes.func,
+  url: PropTypes.string
 };
 
 const mapStateToProps = (state) => {
@@ -54,12 +62,14 @@ const mapStateToProps = (state) => {
     contextMenuActive: state.app.contextMenuActive,
     mode: state.app.mode,
     route: state.app.route,
-    routeStatus: state.app.routeStatus
+    routeStatus: state.app.routeStatus,
   };
 };
 
-const mapDispatchToProps = () => {
-  return {};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setStateFromURL: () => dispatch(setStateFromURL())
+  };
 };
 
 export default connect(

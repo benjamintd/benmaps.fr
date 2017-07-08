@@ -61,7 +61,6 @@ class ContextMenu extends Component {
     // geocode. This will trigger a second request but we don't have cancel
     // actions yet. This is better than a spinner forever spinning.
     if (this.props.place.place_name === '__loading') {
-      console.log(this.props);
       this.props.getReverseGeocode(
         k,
         this.props.coordinates.slice(),

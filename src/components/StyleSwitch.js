@@ -54,9 +54,9 @@ StyleSwitch.propTypes = {
 const mapStateToProps = (state) => {
   return {
     accessToken: state.app.mapboxAccessToken,
-    center: state.app.mapCenter,
+    center: state.app.mapCoords.slice(0, 2),
     mapStyle: state.app.mapStyle,
-    zoom: state.app.mapZoom,
+    zoom: state.app.mapCoords[2],
   };
 };
 

@@ -59,3 +59,7 @@ export const setContextMenu = (coordinates, position) => ({
 export const resetContextMenu = () => ({
   type: 'RESET_CONTEXT_MENU'
 });
+
+export const setStateFromURL = () => ({
+  type: 'SET_STATE_FROM_URL'
+});

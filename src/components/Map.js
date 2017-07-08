@@ -48,7 +48,7 @@ class MapComponent extends Component {
 
   componentDidMount() {
     mapboxgl.accessToken = this.props.accessToken;
-    console.log('center', this.props.center);
+
     const map = new mapboxgl.Map({
       container: 'map',
       style: style,
@@ -57,7 +57,7 @@ class MapComponent extends Component {
       minZoom: 2,
       maxZoom: 21
     });
-    console.log('center', this.props.center);
+
     this.map = map;
 
     map.on('load', () => {
@@ -69,13 +69,14 @@ class MapComponent extends Component {
     if (!this.props.needMapUpdate) return;
 
     // This is where we update the layers and map bbox
-    this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
-
+    if (this.props.userLocation && this.props.userLocation.geometry) {
+      this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
+    }
 
     // Search mode
     if (this.props.mode === 'search') {
       if (this.props.searchLocation) {
-        this.map.getSource('marker').setData(this.props.searchLocation.geometry);
+        if (this.props.searchLocation.geometry) this.map.getSource('marker').setData(this.props.searchLocation.geometry);
       } else {
         this.map.getSource('marker').setData(this.emptyData);
       }
@@ -193,7 +194,8 @@ class MapComponent extends Component {
 
     // Mouse events
     this.map.on('mousemove', mouseMoveFn);
-    this.map.once('mouseup', () => this.onUp());
+    this.map.once('mousemove', (e) => this.onceMove(e));
+    this.map.once('mouseup', (e) => this.onUp(e));
   }
 
   onMove(e) {
@@ -214,7 +216,16 @@ class MapComponent extends Component {
     };
 
     this.map.getSource(layerId).setData(geometry);
+  }
 
+  onceMove(e) {
+    var coords = [e.lngLat.lng, e.lngLat.lat];
+    const geometry = {
+      type: 'Point',
+      coordinates: coords
+    };
+
+    const layerId = this.state.draggedLayer;
     this.props.resetStateKeys(['placeInfo', 'searchLocation', 'route', 'routeStatus']);
     this.props.setStateValue('routeStatus', 'paused'); // pause route updates
     this.props.setStateValue(this.layerToKey(layerId), {
@@ -224,7 +235,7 @@ class MapComponent extends Component {
     this.props.triggerMapUpdate();
   }
 
-  onUp() {
+  onUp(e) {
     if (!this.state.isDragging) return;
 
     this.map.getCanvas().style.cursor = '';
@@ -238,10 +249,8 @@ class MapComponent extends Component {
       this.props.accessToken
     );
 
+    this.onceMove(e);
     this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
-
-    this.props.resetStateKeys(['route', 'routeStatus']); // retrigger API call
-    this.props.triggerMapUpdate();
   }
 
   onClick(e) {
@@ -363,13 +372,14 @@ class MapComponent extends Component {
     this.map.on('moveend', () => {
       const center = this.map.getCenter();
       const zoom = this.map.getZoom();
-      this.props.setStateValue('mapCenter', [center.lng, center.lat]);
-      this.props.setStateValue('mapZoom', zoom);
-      this.props.pushHistory(['', center.lng.toFixed(6), center.lat.toFixed(6), zoom.toFixed(2)].join('/'));
+      this.props.setStateValue('mapCoords', [center.lng, center.lat, zoom]);
     });
 
     // Update the style if needed
     this.updateStyle(this.props.mapStyle);
+
+    // Final update if the original state has some data
+    this.props.triggerMapUpdate();
   }
 
   updateStyle(styleString) {
@@ -469,7 +479,7 @@ MapComponent.propTypes = {
 const mapStateToProps = (state) => {
   return {
     accessToken: state.app.mapboxAccessToken,
-    center: state.app.mapCenter,
+    center: state.app.mapCoords.slice(0, 2),
     contextMenuActive: state.app.contextMenuActive,
     directionsFrom: state.app.directionsFrom,
     directionsTo: state.app.directionsTo,
@@ -483,7 +493,7 @@ const mapStateToProps = (state) => {
     routeStatus: state.app.routeStatus,
     searchLocation: state.app.searchLocation,
     userLocation: state.app.userLocation,
-    zoom: state.app.mapZoom,
+    zoom: state.app.mapCoords[2],
   };
 };
 

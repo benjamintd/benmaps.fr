@@ -4,18 +4,18 @@ const defaultAppState = {
   // Mapbox Access Token
   mapboxAccessToken: process.env.REACT_APP_MAPBOX_TOKEN,
   // Map
-  mapCenter: [-122.4, 37.8],
-  mapZoom: 10,
+  mapCoords: [-122.4, 37.8, 10],
   mapStyle: 'streets',
+  // Map updates
+  needMapUpdate: false,
+  needMapRepan: false,
+  needMapRestyle: false,
   // Mode
   mode: 'search',
   modality: 'car',
   // Search
   searchString: '',
   searchLocation: null,
-  needMapUpdate: false,
-  needMapRepan: false,
-  needMapRestyle: false,
   placeInfo: null,
   // User
   userLocation: null,
@@ -135,6 +135,11 @@ const appReducer = (state = defaultAppState, action) => {
       contextMenuPlace: null,
       contextMenuActive: false
     });
+  }
+
+  case 'SET_STATE_FROM_URL': {
+    console.log(action);
+    return state;
   }
 
   default:
