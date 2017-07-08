@@ -12,7 +12,7 @@ it('renders correctly', () => {
     />
   );
 
-  component.setState({elevations: [10, 30, 50, 100, 75, 20], status: 'ok'});
+  component.setState({elevations: [-10, 30, 50, 100, 75, 20], status: 'ok'});
 
   let tree = toJson(component);
   expect(tree).toMatchSnapshot();

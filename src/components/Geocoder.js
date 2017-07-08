@@ -207,8 +207,8 @@ function search(endpoint, source, accessToken, proximity, bbox, types, query, ca
 
 const mapStateToProps = (state) => {
   return {
-    accessToken: state.mapboxAccessToken,
-    proximity: state.mapZoom > 7 ? state.mapCenter.join(',') : ''
+    accessToken: state.app.mapboxAccessToken,
+    proximity: state.app.mapCoords[2] > 7 ? state.app.mapCoords.slice(0, 2).join(',') : ''
   };
 };
 

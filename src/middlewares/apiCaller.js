@@ -113,7 +113,13 @@ const apiCaller = (store) => (next) => (action) => { // eslint-disable-line
     next({
       'type': 'SET_STATE_VALUE',
       'key': action.key,
-      'value': {'place_name': '__loading'}
+      'value': {
+        'place_name': '__loading',
+        'geometry': {
+          'type': 'Point',
+          'coordinates': action.coordinates
+        }
+      }
     });
 
     fetch(url, {method: 'get'})
