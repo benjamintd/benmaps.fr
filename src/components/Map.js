@@ -218,7 +218,7 @@ class MapComponent extends Component {
     this.map.getSource(layerId).setData(geometry);
   }
 
-  onceMove(e) {
+  onceMove(e, status = 'paused') {
     var coords = [e.lngLat.lng, e.lngLat.lat];
     const geometry = {
       type: 'Point',
@@ -227,7 +227,7 @@ class MapComponent extends Component {
 
     const layerId = this.state.draggedLayer;
     this.props.resetStateKeys(['placeInfo', 'searchLocation', 'route', 'routeStatus']);
-    this.props.setStateValue('routeStatus', 'paused'); // pause route updates
+    this.props.setStateValue('routeStatus', status); // pause route updates
     this.props.setStateValue(this.layerToKey(layerId), {
       'place_name': '__loading',
       'geometry': geometry
@@ -249,7 +249,7 @@ class MapComponent extends Component {
       this.props.accessToken
     );
 
-    this.onceMove(e);
+    this.onceMove(e, 'idle');
     this.setState({isDragging: false, draggedLayer: '', draggedCoords: null});
   }
 
