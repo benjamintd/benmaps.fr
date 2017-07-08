@@ -16,9 +16,14 @@ class App extends Component {
   }
 
   render() {
+    var moveOnLoad = this.props.url
+      .split('/')
+      .map(e => !e.startsWith('+'))
+      .reduce((a, b) => (a && b), true);
+
     return (
       <div className='root'>
-        <Map/>
+        <Map moveOnLoad={moveOnLoad}/>
         <div className='relative m12 m24-mm w420-mm flex-parent flex-parent--column'>
           {
             (this.props.mode === 'directions')
@@ -63,6 +68,7 @@ const mapStateToProps = (state) => {
     mode: state.app.mode,
     route: state.app.route,
     routeStatus: state.app.routeStatus,
+    url: state.router.location.pathname
   };
 };
 

@@ -40,6 +40,51 @@ const urlTinkerer = (store) => (next) => (action) => { // eslint-disable-line
     break;
   }
 
+  case 'RESET_STATE_KEYS': {
+    next(action);
+
+    if (action.keys.indexOf('searchLocation') > -1) {
+      let url = updateUrlWithPayload(store.getState().router.location.pathname, {
+        searchCoords: null,
+        searchPlace: null
+      });
+
+      next({
+        type: CALL_HISTORY_METHOD,
+        payload: {
+          method: 'replace',
+          args: [url]
+        }
+      });
+    }
+    break;
+  }
+
+  case 'SET_STATE_FROM_URL': {
+    let url = store.getState().router.location.pathname;
+    const params = parseUrl(url);
+    if (params.searchCoords) {
+      next({
+        type: 'SET_STATE_VALUES',
+        modifiedState: {
+          searchLocation: {
+            'place_name': params.searchPlace,
+            geometry: {
+              type: 'Point',
+              coordinates: params.searchCoords
+            }
+          },
+          mapCoords: params.searchCoords.concat([13])
+        }
+      });
+      next({
+        type: 'TRIGGER_MAP_UPDATE',
+        needMapRepan: true
+      });
+    }
+    break;
+  }
+
   default:
     next(action); // let through as default
     break;

@@ -138,7 +138,6 @@ const appReducer = (state = defaultAppState, action) => {
   }
 
   case 'SET_STATE_FROM_URL': {
-    console.log(action);
     return state;
   }
 

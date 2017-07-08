@@ -311,7 +311,7 @@ class MapComponent extends Component {
       const geometry = {type: 'Point', coordinates: [data.coords.longitude, data.coords.latitude]};
       this.map.getSource('geolocation').setData(geometry);
       this.props.setUserLocation(geometry.coordinates);
-      this.moveTo(geometry, 13);
+      if (this.props.moveOnLoad) this.moveTo(geometry, 13);
     };
 
     // Create scale control
@@ -329,7 +329,7 @@ class MapComponent extends Component {
     // Initial ask for location and display on the map
     if (this.props.userLocation) {
       this.map.getSource('geolocation').setData(this.props.userLocation.geometry);
-      this.moveTo(this.props.userLocation, 13);
+      if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setGeolocation);
     }
@@ -459,6 +459,7 @@ MapComponent.propTypes = {
   mapStyle: PropTypes.string,
   modality: PropTypes.string,
   mode: PropTypes.string,
+  moveOnLoad: PropTypes.bool,
   needMapRepan: PropTypes.bool,
   needMapRestyle: PropTypes.bool,
   needMapUpdate: PropTypes.bool,

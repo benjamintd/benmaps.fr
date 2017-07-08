@@ -112,7 +112,7 @@ class Directions extends Component {
         }
 
         {
-          (this.props.route && this.props.routeStatus === 'idle' || this.props.routeStatus === 'pending')
+          (this.props.route || this.props.routeStatus === 'pending')
           ? <RoutePanel/>
           : null
         }

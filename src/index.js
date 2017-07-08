@@ -31,7 +31,7 @@ let store = createStore(
     router: routerReducer
   }),
   initialState,
-  composeEnhancers(applyMiddleware(urlTinkerer, routerMid, apiCaller))
+  composeEnhancers(applyMiddleware(apiCaller, urlTinkerer, routerMid))
 );
 
 // Store subscription that will keep the persisted state in local storage in sync with the state.
