@@ -8,15 +8,15 @@ const urlTinkerer = (store) => (next) => (action) => { // eslint-disable-line
 
     let actionPayload = getActionPayload(action.key, action.value);
     const url = updateUrlWithPayload(store.getState().router.location.pathname, actionPayload);
-
-    next({
-      type: CALL_HISTORY_METHOD,
-      payload: {
-        method: 'replace',
-        args: [url]
-      }
-    });
-
+    if (store.getState().router.location.pathname !== url) {
+      next({
+        type: CALL_HISTORY_METHOD,
+        payload: {
+          method: 'replace',
+          args: [url]
+        }
+      });
+    }
     break;
   }
 
@@ -28,14 +28,15 @@ const urlTinkerer = (store) => (next) => (action) => { // eslint-disable-line
       let actionPayload = getActionPayload(k, action.modifiedState[k]);
       url = updateUrlWithPayload(url, actionPayload);
     });
-
-    next({
-      type: CALL_HISTORY_METHOD,
-      payload: {
-        method: 'replace',
-        args: [url]
-      }
-    });
+    if (store.getState().router.location.pathname !== url) {
+      next({
+        type: CALL_HISTORY_METHOD,
+        payload: {
+          method: 'replace',
+          args: [url]
+        }
+      });
+    }
 
     break;
   }
@@ -49,13 +50,15 @@ const urlTinkerer = (store) => (next) => (action) => { // eslint-disable-line
         searchPlace: null
       });
 
-      next({
-        type: CALL_HISTORY_METHOD,
-        payload: {
-          method: 'replace',
-          args: [url]
-        }
-      });
+      if (store.getState().router.location.pathname !== url) {
+        next({
+          type: CALL_HISTORY_METHOD,
+          payload: {
+            method: 'replace',
+            args: [url]
+          }
+        });
+      }
     }
     break;
   }
@@ -149,7 +152,8 @@ function toUrl(props) {
 
 function baseUrl() {
   if (process.env.NODE_ENV === 'production') {
-    return new URL(process.env.PUBLIC_URL).pathname;
+    // return the pathname without trailing slash
+    return new URL(process.env.PUBLIC_URL).pathname.replace(/\/+$/, '');
   } else {
     return '';
   }
