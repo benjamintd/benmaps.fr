@@ -364,7 +364,6 @@
             "type": "fill",
             "source": "composite",
             "source-layer": "hillshade",
-            "maxzoom": 16,
             "filter": [
                 "==",
                 "level",
@@ -373,18 +372,7 @@
             "layout": {},
             "paint": {
                 "fill-color": "hsl(0, 0%, 100%)",
-                "fill-opacity": {
-                    "stops": [
-                        [
-                            14,
-                            0.12
-                        ],
-                        [
-                            16,
-                            0
-                        ]
-                    ]
-                },
+                "fill-opacity": 0.12,
                 "fill-antialias": false
             }
         },
@@ -393,7 +381,6 @@
             "type": "fill",
             "source": "composite",
             "source-layer": "hillshade",
-            "maxzoom": 16,
             "filter": [
                 "==",
                 "level",
@@ -402,18 +389,7 @@
             "layout": {},
             "paint": {
                 "fill-color": "hsl(0, 0%, 100%)",
-                "fill-opacity": {
-                    "stops": [
-                        [
-                            14,
-                            0.12
-                        ],
-                        [
-                            16,
-                            0
-                        ]
-                    ]
-                },
+                "fill-opacity": 0.12,
                 "fill-antialias": false
             }
         },
@@ -422,7 +398,6 @@
             "type": "fill",
             "source": "composite",
             "source-layer": "hillshade",
-            "maxzoom": 16,
             "filter": [
                 "==",
                 "level",
@@ -431,18 +406,7 @@
             "layout": {},
             "paint": {
                 "fill-color": "hsl(150, 18%, 34%)",
-                "fill-opacity": {
-                    "stops": [
-                        [
-                            14,
-                            0.03
-                        ],
-                        [
-                            16,
-                            0
-                        ]
-                    ]
-                },
+                "fill-opacity": 0.03,
                 "fill-antialias": false
             }
         },
@@ -451,7 +415,6 @@
             "type": "fill",
             "source": "composite",
             "source-layer": "hillshade",
-            "maxzoom": 16,
             "filter": [
                 "==",
                 "level",
@@ -460,18 +423,7 @@
             "layout": {},
             "paint": {
                 "fill-color": "hsl(150, 18%, 34%)",
-                "fill-opacity": {
-                    "stops": [
-                        [
-                            14,
-                            0.03
-                        ],
-                        [
-                            16,
-                            0
-                        ]
-                    ]
-                },
+                "fill-opacity": 0.03,
                 "fill-antialias": false
             }
         },
@@ -480,7 +432,6 @@
             "type": "fill",
             "source": "composite",
             "source-layer": "hillshade",
-            "maxzoom": 16,
             "filter": [
                 "==",
                 "level",
@@ -489,18 +440,7 @@
             "layout": {},
             "paint": {
                 "fill-color": "hsl(150, 18%, 34%)",
-                "fill-opacity": {
-                    "stops": [
-                        [
-                            14,
-                            0.05
-                        ],
-                        [
-                            16,
-                            0
-                        ]
-                    ]
-                },
+                "fill-opacity": 0.05,
                 "fill-antialias": false
             }
         },
@@ -509,7 +449,6 @@
             "type": "fill",
             "source": "composite",
             "source-layer": "hillshade",
-            "maxzoom": 16,
             "filter": [
                 "==",
                 "level",
@@ -518,18 +457,7 @@
             "layout": {},
             "paint": {
                 "fill-color": "hsl(150, 18%, 34%)",
-                "fill-opacity": {
-                    "stops": [
-                        [
-                            14,
-                            0.05
-                        ],
-                        [
-                            16,
-                            0
-                        ]
-                    ]
-                },
+                "fill-opacity": 0.05,
                 "fill-antialias": false
             }
         },

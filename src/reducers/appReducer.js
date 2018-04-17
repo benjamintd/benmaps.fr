@@ -152,18 +152,29 @@ function congestionSegments(line, congestionArray) {
     features: []
   };
   const coordinates = line.coordinates;
+  let prevCongestion = congestionArray[0];
+  let currentCoordinates = [];
   for (var i = 0; i < coordinates.length - 1; i++) {
-    let segment = {
-      type: 'Feature',
-      geometry: {
-        type: 'LineString',
-        coordinates: coordinates.slice(i, i + 2)
-      },
-      properties: {
-        congestion: congestionArray[i]
-      }
-    };
-    featureCollection.features.push(segment);
+    currentCoordinates.push(coordinates[i]);
+
+    if (i === coordinates.length - 1 || congestionArray[i + 1] !== prevCongestion) {
+      currentCoordinates.push(coordinates[i + 1]);
+      let segment = {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: currentCoordinates.slice()
+        },
+        properties: {
+          congestion: prevCongestion
+        }
+      };
+      featureCollection.features.push(segment);
+      currentCoordinates = [];
+    }
+
+    prevCongestion = congestionArray[i];
+
   }
   return featureCollection;
 }
