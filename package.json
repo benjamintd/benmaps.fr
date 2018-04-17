@@ -2,7 +2,7 @@
   "name": "mapbox-maps",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://benjamintd.github.io/mapbox-maps",
+  "homepage": "https://maps.benjamintd.com",
   "devDependencies": {
     "@mapbox/spritezero-cli": "^2.0.0",
     "enzyme": "^2.8.2",
@@ -40,7 +40,7 @@
   },
   "scripts": {
     "dev": "react-scripts start",
-    "start": "serve ./build",
+    "start": "serve ./build -s",
     "build": "npm run build-sprites && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "lint": "eslint src/**/*.js",
