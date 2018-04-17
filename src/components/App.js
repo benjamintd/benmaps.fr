@@ -16,10 +16,10 @@ class App extends Component {
   }
 
   render() {
-    var moveOnLoad = this.props.url
+    var moveOnLoad = !this.props.url
       .split('/')
-      .map(e => !e.startsWith('+'))
-      .reduce((a, b) => (a && b), true);
+      .filter(e => e.startsWith('+') || e.startsWith('@'))
+      .length;
 
     return (
       <div className='root'>
