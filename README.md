@@ -2,7 +2,7 @@
 
 # Mapbox Maps
 
-[A user-friendly interface for Mapbox maps](https://benjamintd.github.io/mapbox-maps/)
+[A user-friendly interface for Mapbox maps](https://maps.benjamintd.com)
 
 ![screen shot 2017-03-29 at 5 11 20 pm](https://cloud.githubusercontent.com/assets/11202803/24481982/098cf8f8-14a3-11e7-8f91-c4f8061aece8.png)
 ------

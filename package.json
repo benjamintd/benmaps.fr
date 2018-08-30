@@ -34,7 +34,7 @@
     "react-router-redux": "^5.0.0-alpha.6",
     "recharts": "^1.0.0-alpha.0",
     "redux": "^3.6.0",
-    "serve": "^6.2.0",
+    "serve": "^10.0.0",
     "wikidata-sdk": "^4.2.4",
     "xhr": "^2.4.0"
   },
