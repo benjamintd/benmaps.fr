@@ -127,7 +127,7 @@ class RouteElevation extends Component {
         if (b > a) ups += b - a;
         else downs += a - b;
         return b;
-      }, 0);
+      });
 
     return [ups, downs];
   }
