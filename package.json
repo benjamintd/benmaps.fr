@@ -46,7 +46,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "build-sprites": "spritezero public/sprite src/styles/icons && spritezero public/sprite@2x src/styles/icons --retina"
+    "build-sprites": "node scripts/make-sprites.js"
   },
   "description": "A Google-like interface to Mapbox maps.",
   "main": "src/index.js",
