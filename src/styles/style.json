@@ -4887,7 +4887,7 @@
             }
         },
         {
-            "id": "poi-scalerank4-l15",
+            "id": "poi-scalerank4",
             "type": "symbol",
             "metadata": {"mapbox:group": "1444933456003.5437"},
             "source": "composite",
@@ -5027,7 +5027,7 @@
             }
         },
         {
-            "id": "poi-parks_scalerank4",
+            "id": "poi-parks-scalerank4",
             "type": "symbol",
             "metadata": {"mapbox:group": "1444933456003.5437"},
             "source": "composite",

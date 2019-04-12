@@ -397,17 +397,7 @@ class MapComponent extends Component {
 
     if (styleString.indexOf('satellite') > -1) {
       this.map.setLayoutProperty('satellite', 'visibility', 'visible');
-      // TODO add labels and stuff?
-      // timeout to have a smooth transition, no flash
-      setTimeout(() => {
-        this.map.getStyle().layers.forEach(layer => {
-          if (layer.source === 'composite') this.map.setLayoutProperty(layer.id, 'visibility', 'none');
-        });
-      }, 300);
     } else {
-      this.map.getStyle().layers.forEach(layer => {
-        if (layer.source === 'composite') this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
-      });
       this.map.setLayoutProperty('satellite', 'visibility', 'none');
     }
 
@@ -438,6 +428,7 @@ class MapComponent extends Component {
       'poi-scalerank3',
       'poi-parks-scalerank3',
       'poi-scalerank4',
+      'poi-scalerank4-l1',
       'poi-parks-scalerank4',
     ];
   }
