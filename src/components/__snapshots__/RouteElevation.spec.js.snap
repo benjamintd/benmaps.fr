@@ -52,11 +52,13 @@ exports[`test renders correctly 1`] = `
         "top": 0,
       }
     }
+    reverseStackOrder={false}
     stackOffset="none"
     width={420}>
     <YAxis
       allowDataOverflow={false}
       allowDecimals={true}
+      allowDuplicatedCategory={true}
       domain={
         Array [
           0,

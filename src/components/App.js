@@ -1,53 +1,37 @@
-import PropTypes from 'prop-types';
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import ContextMenu from './ContextMenu';
-import Map from './Map';
-import Search from './Search';
-import Directions from './Directions';
-import StyleSwitch from './StyleSwitch';
-import TrafficSwitch from './TrafficSwitch';
-import {setStateFromURL} from '../actions/index';
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import ContextMenu from "./ContextMenu";
+import Map from "./Map";
+import Search from "./Search";
+import Directions from "./Directions";
+import StyleSwitch from "./StyleSwitch";
+import TrafficSwitch from "./TrafficSwitch";
+import { setStateFromURL } from "../actions/index";
 
 class App extends Component {
-
   componentWillMount() {
     this.props.setStateFromURL();
   }
 
   render() {
-    var moveOnLoad = !this.props.url
-      .split('/')
-      .filter(e => e.startsWith('+') || e.startsWith('@'))
-      .length;
-
     return (
-      <div className='root'>
-        <Map moveOnLoad={moveOnLoad}/>
-        <div className='relative m12 m24-mm w420-mm flex-parent flex-parent--column'>
-          {
-            (this.props.mode === 'directions')
-            ? <Directions/>
-            : <Search/>
-          }
+      <div className="root">
+        <Map />
+        <div className="relative m12 m24-mm w420-mm flex-parent flex-parent--column">
+          {this.props.mode === "directions" ? <Directions /> : <Search />}
         </div>
-        {
-          (window.innerWidth > 640)
-          ? <div className='absolute bottom mb36 mx12 bg-white shadow-darken25 px3 py3'>
-              <div className='relative'>
-                <TrafficSwitch/>
-              </div>
-              <div className='style-switch'>
-                <StyleSwitch/>
-              </div>
+        {window.innerWidth > 640 ? (
+          <div className="absolute bottom mb36 mx12 bg-white shadow-darken25 px3 py3">
+            <div className="relative">
+              <TrafficSwitch />
             </div>
-          : null
-        }
-        {
-          (this.props.contextMenuActive === true)
-          ? <ContextMenu/>
-          : null
-        }
+            <div className="style-switch">
+              <StyleSwitch />
+            </div>
+          </div>
+        ) : null}
+        {this.props.contextMenuActive === true ? <ContextMenu /> : null}
       </div>
     );
   }
@@ -62,17 +46,16 @@ App.propTypes = {
   url: PropTypes.string
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     contextMenuActive: state.app.contextMenuActive,
     mode: state.app.mode,
     route: state.app.route,
-    routeStatus: state.app.routeStatus,
-    url: state.router.location.pathname
+    routeStatus: state.app.routeStatus
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     setStateFromURL: () => dispatch(setStateFromURL())
   };

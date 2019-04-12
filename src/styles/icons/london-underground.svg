@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="16" viewBox="0 0 20 16">
-  <title>london-underground</title>
-  <path d="M10,16a8.05,8.05,0,0,1-7.6-5.5H0v-5H2.4a8,8,0,0,1,15.19,0H20v5H17.6A8.05,8.05,0,0,1,10,16Z" fill="#fff" opacity="0.75"/>
-  <circle cx="10" cy="8" r="4" fill="#fff"/>
-  <path d="M10,1a7,7,0,1,0,7,7A7,7,0,0,0,10,1Zm0,11a4,4,0,1,1,4-4A4,4,0,0,1,10,12Z" fill="#f23d3d"/>
-  <rect x="1" y="6.5" width="18" height="3" fill="#4862cc"/>
-</svg>
