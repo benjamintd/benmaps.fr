@@ -15,13 +15,9 @@ class App extends Component {
   }
 
   render() {
-    var moveOnLoad = !this.props.url
-      .split("/")
-      .filter(e => e.startsWith("+") || e.startsWith("@")).length;
-
     return (
       <div className="root">
-        <Map moveOnLoad={moveOnLoad} />
+        <Map />
         <div className="relative m12 m24-mm w420-mm flex-parent flex-parent--column">
           {this.props.mode === "directions" ? <Directions /> : <Search />}
         </div>
@@ -55,8 +51,7 @@ const mapStateToProps = state => {
     contextMenuActive: state.app.contextMenuActive,
     mode: state.app.mode,
     route: state.app.route,
-    routeStatus: state.app.routeStatus,
-    url: state.router.location.pathname
+    routeStatus: state.app.routeStatus
   };
 };
 

@@ -5,11 +5,6 @@ import _ from "lodash";
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
 import createHistory from "history/createBrowserHistory";
 import { Route } from "react-router";
-import {
-  ConnectedRouter,
-  routerReducer,
-  routerMiddleware
-} from "react-router-redux";
 import { defaultState } from "./reducers/index";
 import apiCaller from "./middlewares/apiCaller";
 import urlTinkerer from "./middlewares/urlTinkerer";
@@ -27,17 +22,12 @@ const initialState = _.merge({}, defaultState, persistedState);
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-// Create history and router middleware
-const history = createHistory();
-const routerMid = routerMiddleware(history);
-
 let store = createStore(
   combineReducers({
-    ...reducers,
-    router: routerReducer
+    ...reducers
   }),
   initialState,
-  composeEnhancers(applyMiddleware(apiCaller, urlTinkerer, routerMid))
+  composeEnhancers(applyMiddleware(apiCaller))
 );
 
 // Store subscription that will keep the persisted state in local storage in sync with the state.
@@ -54,9 +44,7 @@ store.subscribe(() => {
 
 ReactDOM.render(
   <Provider store={store}>
-    <ConnectedRouter history={history}>
-      <Route path="*" component={App} />
-    </ConnectedRouter>
+    <App />
   </Provider>,
   document.getElementById("root")
 );
