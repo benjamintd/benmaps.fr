@@ -1,70 +1,91 @@
-exports[`test bike route renders correctly 1`] = `
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`bike route renders correctly 1`] = `
 <div
-  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main"
+>
   <div
-    className="flex-parent flex-parent--row flex-parent--center-cross">
+    className="flex-parent flex-parent--row flex-parent--center-cross"
+  >
     <div
-      className="w48 hmin48 flex-parent flex-parent--center-main flex-parent--center-cross">
+      className="w48 hmin48 flex-parent flex-parent--center-main flex-parent--center-cross"
+    >
       <svg
-        className="icon color-gray">
+        className="icon color-gray"
+      >
         <use
-          xlinkHref="#icon-bike" />
+          xlinkHref="#icon-bike"
+        />
       </svg>
     </div>
     <div
-      className="bottom pr12">
+      className="bottom pr12"
+    >
       17 minutes 
       
     </div>
     <div
-      className="bottom color-gray">
+      className="bottom color-gray"
+    >
       2.6
        km
     </div>
   </div>
   <div
-    className="loading--s" />
+    className="loading--s"
+  />
 </div>
 `;
 
-exports[`test error route renders correctly 1`] = `
+exports[`error route renders correctly 1`] = `
 <div
-  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main"
+>
   <div
-    className="txt-s txt-m-mm animation-subtle-shake px18">
+    className="txt-s txt-m-mm animation-subtle-shake px18"
+  >
     Sorry, no route found for these locations.
   </div>
 </div>
 `;
 
-exports[`test pending route renders correctly 1`] = `
+exports[`pending route renders correctly 1`] = `
 <div
-  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main"
+>
   <div
-    className="loading loading--s" />
+    className="loading loading--s"
+  />
 </div>
 `;
 
-exports[`test walking route renders correctly 1`] = `
+exports[`walking route renders correctly 1`] = `
 <div
-  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main">
+  className="relative mt6 bg-white w-full w420-mm hmin42 hmin48-mm shadow-darken25 flex-parent flex-parent--column flex-parent--center-main"
+>
   <div
-    className="flex-parent flex-parent--row flex-parent--center-cross">
+    className="flex-parent flex-parent--row flex-parent--center-cross"
+  >
     <div
-      className="w48 hmin48 flex-parent flex-parent--center-main flex-parent--center-cross">
+      className="w48 hmin48 flex-parent flex-parent--center-main flex-parent--center-cross"
+    >
       <svg
-        className="icon color-gray">
+        className="icon color-gray"
+      >
         <use
-          xlinkHref="#icon-walk" />
+          xlinkHref="#icon-walk"
+        />
       </svg>
     </div>
     <div
-      className="bottom pr12">
+      className="bottom pr12"
+    >
       8 days, 4 hours and 41 minutes 
       
     </div>
     <div
-      className="bottom color-gray">
+      className="bottom color-gray"
+    >
       982.4
        km
     </div>
