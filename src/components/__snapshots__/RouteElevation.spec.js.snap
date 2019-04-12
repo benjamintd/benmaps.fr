@@ -1,18 +1,25 @@
-exports[`test renders correctly 1`] = `
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
 <div>
   <div
-    className="txt-s color-darken50 px42">
+    className="txt-s color-darken50 px42"
+  >
     <svg
-      className="icon inline-block align-middle">
+      className="icon inline-block align-middle"
+    >
       <use
-        xlinkHref="#icon-arrow-up" />
+        xlinkHref="#icon-arrow-up"
+      />
     </svg>
     100
     m -
     <svg
-      className="icon inline-block align-middle">
+      className="icon inline-block align-middle"
+    >
       <use
-        xlinkHref="#icon-arrow-down" />
+        xlinkHref="#icon-arrow-down"
+      />
     </svg>
     80
     m
@@ -54,7 +61,8 @@ exports[`test renders correctly 1`] = `
     }
     reverseStackOrder={false}
     stackOffset="none"
-    width={420}>
+    width={420}
+  >
     <YAxis
       allowDataOverflow={false}
       allowDecimals={true}
@@ -80,7 +88,8 @@ exports[`test renders correctly 1`] = `
       tickCount={5}
       type="number"
       width={60}
-      yAxisId={0} />
+      yAxisId={0}
+    />
     <Area
       activeDot={true}
       animationBegin={0}
@@ -99,7 +108,8 @@ exports[`test renders correctly 1`] = `
       strokeWidth={2}
       type="monotone"
       xAxisId={0}
-      yAxisId={0} />
+      yAxisId={0}
+    />
   </AreaChart>
 </div>
 `;
