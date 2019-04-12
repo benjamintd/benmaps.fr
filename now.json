@@ -21,7 +21,7 @@
     },
     { "src": "/manifest.json", "dest": "/manifest.json" },
     {
-      "src": "/service-worker.js",
+      "src": "src/service-worker.js",
       "headers": { "cache-control": "s-maxage=0" },
       "dest": "/service-worker.js"
     },

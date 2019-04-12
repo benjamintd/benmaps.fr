@@ -114,7 +114,12 @@ class PlaceInfo extends Component {
               <use xlinkHref="#icon-globe" />
             </svg>
           </div>
-          <a href={claim[0]} target="_blank" className="txt-truncate">
+          <a
+            href={claim[0]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="txt-truncate"
+          >
             {claim[0]}
           </a>
         </div>
