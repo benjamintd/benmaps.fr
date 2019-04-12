@@ -4,7 +4,7 @@ const defaultAppState = {
   // Mapbox Access Token
   mapboxAccessToken: process.env.REACT_APP_MAPBOX_TOKEN,
   // Map
-  mapCoords: [-122.4, 37.8, 10],
+  mapCoords: [2.3437, 48.8582, 10],
   mapStyle: "streets",
   // Map updates
   needMapUpdate: false,
