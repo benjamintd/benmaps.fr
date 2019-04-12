@@ -3,11 +3,8 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import _ from "lodash";
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
-import createHistory from "history/createBrowserHistory";
-import { Route } from "react-router";
 import { defaultState } from "./reducers/index";
 import apiCaller from "./middlewares/apiCaller";
-import urlTinkerer from "./middlewares/urlTinkerer";
 import reducers from "./reducers/index";
 
 import App from "./components/App";

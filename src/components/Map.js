@@ -6,7 +6,6 @@ import turfBbox from "@turf/bbox";
 import turfBboxPolygon from "@turf/bbox-polygon";
 import turfBuffer from "@turf/buffer";
 import turfDistance from "@turf/distance";
-import { push } from "react-router-redux";
 import {
   setStateValue,
   setUserLocation,
@@ -495,7 +494,6 @@ MapComponent.propTypes = {
   needMapRepan: PropTypes.bool,
   needMapRestyle: PropTypes.bool,
   needMapUpdate: PropTypes.bool,
-  pushHistory: PropTypes.func,
   resetContextMenu: PropTypes.func,
   resetStateKeys: PropTypes.func,
   route: PropTypes.object,
@@ -536,7 +534,6 @@ const mapDispatchToProps = dispatch => {
       dispatch(getReverseGeocode(key, coordinates, accessToken)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) =>
       dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
-    pushHistory: url => dispatch(push(url)),
     resetContextMenu: () => dispatch(resetContextMenu()),
     setContextMenu: (coordinates, location) =>
       dispatch(setContextMenu(coordinates, location)),
