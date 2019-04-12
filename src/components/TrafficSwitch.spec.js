@@ -1,14 +1,13 @@
-import React from 'react';
-import renderer from 'react-test-renderer';
-import {shallow} from 'enzyme';
-import {TrafficSwitch} from './TrafficSwitch';
+import React from "react";
+import renderer from "react-test-renderer";
+import { shallow } from "enzyme";
+import { TrafficSwitch } from "./TrafficSwitch";
 
-it('renders correctly', () => {
-
+it("renders correctly", () => {
   const component = renderer.create(
     <TrafficSwitch
       triggerMapUpdate={() => {}}
-      mapStyle='streets'
+      mapStyle="streets"
       setStateValues={() => {}}
     />
   );
@@ -17,19 +16,22 @@ it('renders correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('switches style on change event', () => {
+it("switches style on change event", () => {
   const setStateValues = jest.fn();
 
   const trafficSwitch = shallow(
     <TrafficSwitch
       triggerMapUpdate={() => {}}
-      mapStyle='streets'
+      mapStyle="streets"
       setStateValues={setStateValues}
     />
   );
 
-  trafficSwitch.find('input').simulate('change', {target: {checked: true}});
+  trafficSwitch.find("input").simulate("change", { target: { checked: true } });
 
   expect(setStateValues).toBeCalled();
-  expect(setStateValues).toBeCalledWith({mapStyle: 'streets-traffic', needMapRestyle: true});
+  expect(setStateValues).toBeCalledWith({
+    mapStyle: "streets-traffic",
+    needMapRestyle: true
+  });
 });

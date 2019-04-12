@@ -1,4 +1,4 @@
-import {appReducer, defaultAppState} from './appReducer';
+import { appReducer, defaultAppState } from "./appReducer";
 
 const reducers = {
   app: appReducer
@@ -10,4 +10,4 @@ const defaultState = {
 
 export default reducers;
 
-export {defaultState};
+export { defaultState };

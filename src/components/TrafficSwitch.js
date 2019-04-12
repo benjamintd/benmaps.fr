@@ -1,18 +1,21 @@
-import PropTypes from 'prop-types';
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {triggerMapUpdate, setStateValues} from '../actions/index';
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { triggerMapUpdate, setStateValues } from "../actions/index";
 
 class TrafficSwitch extends Component {
   render() {
     return (
-      <label className='switch-container align-middle px3 bg-lighten75'>
-        <input type='checkbox'
-          onChange={(e) => this.toggle(e, this.trafficInStyle())}
+      <label className="switch-container align-middle px3 bg-lighten75">
+        <input
+          type="checkbox"
+          onChange={e => this.toggle(e, this.trafficInStyle())}
           checked={this.trafficInStyle()}
         />
-        <div className='switch switch--blue'></div>
-        <svg className='icon icon-switch color-blue'><use xlinkHref='#icon-street'/></svg>
+        <div className="switch switch--blue" />
+        <svg className="icon icon-switch color-blue">
+          <use xlinkHref="#icon-street" />
+        </svg>
       </label>
     );
   }
@@ -21,14 +24,14 @@ class TrafficSwitch extends Component {
     var checked = e.target.checked;
     if (checked && !trafficInStyle) {
       this.props.setStateValues({
-        mapStyle: this.props.mapStyle + '-traffic',
+        mapStyle: this.props.mapStyle + "-traffic",
         needMapRestyle: true
       });
 
       this.props.triggerMapUpdate();
     } else if (!checked && trafficInStyle) {
       this.props.setStateValues({
-        mapStyle: this.props.mapStyle.split('-')[0],
+        mapStyle: this.props.mapStyle.split("-")[0],
         needMapRestyle: true
       });
 
@@ -37,30 +40,30 @@ class TrafficSwitch extends Component {
   }
 
   trafficInStyle() {
-    return this.props.mapStyle.indexOf('traffic') > -1;
+    return this.props.mapStyle.indexOf("traffic") > -1;
   }
 }
 
 TrafficSwitch.propTypes = {
   setStateValues: PropTypes.func,
   mapStyle: PropTypes.string,
-  triggerMapUpdate: PropTypes.func,
+  triggerMapUpdate: PropTypes.func
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    mapStyle: state.app.mapStyle,
+    mapStyle: state.app.mapStyle
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    setStateValues: (obj) => dispatch(setStateValues(obj)),
-    triggerMapUpdate: (v) => dispatch(triggerMapUpdate(v))
+    setStateValues: obj => dispatch(setStateValues(obj)),
+    triggerMapUpdate: v => dispatch(triggerMapUpdate(v))
   };
 };
 
-export {TrafficSwitch};
+export { TrafficSwitch };
 export default connect(
   mapStateToProps,
   mapDispatchToProps

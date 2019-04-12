@@ -1,16 +1,15 @@
-import React from 'react';
-import renderer from 'react-test-renderer';
-import {RoutePanel} from './RoutePanel';
-import {bikeRoute, walkingRoute} from './fixtures/RoutePanel.fixtures.js';
+import React from "react";
+import renderer from "react-test-renderer";
+import { RoutePanel } from "./RoutePanel";
+import { bikeRoute, walkingRoute } from "./fixtures/RoutePanel.fixtures.js";
 
-it('bike route renders correctly', () => {
-
+it("bike route renders correctly", () => {
   const component = renderer.create(
     <RoutePanel
-      mapboxAccessToken='test'
-      modality='bike'
+      mapboxAccessToken="test"
+      modality="bike"
       route={bikeRoute}
-      routeStatus='idle'
+      routeStatus="idle"
     />
   );
 
@@ -18,14 +17,13 @@ it('bike route renders correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('walking route renders correctly', () => {
-
+it("walking route renders correctly", () => {
   const component = renderer.create(
     <RoutePanel
-      mapboxAccessToken='test'
-      modality='walk'
+      mapboxAccessToken="test"
+      modality="walk"
       route={walkingRoute}
-      routeStatus='idle'
+      routeStatus="idle"
     />
   );
 
@@ -33,14 +31,13 @@ it('walking route renders correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('pending route renders correctly', () => {
-
+it("pending route renders correctly", () => {
   const component = renderer.create(
     <RoutePanel
-      mapboxAccessToken='test'
-      modality='walk'
+      mapboxAccessToken="test"
+      modality="walk"
       route={null}
-      routeStatus='pending'
+      routeStatus="pending"
     />
   );
 
@@ -48,14 +45,13 @@ it('pending route renders correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('error route renders correctly', () => {
-
+it("error route renders correctly", () => {
   const component = renderer.create(
     <RoutePanel
-      mapboxAccessToken='test'
-      modality='walk'
+      mapboxAccessToken="test"
+      modality="walk"
       route={null}
-      routeStatus='error'
+      routeStatus="error"
     />
   );
 

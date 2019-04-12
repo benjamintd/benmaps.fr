@@ -1,23 +1,22 @@
-import React from 'react';
-import renderer from 'react-test-renderer';
-import {shallow} from 'enzyme';
-import {createStore, combineReducers} from 'redux';
-import {Provider} from 'react-redux';
-import {defaultState} from '../reducers/index';
-import reducers from '../reducers/index';
-import {Search} from './Search';
-import ConnectedSearch from './Search';
-import {placeInfo, searchLocation} from './fixtures/Search.fixtures.js';
+import React from "react";
+import renderer from "react-test-renderer";
+import { shallow } from "enzyme";
+import { createStore, combineReducers } from "redux";
+import { Provider } from "react-redux";
+import { defaultState } from "../reducers/index";
+import reducers from "../reducers/index";
+import { Search } from "./Search";
+import ConnectedSearch from "./Search";
+import { placeInfo, searchLocation } from "./fixtures/Search.fixtures.js";
 
-it('renders correctly with search location', () => {
-
+it("renders correctly with search location", () => {
   const component = renderer.create(
     <Search
       getPlaceInfo={() => {}}
       placeInfo={placeInfo}
       resetStateKeys={() => {}}
       searchLocation={searchLocation}
-      searchString='Paris'
+      searchString="Paris"
       setDirectionsLocation={() => {}}
       setMode={() => {}}
       setPlaceInfo={() => {}}
@@ -31,13 +30,12 @@ it('renders correctly with search location', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('renders correctly without search location', () => {
-
-  let store = createStore(combineReducers({...reducers}), defaultState);
+it("renders correctly without search location", () => {
+  let store = createStore(combineReducers({ ...reducers }), defaultState);
 
   const component = renderer.create(
     <Provider store={store}>
-      <ConnectedSearch/>
+      <ConnectedSearch />
     </Provider>
   );
 
@@ -45,8 +43,7 @@ it('renders correctly without search location', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('behaves correctly on clicking directions', () => {
-
+it("behaves correctly on clicking directions", () => {
   const setDirectionsLocation = jest.fn();
   const setMode = jest.fn();
 
@@ -56,7 +53,7 @@ it('behaves correctly on clicking directions', () => {
       placeInfo={placeInfo}
       resetStateKeys={() => {}}
       searchLocation={searchLocation}
-      searchString='Paris'
+      searchString="Paris"
       setDirectionsLocation={setDirectionsLocation}
       setMode={setMode}
       setPlaceInfo={() => {}}
@@ -66,7 +63,7 @@ it('behaves correctly on clicking directions', () => {
     />
   );
 
-  search.find('#search-directions').simulate('click');
-  expect(setDirectionsLocation).toBeCalledWith('to', searchLocation);
-  expect(setMode).toBeCalledWith('directions');
+  search.find("#search-directions").simulate("click");
+  expect(setDirectionsLocation).toBeCalledWith("to", searchLocation);
+  expect(setMode).toBeCalledWith("directions");
 });
