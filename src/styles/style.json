@@ -80,10 +80,6 @@
       "type": "geojson",
       "data": { "type": "FeatureCollection", "features": [] }
     },
-    "geolocation": {
-      "type": "geojson",
-      "data": { "type": "FeatureCollection", "features": [] }
-    },
     "fromMarker": {
       "type": "geojson",
       "data": { "type": "FeatureCollection", "features": [] }
@@ -6973,14 +6969,6 @@
           "hsl(0, 0%, 100%)"
         ],
         "text-halo-width": 1.25
-      }
-    },
-    {
-      "id": "geolocation",
-      "source": "geolocation",
-      "type": "symbol",
-      "layout": {
-        "icon-image": "geolocation"
       }
     },
     {

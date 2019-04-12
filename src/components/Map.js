@@ -56,13 +56,6 @@ class MapComponent extends Component {
   componentDidUpdate() {
     if (!this.props.needMapUpdate) return;
 
-    // This is where we update the layers and map bbox
-    if (this.props.userLocation && this.props.userLocation.geometry) {
-      this.map
-        .getSource("geolocation")
-        .setData(this.props.userLocation.geometry);
-    }
-
     // Search mode
     if (this.props.mode === "search") {
       if (this.props.searchLocation) {
@@ -333,12 +326,8 @@ class MapComponent extends Component {
   onLoad() {
     // helper to set geolocation
     const setGeolocation = data => {
-      const geometry = {
-        type: "Point",
-        coordinates: [data.coords.longitude, data.coords.latitude]
-      };
-      this.map.getSource("geolocation").setData(geometry);
-      this.props.setUserLocation(geometry.coordinates);
+      const geometry = [data.coords.longitude, data.coords.latitude];
+      this.props.setUserLocation(geometry);
       if (this.props.moveOnLoad) this.moveTo(geometry, 13);
     };
 
@@ -356,9 +345,6 @@ class MapComponent extends Component {
 
     // Initial ask for location and display on the map
     if (this.props.userLocation) {
-      this.map
-        .getSource("geolocation")
-        .setData(this.props.userLocation.geometry);
       if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setGeolocation);
@@ -368,12 +354,10 @@ class MapComponent extends Component {
     window.setInterval(() => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(data => {
-          const geometry = {
-            type: "Point",
-            coordinates: [data.coords.longitude, data.coords.latitude]
-          };
-          this.map.getSource("geolocation").setData(geometry);
-          this.props.setUserLocation(geometry.coordinates);
+          this.props.setUserLocation([
+            data.coords.longitude,
+            data.coords.latitude
+          ]);
         });
       }
     }, 10000);
