@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17">
-  <title>osaka-metro</title>
-  <rect y="3" width="20" height="14" rx="2" ry="2" fill="#d6d6d6" opacity="0.75"/>
-  <rect x="1" y="4" width="18" height="12" rx="1" ry="1" fill="#fff"/>
-  <rect width="20" height="17" fill="none"/>
-  <polygon points="2 8 2 9 17 9 17 11 2 11 2 12 18 12 18 8 2 8" fill="#f23d3d"/>
-  <path d="M10,5a5,5,0,1,0,5,5A5,5,0,0,0,10,5Zm0,9.5A4.5,4.5,0,1,1,14.5,10,4.5,4.5,0,0,1,10,14.5Z" fill="#f23d3d"/>
-</svg>
