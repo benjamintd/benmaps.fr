@@ -6,5 +6,8 @@
       "use": "@now/static-build",
       "config": { "distDir": "build" }
     }
-  ]
+  ],
+  "env": {
+    "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng"
+  }
 }
