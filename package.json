@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "https://maps.benjamintd.com",
   "devDependencies": {
-    "@mapbox/spritezero": "^6.1.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.12.1",
     "enzyme-to-json": "^3.3.5",
@@ -36,11 +35,10 @@
   "scripts": {
     "dev": "react-scripts start",
     "start": "serve ./build",
-    "build": "npm run build-sprites && react-scripts build",
+    "build": "react-scripts build",
     "now-build": "npm run build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "build-sprites": "node scripts/make-sprites.js"
+    "eject": "react-scripts eject"
   },
   "description": "A Google-like interface to Mapbox maps.",
   "main": "src/index.js",

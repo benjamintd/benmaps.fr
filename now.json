@@ -19,14 +19,14 @@
       "headers": { "cache-control": "s-maxage=31536000,immutable" },
       "dest": "/static/$1"
     },
-    { "src": "public/manifest.json", "dest": "/manifest.json" },
+    { "src": "/manifest.json", "dest": "/manifest.json" },
     {
-      "src": "public/service-worker.js",
+      "src": "/service-worker.js",
       "headers": { "cache-control": "s-maxage=0" },
       "dest": "/service-worker.js"
     },
     {
-      "src": "public/favicon.png",
+      "src": "/favicon.png",
       "headers": { "cache-control": "s-maxage=3600" },
       "dest": "/favicon.png"
     },
