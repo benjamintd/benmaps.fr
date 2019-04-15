@@ -3,6 +3,9 @@ import renderer from "react-test-renderer";
 import { shallow } from "enzyme";
 import { TrafficSwitch } from "./TrafficSwitch";
 
+const now = Date.now();
+Date.now = jest.fn().mockReturnValue(now);
+
 it("renders correctly", () => {
   const component = renderer.create(
     <TrafficSwitch
@@ -32,6 +35,6 @@ it("switches style on change event", () => {
   expect(setStateValues).toBeCalled();
   expect(setStateValues).toBeCalledWith({
     mapStyle: "streets-traffic",
-    needMapRestyle: true
+    latestMapRestyle: Date.now()
   });
 });

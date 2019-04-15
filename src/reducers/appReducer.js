@@ -7,9 +7,9 @@ const defaultAppState = {
   mapCoords: [2.3437, 48.8582, 10],
   mapStyle: "streets",
   // Map updates
-  needMapUpdate: false,
-  needMapRepan: false,
-  needMapRestyle: false,
+  latestMapUpdate: Date.now(),
+  latestMapRepan: Date.now(),
+  latestMapRestyle: Date.now(),
   // Mode
   mode: "search",
   modality: "car",
@@ -56,8 +56,8 @@ const appReducer = (state = defaultAppState, action) => {
 
     case "TRIGGER_MAP_UPDATE":
       return Object.assign({}, state, {
-        needMapUpdate: true,
-        needMapRepan: action.needMapRepan
+        latestMapUpdate: Date.now(),
+        latestMapRepan: action.needMapRepan ? Date.now() : undefined
       });
 
     case "SET_USER_LOCATION":

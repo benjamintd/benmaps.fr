@@ -25,14 +25,14 @@ class TrafficSwitch extends Component {
     if (checked && !trafficInStyle) {
       this.props.setStateValues({
         mapStyle: this.props.mapStyle + "-traffic",
-        needMapRestyle: true
+        latestMapRestyle: Date.now()
       });
 
       this.props.triggerMapUpdate();
     } else if (!checked && trafficInStyle) {
       this.props.setStateValues({
         mapStyle: this.props.mapStyle.split("-")[0],
-        needMapRestyle: true
+        latestMapRestyle: Date.now()
       });
 
       this.props.triggerMapUpdate();

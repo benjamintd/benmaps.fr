@@ -21,7 +21,7 @@ class StyleSwitch extends Component {
 
           this.props.setStateValues({
             mapStyle: newStyle,
-            needMapRestyle: true
+            latestMapRestyle: Date.now()
           });
           this.props.triggerMapUpdate();
         }}

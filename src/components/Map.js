@@ -53,8 +53,8 @@ class MapComponent extends Component {
     });
   }
 
-  componentDidUpdate() {
-    if (!this.props.needMapUpdate) return;
+  componentDidUpdate(prevProps) {
+    if (this.props.latestMapUpdate === prevProps.latestMapUpdate) return;
 
     // Search mode
     if (this.props.mode === "search") {
@@ -116,7 +116,7 @@ class MapComponent extends Component {
       }
     }
 
-    if (this.props.needMapRepan) {
+    if (this.props.latestMapRepan !== prevProps.latestMapRepan) {
       // Search mode
       if (this.props.mode === "search") {
         this.moveTo(this.props.searchLocation);
@@ -141,15 +141,9 @@ class MapComponent extends Component {
       }
     }
 
-    if (this.props.needMapRestyle) {
+    if (this.props.latestMapRestyle !== prevProps.latestMapRestyle) {
       this.updateStyle(this.props.mapStyle);
-    } else {
-      // No need to re-update until the state says so
-      this.props.setStateValue("needMapUpdate", false);
-      this.props.setStateValue("needMapRepan", false);
     }
-
-    this.props.setStateValue("needMapRestyle", false);
   }
 
   moveTo(location, zoom) {
@@ -339,7 +333,13 @@ class MapComponent extends Component {
     this.map.addControl(scaleControl, "bottom-right");
 
     // Create geolocation control
-    const geolocateControl = new mapboxgl.GeolocateControl();
+    const geolocateControl = new mapboxgl.GeolocateControl({
+      trackUserLocation: true,
+      positionOptions: {
+        enableHighAccuracy: true,
+        timeout: 15000
+      }
+    });
     geolocateControl.on("geolocate", setGeolocation);
     this.map.addControl(geolocateControl, "bottom-right");
 
@@ -347,20 +347,8 @@ class MapComponent extends Component {
     if (this.props.userLocation) {
       if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(setGeolocation);
+      geolocateControl.trigger();
     }
-
-    // Regularly poll the user location and update the map
-    window.setInterval(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(data => {
-          this.props.setUserLocation([
-            data.coords.longitude,
-            data.coords.latitude
-          ]);
-        });
-      }
-    }, 10000);
 
     // Set event listeners
 
@@ -451,7 +439,7 @@ class MapComponent extends Component {
       "poi-parks-scalerank2",
       "poi-scalerank3",
       "poi-parks-scalerank3",
-      "poi-scalerank4",
+      "poi-scalerank4-l15",
       "poi-scalerank4-l1",
       "poi-parks-scalerank4"
     ];
@@ -475,9 +463,9 @@ MapComponent.propTypes = {
   modality: PropTypes.string,
   mode: PropTypes.string,
   moveOnLoad: PropTypes.bool,
-  needMapRepan: PropTypes.bool,
-  needMapRestyle: PropTypes.bool,
-  needMapUpdate: PropTypes.bool,
+  latestMapRepan: PropTypes.number,
+  latestMapRestyle: PropTypes.number,
+  latestMapUpdate: PropTypes.number,
   resetContextMenu: PropTypes.func,
   resetStateKeys: PropTypes.func,
   route: PropTypes.object,
@@ -501,9 +489,9 @@ const mapStateToProps = state => {
     mapStyle: state.app.mapStyle,
     modality: state.app.modality,
     mode: state.app.mode,
-    needMapRepan: state.app.needMapRepan,
-    needMapRestyle: state.app.needMapRestyle,
-    needMapUpdate: state.app.needMapUpdate,
+    latestMapRepan: state.app.latestMapRepan,
+    latestMapRestyle: state.app.latestMapRestyle,
+    latestMapUpdate: state.app.latestMapUpdate,
     route: state.app.route,
     routeStatus: state.app.routeStatus,
     searchLocation: state.app.searchLocation,

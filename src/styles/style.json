@@ -85,7 +85,7 @@
       "data": { "type": "FeatureCollection", "features": [] }
     }
   },
-  "sprite": "mapbox://sprites/benjamintd/cjue3ir3w0dwy1fnzajaxngt5/dcdi5k7e29l19597zbvao0erz",
+  "sprite": "mapbox://sprites/benjamintd/cjue3ir3w0dwy1fnzajaxngt5/e385bkcaas6r5okgx4axtc2zz",
   "glyphs": "mapbox://fonts/benjamintd/{fontstack}/{range}.pbf",
   "layers": [
     {
@@ -4561,7 +4561,7 @@
       }
     },
     {
-      "id": "poi-scalerank4",
+      "id": "poi-scalerank4-l15",
       "type": "symbol",
       "metadata": { "mapbox:group": "1444933456003.5437" },
       "source": "composite",
@@ -4615,7 +4615,7 @@
         "symbol-spacing": 250,
         "text-font": ["Roboto Regular"],
         "text-padding": 2,
-        "text-offset": [0, 0.65],
+        "text-offset": [0, 0.9],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -4623,7 +4623,29 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(26, 25%, 32%)",
+        "text-color": [
+          "match",
+          ["get", "maki"],
+          ["shop", "clothing-store"],
+          "hsl(217, 71%, 58%)",
+          ["cafe", "restaurant", "grocery", "bar", "ice-cream"],
+          "hsl(26, 64%, 44%)",
+          ["college", "fuel", "information", "town-hall", "bank"],
+          "hsl(266, 39%, 33%)",
+          ["pharmacy", "hospital"],
+          "#f01d1d",
+          [
+            "castle",
+            "attraction",
+            "monument",
+            "museum",
+            "art-gallery",
+            "cinema",
+            "music"
+          ],
+          "hsl(182, 63%, 37%)",
+          "hsl(26, 25%, 32%)"
+        ],
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-halo-width": 0.5,
         "text-halo-blur": 0.5
@@ -4686,7 +4708,7 @@
         "symbol-spacing": 250,
         "text-font": ["Roboto Regular"],
         "text-padding": 1,
-        "text-offset": [0, 0.65],
+        "text-offset": [0, 1],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -4694,7 +4716,29 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(26, 25%, 32%)",
+        "text-color": [
+          "match",
+          ["get", "maki"],
+          ["shop", "clothing-store"],
+          "hsl(217, 71%, 58%)",
+          ["cafe", "restaurant", "grocery", "bar", "ice-cream"],
+          "hsl(26, 64%, 44%)",
+          ["college", "fuel", "information", "town-hall", "bank"],
+          "hsl(266, 39%, 33%)",
+          ["pharmacy", "hospital"],
+          "#f01d1d",
+          [
+            "castle",
+            "attraction",
+            "monument",
+            "museum",
+            "art-gallery",
+            "cinema",
+            "music"
+          ],
+          "hsl(182, 63%, 37%)",
+          "hsl(26, 25%, 32%)"
+        ],
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-halo-width": 0.5,
         "text-halo-blur": 0.5
@@ -4754,7 +4798,7 @@
         "symbol-spacing": 250,
         "text-font": ["Roboto Regular"],
         "text-padding": 1,
-        "text-offset": [0, 0.65],
+        "text-offset": [0, 0.9],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -4823,7 +4867,7 @@
         "symbol-spacing": 250,
         "text-font": ["Roboto Regular"],
         "text-padding": 1,
-        "text-offset": [0, 0.65],
+        "text-offset": [0, 1],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -4831,7 +4875,29 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(26, 25%, 32%)",
+        "text-color": [
+          "match",
+          ["get", "maki"],
+          ["shop", "clothing-store"],
+          "hsl(217, 71%, 58%)",
+          ["cafe", "restaurant", "grocery", "bar", "ice-cream"],
+          "hsl(26, 64%, 44%)",
+          ["college", "fuel", "information", "town-hall", "bank"],
+          "hsl(266, 39%, 33%)",
+          ["pharmacy", "hospital"],
+          "#f01d1d",
+          [
+            "castle",
+            "attraction",
+            "monument",
+            "museum",
+            "art-gallery",
+            "cinema",
+            "music"
+          ],
+          "hsl(182, 63%, 37%)",
+          "hsl(26, 25%, 32%)"
+        ],
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-halo-width": 0.5,
         "text-halo-blur": 0.5
@@ -4885,11 +4951,12 @@
           20,
           13
         ],
+        "icon-image": ["concat", ["get", "maki"], "-11"],
         "text-max-angle": 38,
         "symbol-spacing": 250,
         "text-font": ["Roboto Regular"],
         "text-padding": 0,
-        "text-offset": [0, 0],
+        "text-offset": [0, 0.9],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -5411,7 +5478,7 @@
         "symbol-spacing": 250,
         "text-font": ["Roboto Regular"],
         "text-padding": 2,
-        "text-offset": [0, 0.65],
+        "text-offset": [0, 1],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -5419,7 +5486,29 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(26, 25%, 32%)",
+        "text-color": [
+          "match",
+          ["get", "maki"],
+          ["shop", "clothing-store"],
+          "hsl(217, 71%, 58%)",
+          ["cafe", "restaurant", "grocery", "bar", "ice-cream"],
+          "hsl(26, 64%, 44%)",
+          ["college", "fuel", "information", "town-hall", "bank"],
+          "hsl(266, 39%, 33%)",
+          ["pharmacy", "hospital"],
+          "#f01d1d",
+          [
+            "castle",
+            "attraction",
+            "monument",
+            "museum",
+            "art-gallery",
+            "cinema",
+            "music"
+          ],
+          "hsl(182, 63%, 37%)",
+          "hsl(26, 25%, 32%)"
+        ],
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-halo-width": 0.5,
         "text-halo-blur": 0.5
@@ -5473,11 +5562,18 @@
           20,
           14
         ],
+        "icon-image": [
+          "step",
+          ["zoom"],
+          ["concat", ["get", "maki"], "-11"],
+          15,
+          ["concat", ["get", "maki"], "-15"]
+        ],
         "text-max-angle": 38,
         "symbol-spacing": 250,
         "text-font": ["Roboto Italic"],
         "text-padding": 0,
-        "text-offset": [0, 0],
+        "text-offset": [0, 1],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
         "text-field": ["to-string", ["get", "name"]],
@@ -5521,7 +5617,7 @@
         ],
         "icon-image": ["to-string", ["get", "network"]],
         "symbol-spacing": 250,
-        "text-font": ["Roboto Medium"],
+        "text-font": ["Open Sans Regular"],
         "text-offset": [0, 0.85],
         "text-rotation-alignment": "viewport",
         "text-anchor": "top",
@@ -5574,7 +5670,7 @@
       ],
       "layout": {
         "text-field": ["to-string", ["get", "name_en"]],
-        "text-font": ["Roboto Regular"],
+        "text-font": ["Open Sans Regular"],
         "text-max-width": 7,
         "text-size": [
           "interpolate",
@@ -5608,7 +5704,7 @@
       ],
       "layout": {
         "text-field": ["to-string", ["get", "name_en"]],
-        "text-font": ["Roboto Regular"],
+        "text-font": ["Open Sans Regular"],
         "text-max-width": 7,
         "text-size": [
           "interpolate",
@@ -5657,7 +5753,7 @@
         ],
         "text-max-angle": 38,
         "symbol-spacing": 250,
-        "text-font": ["Roboto Regular"],
+        "text-font": ["Open Sans Regular"],
         "text-padding": 2,
         "text-offset": [0, 0],
         "text-rotation-alignment": "viewport",
@@ -5721,7 +5817,7 @@
         ],
         "text-max-angle": 38,
         "symbol-spacing": 250,
-        "text-font": ["Roboto Italic"],
+        "text-font": ["Open Sans Regular"],
         "text-padding": 0,
         "text-offset": [0, 0],
         "text-rotation-alignment": "viewport",
@@ -5793,7 +5889,7 @@
         ],
         "text-max-angle": 38,
         "symbol-spacing": 250,
-        "text-font": ["Roboto Regular"],
+        "text-font": ["Open Sans Regular"],
         "text-padding": 2,
         "text-offset": [0, 0.65],
         "text-rotation-alignment": "viewport",
@@ -5803,7 +5899,29 @@
         "text-max-width": 8
       },
       "paint": {
-        "text-color": "hsl(26, 25%, 32%)",
+        "text-color": [
+          "match",
+          ["get", "maki"],
+          ["shop", "clothing-store"],
+          "hsl(217, 71%, 58%)",
+          ["cafe", "restaurant", "grocery", "bar", "ice-cream"],
+          "hsl(26, 64%, 44%)",
+          ["college", "fuel", "information", "town-hall", "bank"],
+          "hsl(266, 39%, 33%)",
+          ["pharmacy", "hospital"],
+          "#f01d1d",
+          [
+            "castle",
+            "attraction",
+            "monument",
+            "museum",
+            "art-gallery",
+            "cinema",
+            "music"
+          ],
+          "hsl(182, 63%, 37%)",
+          "hsl(26, 25%, 32%)"
+        ],
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-halo-width": 0.5,
         "text-halo-blur": 0.5
@@ -5868,7 +5986,7 @@
           0,
           "hsl(0, 0%, 20%)",
           14,
-          "hsl(0, 0%, 40%)"
+          "#2ba4f0"
         ],
         "text-halo-color": "hsl(0, 0%, 100%)",
         "text-halo-width": 0.5,
@@ -6863,7 +6981,7 @@
         ]
       },
       "paint": {
-        "text-color": "hsl(40, 80%, 23%)",
+        "text-color": "hsl(40, 13%, 20%)",
         "text-halo-color": [
           "interpolate",
           ["exponential", 1],
@@ -6902,7 +7020,7 @@
         "text-size": ["interpolate", ["exponential", 1], ["zoom"], 3, 10, 8, 24]
       },
       "paint": {
-        "text-color": "hsl(40, 80%, 23%)",
+        "text-color": "hsl(40, 13%, 20%)",
         "text-halo-color": [
           "interpolate",
           ["exponential", 1],

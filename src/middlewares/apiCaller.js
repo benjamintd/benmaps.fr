@@ -67,7 +67,7 @@ const apiCaller = store => next => action => {
             });
             next({
               type: "TRIGGER_MAP_UPDATE",
-              needMapRepan: true
+              latestMapRepan: Date.now()
             });
 
             return Promise.resolve();

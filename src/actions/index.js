@@ -16,7 +16,7 @@ export const resetStateKeys = keys => ({
 
 export const triggerMapUpdate = needMapRepan => ({
   type: "TRIGGER_MAP_UPDATE",
-  needMapRepan: !!needMapRepan || false
+  needMapRepan: !!needMapRepan
 });
 
 export const setUserLocation = coordinates => ({

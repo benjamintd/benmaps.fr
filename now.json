@@ -21,9 +21,14 @@
     },
     { "src": "/manifest.json", "dest": "/manifest.json" },
     {
-      "src": "src/service-worker.js",
+      "src": "/service-worker.js",
       "headers": { "cache-control": "s-maxage=0" },
       "dest": "/service-worker.js"
+    },
+    {
+      "src": "/favicon.png",
+      "headers": { "cache-control": "s-maxage=3600" },
+      "dest": "/favicon.png"
     },
     {
       "src": "/(.*)",

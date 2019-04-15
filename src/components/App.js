@@ -21,7 +21,7 @@ class App extends Component {
         <div className="relative m12 m24-mm w420-mm flex-parent flex-parent--column">
           {this.props.mode === "directions" ? <Directions /> : <Search />}
         </div>
-        {window.innerWidth > 640 ? (
+        {window.innerWidth > 360 ? (
           <div className="absolute bottom mb36 mx12 bg-white shadow-darken25 px3 py3">
             <div className="relative">
               <TrafficSwitch />
