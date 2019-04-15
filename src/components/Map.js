@@ -339,7 +339,13 @@ class MapComponent extends Component {
     this.map.addControl(scaleControl, "bottom-right");
 
     // Create geolocation control
-    const geolocateControl = new mapboxgl.GeolocateControl();
+    const geolocateControl = new mapboxgl.GeolocateControl({
+      trackUserLocation: true,
+      positionOptions: {
+        enableHighAccuracy: true,
+        timeout: 15000
+      }
+    });
     geolocateControl.on("geolocate", setGeolocation);
     this.map.addControl(geolocateControl, "bottom-right");
 
@@ -347,20 +353,8 @@ class MapComponent extends Component {
     if (this.props.userLocation) {
       if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(setGeolocation);
+      geolocateControl.trigger();
     }
-
-    // Regularly poll the user location and update the map
-    window.setInterval(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(data => {
-          this.props.setUserLocation([
-            data.coords.longitude,
-            data.coords.latitude
-          ]);
-        });
-      }
-    }, 10000);
 
     // Set event listeners
 
