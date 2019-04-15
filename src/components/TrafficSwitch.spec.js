@@ -32,6 +32,6 @@ it("switches style on change event", () => {
   expect(setStateValues).toBeCalled();
   expect(setStateValues).toBeCalledWith({
     mapStyle: "streets-traffic",
-    needMapRestyle: true
+    latestMapRestyle: Date.now()
   });
 });

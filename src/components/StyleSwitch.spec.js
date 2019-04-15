@@ -43,7 +43,7 @@ it("switches style on change event", () => {
 
   expect(setStateValues).toBeCalledWith({
     mapStyle: "satellite",
-    needMapRestyle: true
+    latestMapRestyle: Date.now()
   });
   expect(triggerMapUpdate).toBeCalled();
 });
