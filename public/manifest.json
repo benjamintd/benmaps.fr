@@ -3,7 +3,7 @@
   "name": "Ben Maps - web maps that don't track you.",
   "icons": [
     {
-      "src": "favicon.png",
+      "src": "/favicon.png",
       "sizes": "192x192",
       "type": "image/png"
     }
