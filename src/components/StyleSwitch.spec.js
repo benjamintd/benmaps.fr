@@ -3,6 +3,9 @@ import renderer from "react-test-renderer";
 import { shallow } from "enzyme";
 import { StyleSwitch } from "./StyleSwitch";
 
+const now = Date.now();
+Date.now = jest.fn().mockReturnValue(now);
+
 it("renders correctly", () => {
   const component = renderer.create(
     <StyleSwitch
