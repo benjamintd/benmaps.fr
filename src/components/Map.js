@@ -36,6 +36,9 @@ class MapComponent extends Component {
 
   componentDidMount() {
     mapboxgl.accessToken = this.props.accessToken;
+    mapboxgl.setRTLTextPlugin(
+      "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.0/mapbox-gl-rtl-text.js"
+    );
 
     const map = new mapboxgl.Map({
       container: "map",
@@ -43,7 +46,12 @@ class MapComponent extends Component {
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
-      maxZoom: 21
+      maxZoom: 21,
+      hash: true,
+      pitchWithRotate: false,
+      dragRotate: false,
+      touchZoomROtate: false,
+      localIdeographFontFamily: "sans-serif"
     });
 
     this.map = map;
