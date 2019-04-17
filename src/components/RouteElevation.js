@@ -48,11 +48,17 @@ class RouteElevation extends Component {
               </div>
               <AreaChart
                 width={420}
-                margin={{ top: 0, right: 42, left: 42, bottom: 12 }}
+                margin={{ top: 12, right: 42, left: 42, bottom: 12 }}
                 height={100}
                 data={this.state.elevations.map(e => ({ e: Math.max(e, 0) }))}
               >
-                <YAxis orientation="right" />
+                <YAxis
+                  orientation="right"
+                  domain={[
+                    dataMin => Math.max(0, dataMin - 50),
+                    "dataMax + 50"
+                  ]}
+                />
                 <Area
                   type="monotone"
                   dataKey="e"
