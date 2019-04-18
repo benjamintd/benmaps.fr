@@ -236,11 +236,9 @@ function search(
 
 const mapStateToProps = state => {
   return {
-    accessToken: state.app.mapboxAccessToken,
+    accessToken: state.mapboxAccessToken,
     proximity:
-      state.app.mapCoords[2] > 7
-        ? state.app.mapCoords.slice(0, 2).join(",")
-        : ""
+      state.mapCoords[2] > 7 ? state.mapCoords.slice(0, 2).join(",") : ""
   };
 };
 

@@ -2,10 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import _ from "lodash";
-import { createStore, applyMiddleware, compose, combineReducers } from "redux";
-import { defaultState } from "./reducers/index";
+import { createStore, applyMiddleware, compose } from "redux";
+import { defaultState, reducer } from "./reducers/index";
 import apiCaller from "./middlewares/apiCaller";
-import reducers from "./reducers/index";
 import * as serviceWorker from "./serviceWorker";
 
 import App from "./components/App";
@@ -21,9 +20,7 @@ const initialState = _.merge({}, defaultState, persistedState);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 let store = createStore(
-  combineReducers({
-    ...reducers
-  }),
+  reducer,
   initialState,
   composeEnhancers(applyMiddleware(apiCaller))
 );

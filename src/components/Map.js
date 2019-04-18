@@ -348,8 +348,8 @@ class MapComponent extends Component {
         timeout: 15000
       }
     });
-    geolocateControl.on("geolocate", setGeolocation);
     this.map.addControl(geolocateControl, "bottom-right");
+    geolocateControl.on("geolocate", setGeolocation);
 
     // Initial ask for location and display on the map
     if (this.props.userLocation) {
@@ -489,22 +489,22 @@ MapComponent.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    accessToken: state.app.mapboxAccessToken,
-    center: state.app.mapCoords.slice(0, 2),
-    contextMenuActive: state.app.contextMenuActive,
-    directionsFrom: state.app.directionsFrom,
-    directionsTo: state.app.directionsTo,
-    mapStyle: state.app.mapStyle,
-    modality: state.app.modality,
-    mode: state.app.mode,
-    latestMapRepan: state.app.latestMapRepan,
-    latestMapRestyle: state.app.latestMapRestyle,
-    latestMapUpdate: state.app.latestMapUpdate,
-    route: state.app.route,
-    routeStatus: state.app.routeStatus,
-    searchLocation: state.app.searchLocation,
-    userLocation: state.app.userLocation,
-    zoom: state.app.mapCoords[2]
+    accessToken: state.mapboxAccessToken,
+    center: state.mapCoords.slice(0, 2),
+    contextMenuActive: state.contextMenuActive,
+    directionsFrom: state.directionsFrom,
+    directionsTo: state.directionsTo,
+    mapStyle: state.mapStyle,
+    modality: state.modality,
+    mode: state.mode,
+    latestMapRepan: state.latestMapRepan,
+    latestMapRestyle: state.latestMapRestyle,
+    latestMapUpdate: state.latestMapUpdate,
+    route: state.route,
+    routeStatus: state.routeStatus,
+    searchLocation: state.searchLocation,
+    userLocation: state.userLocation,
+    zoom: state.mapCoords[2]
   };
 };
 

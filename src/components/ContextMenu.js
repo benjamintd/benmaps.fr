@@ -30,7 +30,9 @@ class ContextMenu extends Component {
           />
           <p>{this.formatCoordinates()}</p>
           <p className="txt-xs color-darken50 select-none">
-            lon<span className="inline-block w48" />lat
+            lon
+            <span className="inline-block w48" />
+            lat
           </p>
         </div>
         <div
@@ -98,11 +100,11 @@ ContextMenu.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    accessToken: state.app.mapboxAccessToken,
-    active: state.app.contextMenuActive,
-    coordinates: state.app.contextMenuCoordinates,
-    position: state.app.contextMenuPosition,
-    place: state.app.contextMenuPlace
+    accessToken: state.mapboxAccessToken,
+    active: state.contextMenuActive,
+    coordinates: state.contextMenuCoordinates,
+    position: state.contextMenuPosition,
+    place: state.contextMenuPlace
   };
 };
 

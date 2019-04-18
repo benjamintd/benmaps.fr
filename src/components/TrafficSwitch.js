@@ -52,7 +52,7 @@ TrafficSwitch.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    mapStyle: state.app.mapStyle
+    mapStyle: state.mapStyle
   };
 };
 
