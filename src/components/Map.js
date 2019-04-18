@@ -355,7 +355,8 @@ class MapComponent extends Component {
     if (this.props.userLocation) {
       if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
-      geolocateControl.trigger();
+      // wait until the geolocate contril is added to the map
+      setTimeout(geolocateControl.trigger, 1000);
     }
 
     // Set event listeners
