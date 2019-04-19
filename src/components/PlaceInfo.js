@@ -11,8 +11,7 @@ class PlaceInfo extends Component {
       <div className={styles.placeInfo}>
         <ImageWithFallback
           className="cover w-full h72 h120-mm"
-          primary={this.props.info.image.thumb}
-          secondary={this.props.info.image.full}
+          image={this.props.info.image}
           alt={this.props.info.description}
         />
         <div className="bg-blue flex-parent flex-parent--row">

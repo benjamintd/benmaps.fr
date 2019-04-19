@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
+import _ from "lodash";
 
 class ImageWithFallback extends Component {
   constructor(props) {
@@ -11,13 +12,15 @@ class ImageWithFallback extends Component {
   }
 
   render() {
-    if (this.props.primary === "" && this.props.secondary === "") return null;
+    const primary = _.get(this.props, "image.thumb");
+    const secondary = _.get(this.props, "image.full");
+    if (primary === "" && secondary === "") return null;
 
     if (this.state.status === "primary") {
       return (
         <img
           className={this.props.className}
-          src={this.props.primary}
+          src={primary}
           onError={() => this.setState({ status: "secondary" })}
           alt={this.props.alt}
         />
@@ -26,7 +29,7 @@ class ImageWithFallback extends Component {
       return (
         <img
           className={this.props.className}
-          src={this.props.secondary}
+          src={secondary}
           onError={() => this.setState({ status: "error" })}
           alt={this.props.alt}
         />
@@ -38,8 +41,7 @@ class ImageWithFallback extends Component {
 ImageWithFallback.propTypes = {
   alt: PropTypes.string,
   className: PropTypes.string,
-  primary: PropTypes.string,
-  secondary: PropTypes.string
+  image: PropTypes.object
 };
 
 export default ImageWithFallback;
