@@ -30,7 +30,9 @@ class ContextMenu extends Component {
           />
           <p>{this.formatCoordinates()}</p>
           <p className="txt-xs color-darken50 select-none">
-            lon<span className="inline-block w48" />lat
+            lon
+            <span className="inline-block w48" />
+            lat
           </p>
         </div>
         <div

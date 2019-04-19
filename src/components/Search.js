@@ -76,7 +76,6 @@ class Search extends Component {
           }
           onClick={() => this.closeSearch()}
         />
-
         {this.props.searchLocation && this.props.placeInfo ? (
           <PlaceInfo
             info={this.props.placeInfo}

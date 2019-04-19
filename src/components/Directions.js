@@ -48,7 +48,7 @@ class Directions extends Component {
             <div className="flex-child w-full h-full">
               <div className={this.styles.row}>
                 {this.props.directionsFrom ? (
-                  <div className={this.styles.placeName}>
+                  <div className={this.styles.place_name}>
                     <PlaceName
                       location={this.props.directionsFrom}
                       colors="light"
@@ -80,7 +80,7 @@ class Directions extends Component {
 
               <div className={this.styles.row}>
                 {this.props.directionsTo ? (
-                  <div className={this.styles.placeName}>
+                  <div className={this.styles.place_name}>
                     <PlaceName
                       location={this.props.directionsTo}
                       colors="light"
@@ -199,7 +199,7 @@ class Directions extends Component {
         "relative bg-blue w-full w420-mm shadow-darken25 flex-parent flex-parent--column",
       input:
         "input directions-input border--transparent color-white px48 h42 w-full",
-      placeName:
+      place_name:
         "txt-truncate w-full color-white px48 h42 flex-parent flex-parent--row flex-parent--center-cross",
       results: "absolute w-full bg-white shadow-darken5 border-darken10",
       row: "flex-child hmin42 w-full w420-mm flex-parent flex-parent--row",
