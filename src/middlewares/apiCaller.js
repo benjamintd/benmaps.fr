@@ -120,6 +120,10 @@ const apiCaller = store => next => action => {
     }
 
     case "GET_REVERSE_GEOCODE": {
+      if (!action.coordinates) {
+        break;
+      }
+
       const url =
         "https://api.mapbox.com/geocoding/v5/mapbox.places/" +
         action.coordinates.join(",") +

@@ -85,7 +85,7 @@
       "data": { "type": "FeatureCollection", "features": [] }
     }
   },
-  "sprite": "mapbox://sprites/benjamintd/cjue3ir3w0dwy1fnzajaxngt5/e385bkcaas6r5okgx4axtc2zz",
+  "sprite": "mapbox://sprites/benjamintd/cjue3ir3w0dwy1fnzajaxngt5",
   "glyphs": "mapbox://fonts/benjamintd/{fontstack}/{range}.pbf",
   "layers": [
     {
