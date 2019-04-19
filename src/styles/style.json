@@ -7095,7 +7095,8 @@
       "type": "symbol",
       "layout": {
         "icon-image": "pin",
-        "icon-offset": [0, -20]
+        "icon-anchor": "bottom",
+        "icon-allow-overlap": true
       }
     },
     {
@@ -7103,7 +7104,8 @@
       "source": "fromMarker",
       "type": "symbol",
       "layout": {
-        "icon-image": "fromLocation"
+        "icon-image": "fromLocation",
+        "icon-allow-overlap": true
       }
     }
   ],
