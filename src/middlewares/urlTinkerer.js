@@ -13,7 +13,6 @@ const urlTinkerer = store => next => action => {
         actionPayload
       );
       if (store.getState().router.location.pathname !== url) {
-        console.log(url, store.getState());
         next({
           type: CALL_HISTORY_METHOD,
           payload: {

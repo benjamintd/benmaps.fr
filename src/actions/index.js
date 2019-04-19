@@ -43,9 +43,9 @@ export const getRoute = (
   accessToken
 });
 
-export const getPlaceInfo = wikidataId => ({
+export const getPlaceInfo = feature => ({
   type: "GET_PLACE_INFO",
-  id: wikidataId
+  feature
 });
 
 export const getReverseGeocode = (key, coordinates, accessToken) => ({

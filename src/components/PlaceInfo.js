@@ -44,6 +44,12 @@ class PlaceInfo extends Component {
   }
 
   getImageUrl() {
+    console.log(this.props.info);
+    return this.getWikiMediaImageUrl();
+    // TODO when mo wikimedia image, fallback to mapillary
+  }
+
+  getWikiMediaImageUrl() {
     // see https://commons.wikimedia.org/wiki/Commons:FAQ for how images are stored
     const claim = this.props.info.claims["P18"];
     if (claim && claim.length > 0) {
@@ -125,6 +131,16 @@ class PlaceInfo extends Component {
         </div>
       );
     } else return null;
+  }
+
+  getCopyLinkUrl() {
+    // TODO copy the url when available
+  }
+
+  getMapillaryImageUrl() {
+    // https://a.mapillary.com/v3/images?client_id=dFZSZUNYaDN5QVRXb0pHS0g1VWZjQTo5YTRhYzFmZGFkMWI2MzU5&closeto=2.350566,48.856095&lookat=2.350566,48.856095&pano=false
+    // then https://images.mapillary.com/64YrfmfLAkqz-AowRJV7nA/thumb-640.jpg
+    // TODO this should be a synchronous
   }
 
   get styles() {

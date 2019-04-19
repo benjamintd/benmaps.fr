@@ -12,6 +12,7 @@ import {
   triggerMapUpdate,
   getRoute,
   getReverseGeocode,
+  getPlaceInfo,
   setContextMenu,
   resetContextMenu,
   resetStateKeys
@@ -305,6 +306,7 @@ class MapComponent extends Component {
         properties: {},
         geometry: feature.geometry
       });
+      this.props.getPlaceInfo(feature);
       this.props.triggerMapUpdate();
     }
   }
@@ -519,6 +521,7 @@ const mapDispatchToProps = dispatch => {
   return {
     getReverseGeocode: (key, coordinates, accessToken) =>
       dispatch(getReverseGeocode(key, coordinates, accessToken)),
+    getPlaceInfo: feature => dispatch(getPlaceInfo(feature)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) =>
       dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
     resetContextMenu: () => dispatch(resetContextMenu()),

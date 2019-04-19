@@ -91,8 +91,7 @@ class Search extends Component {
     this.props.writeSearch(data.place_name);
     this.props.setSearchLocation(data);
     this.props.triggerMapUpdate("repan");
-    if (data.properties.wikidata)
-      this.props.getPlaceInfo(data.properties.wikidata);
+    this.props.getPlaceInfo(data);
   }
 
   closeSearch() {
