@@ -4,7 +4,7 @@
 
 [Web maps that don't track you](https://maps.benjamintd.com)
 
-## ![screen shot 2017-03-29 at 5 11 20 pm](https://cloud.githubusercontent.com/assets/11202803/24481982/098cf8f8-14a3-11e7-8f91-c4f8061aece8.png)
+## ![Screen shot](https://repository-images.githubusercontent.com/84752763/d3f2bc00-62d4-11e9-9c1a-d95bc8156386)
 
 ### Why this project?
 
