@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import ImageWithFallback from "./ImageWithFallback";
 import directionsIcon from "../assets/directions.svg";
+import copyToClipboardIcon from "../assets/copyToClipboard.svg";
 
 class PlaceInfo extends Component {
   render() {
@@ -29,8 +30,14 @@ class PlaceInfo extends Component {
             </div>
           </div>
           <div
+            onClick={() => navigator.clipboard.writeText(window.location.href)} // This won't work everywhere
+            className={styles.buttonIcon}
+          >
+            <img src={copyToClipboardIcon} alt="copy to clipboard" />
+          </div>
+          <div
             onClick={this.props.clickDirections}
-            className={styles.directionsIcon}
+            className={styles.buttonIcon}
           >
             <img src={directionsIcon} alt="directions" />
           </div>
@@ -100,7 +107,7 @@ const Website = ({ url }) => {
 };
 
 const styles = {
-  directionsIcon:
+  buttonIcon:
     "bg-white hmin42 wmin42 hmin48-mm wmin48-mm hmax42 wmax42 hmax48-mm wmax48-mm m6 m12-mm round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross",
   icon:
     "flex-parent flex-parent--center-cross flex-parent--center-main w42 h42",
