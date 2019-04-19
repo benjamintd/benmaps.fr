@@ -56,7 +56,7 @@ exports[`renders correctly 1`] = `
         "bottom": 12,
         "left": 42,
         "right": 42,
-        "top": 0,
+        "top": 12,
       }
     }
     reverseStackOrder={false}
@@ -69,8 +69,8 @@ exports[`renders correctly 1`] = `
       allowDuplicatedCategory={true}
       domain={
         Array [
-          0,
-          "auto",
+          [Function],
+          "dataMax + 10",
         ]
       }
       height={0}
@@ -106,7 +106,7 @@ exports[`renders correctly 1`] = `
       points={Array []}
       stroke="#2abaf7"
       strokeWidth={2}
-      type="monotone"
+      type="natural"
       xAxisId={0}
       yAxisId={0}
     />

@@ -76,7 +76,6 @@ class Search extends Component {
           }
           onClick={() => this.closeSearch()}
         />
-
         {this.props.searchLocation && this.props.placeInfo ? (
           <PlaceInfo
             info={this.props.placeInfo}
@@ -91,8 +90,7 @@ class Search extends Component {
     this.props.writeSearch(data.place_name);
     this.props.setSearchLocation(data);
     this.props.triggerMapUpdate("repan");
-    if (data.properties.wikidata)
-      this.props.getPlaceInfo(data.properties.wikidata);
+    this.props.getPlaceInfo(data);
   }
 
   closeSearch() {
@@ -126,7 +124,6 @@ Search.propTypes = {
   searchString: PropTypes.string,
   setDirectionsLocation: PropTypes.func,
   setMode: PropTypes.func,
-  setPlaceInfo: PropTypes.func,
   setSearchLocation: PropTypes.func,
   triggerMapUpdate: PropTypes.func,
   writeSearch: PropTypes.func
@@ -147,7 +144,6 @@ const mapDispatchToProps = dispatch => {
     setDirectionsLocation: (kind, location) =>
       dispatch(setDirectionsLocation(kind, location)),
     setMode: mode => dispatch(setStateValue("mode", mode)),
-    setPlaceInfo: info => dispatch(setStateValue("placeInfo", info)),
     setSearchLocation: location =>
       dispatch(setStateValue("searchLocation", location)),
     triggerMapUpdate: repan => dispatch(triggerMapUpdate(repan)),

@@ -48,13 +48,19 @@ class RouteElevation extends Component {
               </div>
               <AreaChart
                 width={420}
-                margin={{ top: 0, right: 42, left: 42, bottom: 12 }}
+                margin={{ top: 12, right: 42, left: 42, bottom: 12 }}
                 height={100}
                 data={this.state.elevations.map(e => ({ e: Math.max(e, 0) }))}
               >
-                <YAxis orientation="right" />
+                <YAxis
+                  orientation="right"
+                  domain={[
+                    dataMin => Math.max(0, dataMin - 10),
+                    "dataMax + 10"
+                  ]}
+                />
                 <Area
-                  type="monotone"
+                  type="natural"
                   dataKey="e"
                   stroke="#2abaf7"
                   fill="#2abaf7"
@@ -82,7 +88,7 @@ class RouteElevation extends Component {
 
     this.setState({ status: "pending" });
 
-    let coords = this.sampleLine(20, nextProps.route);
+    let coords = this.sampleLine(50, nextProps.route);
 
     let baseUrl =
       "https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/";
@@ -137,9 +143,9 @@ class RouteElevation extends Component {
     let samples = [];
     let ruler = cheapRuler(coords[0][1], "meters");
     let distance = ruler.lineDistance(coords);
-
-    for (let i = 0; i < n; i++) {
-      samples.push(ruler.along(coords, (i * distance) / n));
+    let nSamples = Math.min(n, distance / 500); // max n points, or every 500m
+    for (let i = 0; i < nSamples; i++) {
+      samples.push(ruler.along(coords, (i * distance) / nSamples));
     }
 
     return samples;

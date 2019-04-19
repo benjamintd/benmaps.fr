@@ -12,6 +12,7 @@ import {
   triggerMapUpdate,
   getRoute,
   getReverseGeocode,
+  getPlaceInfo,
   setContextMenu,
   resetContextMenu,
   resetStateKeys
@@ -36,6 +37,9 @@ class MapComponent extends Component {
 
   componentDidMount() {
     mapboxgl.accessToken = this.props.accessToken;
+    mapboxgl.setRTLTextPlugin(
+      "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.0/mapbox-gl-rtl-text.js"
+    );
 
     const map = new mapboxgl.Map({
       container: "map",
@@ -43,7 +47,11 @@ class MapComponent extends Component {
       center: this.props.center,
       zoom: this.props.zoom,
       minZoom: 2,
-      maxZoom: 21
+      maxZoom: 21,
+      pitchWithRotate: false,
+      dragRotate: false,
+      touchZoomROtate: false,
+      localIdeographFontFamily: "sans-serif"
     });
 
     this.map = map;
@@ -53,9 +61,9 @@ class MapComponent extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     if (this.props.latestMapUpdate === prevProps.latestMapUpdate) return;
-
+    await loadedPromise(this.map);
     // Search mode
     if (this.props.mode === "search") {
       if (this.props.searchLocation) {
@@ -298,6 +306,7 @@ class MapComponent extends Component {
         properties: {},
         geometry: feature.geometry
       });
+      this.props.getPlaceInfo(feature);
       this.props.triggerMapUpdate();
     }
   }
@@ -347,7 +356,8 @@ class MapComponent extends Component {
     if (this.props.userLocation) {
       if (this.props.moveOnLoad) this.moveTo(this.props.userLocation, 13);
     } else if (navigator.geolocation) {
-      geolocateControl.trigger();
+      // wait until the geolocate contril is added to the map
+      setTimeout(geolocateControl.trigger, 1000);
     }
 
     // Set event listeners
@@ -500,10 +510,18 @@ const mapStateToProps = state => {
   };
 };
 
+const loadedPromise = map => {
+  if (map.isStyleLoaded()) return true;
+  return new Promise((resolve, reject) => {
+    map.on("load", () => resolve());
+  });
+};
+
 const mapDispatchToProps = dispatch => {
   return {
     getReverseGeocode: (key, coordinates, accessToken) =>
       dispatch(getReverseGeocode(key, coordinates, accessToken)),
+    getPlaceInfo: feature => dispatch(getPlaceInfo(feature)),
     getRoute: (directionsFrom, directionsTo, modality, accessToken) =>
       dispatch(getRoute(directionsFrom, directionsTo, modality, accessToken)),
     resetContextMenu: () => dispatch(resetContextMenu()),

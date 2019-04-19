@@ -67,7 +67,6 @@ exports[`renders correctly with search location 1`] = `
       alt="Capital city of France"
       className="cover w-full h72 h120-mm"
       onError={[Function]}
-      src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/A/640px-A"
     />
     <div
       className="bg-blue flex-parent flex-parent--row"
@@ -85,6 +84,15 @@ exports[`renders correctly with search location 1`] = `
         >
           Capital city of France
         </div>
+      </div>
+      <div
+        className="bg-white hmin42 wmin42 hmin48-mm wmin48-mm hmax42 wmax42 hmax48-mm wmax48-mm m6 m12-mm round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross"
+        onClick={[Function]}
+      >
+        <img
+          alt="copy to clipboard"
+          src="copyToClipboard.svg"
+        />
       </div>
       <div
         className="bg-white hmin42 wmin42 hmin48-mm wmin48-mm hmax42 wmax42 hmax48-mm wmax48-mm m6 m12-mm round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross"

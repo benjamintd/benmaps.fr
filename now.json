@@ -3,7 +3,8 @@
   "alias": "maps.benjamintd.com",
   "build": {
     "env": {
-      "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng"
+      "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiYmVuamFtaW50ZCIsImEiOiJjaW83enIwNjYwMnB1dmlsejN6cDBzbm93In0.0ZOGwSLp8OjW6vCaEKYFng",
+      "REACT_APP_MAPILLARY_CLIENT_ID": "dFZSZUNYaDN5QVRXb0pHS0g1VWZjQTo5YTRhYzFmZGFkMWI2MzU5"
     }
   },
   "builds": [
