@@ -42,19 +42,8 @@ class PlaceInfo extends Component {
     );
   }
 
-  getImageUrl() {
-    return this.getWikiMediaImageUrl();
-    // TODO when mo wikimedia image, fallback to mapillary
-  }
-
   getCopyLinkUrl() {
     // TODO copy the url when available
-  }
-
-  getMapillaryImageUrl() {
-    // https://a.mapillary.com/v3/images?client_id=dFZSZUNYaDN5QVRXb0pHS0g1VWZjQTo5YTRhYzFmZGFkMWI2MzU5&closeto=2.350566,48.856095&lookat=2.350566,48.856095&pano=false
-    // then https://images.mapillary.com/64YrfmfLAkqz-AowRJV7nA/thumb-640.jpg
-    // TODO this should be a synchronous
   }
 }
 

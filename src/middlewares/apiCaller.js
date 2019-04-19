@@ -151,7 +151,8 @@ function getWikidataPlaceInfo(action, next) {
           image: getWikiMediaImageUrl(_.get(claims, "P18[0]")),
           phoneNumber: _.get(claims, "P1329[0]"),
           website: _.get(claims, "P856[0]"),
-          address: _.get(claims, "P969[0]")
+          address: _.get(claims, "P969[0]"),
+          wikidata: id
         }
       });
     })
@@ -159,7 +160,6 @@ function getWikidataPlaceInfo(action, next) {
 }
 
 async function getMapillaryPlaceInfo(action, next) {
-  const feature = action.feature;
   const coordinates = action.feature.geometry.coordinates;
 
   const url = `https://a.mapillary.com/v3/images?client_id=${

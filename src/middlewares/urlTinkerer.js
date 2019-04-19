@@ -26,7 +26,7 @@ const urlTinkerer = store => next => action => {
 
     case "SET_STATE_VALUES": {
       next(action);
-
+      console.log("values", action);
       let url = store.getState().router.location.pathname;
       Object.keys(action.modifiedState).forEach(k => {
         let actionPayload = getActionPayload(k, action.modifiedState[k]);
@@ -74,18 +74,28 @@ const urlTinkerer = store => next => action => {
       let url = store.getState().router.location.pathname;
       const params = parseUrl(url);
       if (params.searchCoords) {
+        const feature = {
+          type: "Feature",
+          place_name: params.searchPlace,
+          geometry: {
+            type: "Point",
+            coordinates: params.searchCoords
+          },
+          properties: {
+            name: params.searchPlace,
+            wikidata: params.wikidata
+          }
+        };
         next({
           type: "SET_STATE_VALUES",
           modifiedState: {
-            searchLocation: {
-              place_name: params.searchPlace,
-              geometry: {
-                type: "Point",
-                coordinates: params.searchCoords
-              }
-            },
+            searchLocation: feature,
             mapCoords: params.searchCoords.concat([13])
           }
+        });
+        next({
+          type: "GET_PLACE_INFO",
+          feature
         });
         next({
           type: "TRIGGER_MAP_UPDATE",
@@ -110,7 +120,8 @@ function getActionPayload(key, value) {
   } else if (key === "searchLocation") {
     actionPayload = {
       searchCoords: value.geometry.coordinates,
-      searchPlace: value.place_name.split(",")[0]
+      searchPlace: value.place_name.split(",")[0],
+      wikidata: value.properties.wikidata
     };
   }
   return actionPayload;
@@ -142,6 +153,9 @@ function parseUrl(url) {
     } else if (s.startsWith("~")) {
       // Parse search place name, noted with a ~.
       props.searchPlace = decodeURI(s.slice(1));
+    } else if (s.startsWith("$")) {
+      // Parse wikidata entity, noted with a ^.
+      props.wikidata = decodeURI(s.slice(1));
     }
   });
 
@@ -165,6 +179,9 @@ function toUrl(props) {
   }
   if (props.searchPlace) {
     res.push("~" + encodeURI(props.searchPlace));
+  }
+  if (props.wikidata) {
+    res.push("$" + encodeURI(props.wikidata));
   }
   return res.join("/");
 }

@@ -17,6 +17,7 @@ const defaultAppState = {
   searchString: "",
   searchLocation: null,
   placeInfo: null,
+  wikidata: null,
   // User
   userLocation: null,
   // Directions

@@ -28,7 +28,7 @@ const store = createStore(
   createRootReducer(history), // root reducer with router state
   initialState,
   composeEnhancers(
-    applyMiddleware(apiCaller, urlTinkerer, routerMiddleware(history))
+    applyMiddleware(urlTinkerer, apiCaller, routerMiddleware(history))
   )
 );
 
