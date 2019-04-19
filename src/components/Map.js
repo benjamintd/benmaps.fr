@@ -50,7 +50,7 @@ class MapComponent extends Component {
       maxZoom: 21,
       pitchWithRotate: false,
       dragRotate: false,
-      touchZoomROtate: false,
+      touchZoomRotate: false,
       localIdeographFontFamily: "sans-serif"
     });
 
