@@ -47,7 +47,6 @@ class MapComponent extends Component {
       zoom: this.props.zoom,
       minZoom: 2,
       maxZoom: 21,
-      hash: true,
       pitchWithRotate: false,
       dragRotate: false,
       touchZoomROtate: false,
@@ -61,9 +60,9 @@ class MapComponent extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     if (this.props.latestMapUpdate === prevProps.latestMapUpdate) return;
-
+    await loadedPromise(this.map);
     // Search mode
     if (this.props.mode === "search") {
       if (this.props.searchLocation) {
@@ -507,6 +506,13 @@ const mapStateToProps = state => {
     userLocation: state.app.userLocation,
     zoom: state.app.mapCoords[2]
   };
+};
+
+const loadedPromise = map => {
+  if (map.isStyleLoaded()) return true;
+  return new Promise((resolve, reject) => {
+    map.on("load", () => resolve());
+  });
 };
 
 const mapDispatchToProps = dispatch => {

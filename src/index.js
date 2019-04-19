@@ -2,10 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import _ from "lodash";
-import { createStore, applyMiddleware, compose, combineReducers } from "redux";
-import { defaultState } from "./reducers/index";
+import { createStore, applyMiddleware, compose } from "redux";
+import { createBrowserHistory } from "history";
+import { routerMiddleware, ConnectedRouter } from "connected-react-router";
+import createRootReducer, { defaultState } from "./reducers";
 import apiCaller from "./middlewares/apiCaller";
-import reducers from "./reducers/index";
+import urlTinkerer from "./middlewares/urlTinkerer";
 import * as serviceWorker from "./serviceWorker";
 
 import App from "./components/App";
@@ -20,12 +22,14 @@ const initialState = _.merge({}, defaultState, persistedState);
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-let store = createStore(
-  combineReducers({
-    ...reducers
-  }),
+const history = createBrowserHistory();
+
+const store = createStore(
+  createRootReducer(history), // root reducer with router state
   initialState,
-  composeEnhancers(applyMiddleware(apiCaller))
+  composeEnhancers(
+    applyMiddleware(apiCaller, urlTinkerer, routerMiddleware(history))
+  )
 );
 
 // Store subscription that will keep the persisted state in local storage in sync with the state.
@@ -42,7 +46,9 @@ store.subscribe(() => {
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ConnectedRouter history={history}>
+      <App />
+    </ConnectedRouter>
   </Provider>,
   document.getElementById("root")
 );
