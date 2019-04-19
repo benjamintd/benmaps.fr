@@ -231,14 +231,14 @@ Directions.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    directionsFrom: state.directionsFrom,
-    directionsFromString: state.directionsFromString,
-    directionsTo: state.directionsTo,
-    directionsToString: state.directionsToString,
-    modality: state.modality,
-    route: state.route,
-    routeStatus: state.routeStatus,
-    userLocation: state.userLocation
+    directionsFrom: state.app.directionsFrom,
+    directionsFromString: state.app.directionsFromString,
+    directionsTo: state.app.directionsTo,
+    directionsToString: state.app.directionsToString,
+    modality: state.app.modality,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus,
+    userLocation: state.app.userLocation
   };
 };
 

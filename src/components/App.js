@@ -48,10 +48,10 @@ App.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    contextMenuActive: state.contextMenuActive,
-    mode: state.mode,
-    route: state.route,
-    routeStatus: state.routeStatus
+    contextMenuActive: state.app.contextMenuActive,
+    mode: state.app.mode,
+    route: state.app.route,
+    routeStatus: state.app.routeStatus
   };
 };
 

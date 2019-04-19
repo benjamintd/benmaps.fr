@@ -134,9 +134,9 @@ Search.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    placeInfo: state.placeInfo,
-    searchLocation: state.searchLocation,
-    searchString: state.searchString
+    placeInfo: state.app.placeInfo,
+    searchLocation: state.app.searchLocation,
+    searchString: state.app.searchString
   };
 };
 

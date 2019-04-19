@@ -3,7 +3,8 @@ import renderer from "react-test-renderer";
 import { shallow } from "enzyme";
 import { createStore, combineReducers } from "redux";
 import { Provider } from "react-redux";
-import reducer, { defaultState } from "../reducers/index";
+import { defaultState } from "../reducers/index";
+import reducers from "../reducers/index";
 import { Search } from "./Search";
 import ConnectedSearch from "./Search";
 import { placeInfo, searchLocation } from "./fixtures/Search.fixtures.js";
@@ -30,7 +31,7 @@ it("renders correctly with search location", () => {
 });
 
 it("renders correctly without search location", () => {
-  let store = createStore(reducer, defaultState);
+  let store = createStore(combineReducers({ ...reducers }), defaultState);
 
   const component = renderer.create(
     <Provider store={store}>
