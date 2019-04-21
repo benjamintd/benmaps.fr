@@ -2,7 +2,7 @@
 
 # Ben Maps
 
-[Web maps that don't track you](https://maps.benjamintd.com)
+[Web maps that don't track you](https://benmaps.fr)
 
 ## ![Screen shot](https://repository-images.githubusercontent.com/84752763/d3f2bc00-62d4-11e9-9c1a-d95bc8156386)
 
@@ -19,6 +19,7 @@ My day job involves maps. Lots of them. Yet I still open Google Maps on the web 
 - [Mapbox Geocoding API](https://www.mapbox.com/api-documentation/#geocoding)
 - [Mapbox Directions API](https://www.mapbox.com/api-documentation/#directions)
 - [Wikidata SDK](https://github.com/maxlath/wikidata-sdk)
+- [Mapillary API](https://www.mapillary.com/)
 
 This project was bootstrapped with [`create-react-app`](https://github.com/facebookincubator/create-react-app).
 
