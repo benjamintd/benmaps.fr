@@ -26,7 +26,6 @@ const urlTinkerer = store => next => action => {
 
     case "SET_STATE_VALUES": {
       next(action);
-      console.log("values", action);
       let url = store.getState().router.location.pathname;
       Object.keys(action.modifiedState).forEach(k => {
         let actionPayload = getActionPayload(k, action.modifiedState[k]);
@@ -184,4 +183,9 @@ function toUrl(props) {
     res.push("$" + encodeURI(props.wikidata));
   }
   return res.join("/");
+}
+
+export function shareableUrl(url) {
+  const { coords, ...props } = parseUrl(url);
+  return window.location.protocol + "//" + window.location.host + toUrl(props);
 }
