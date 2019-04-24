@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 import ImageWithFallback from "./ImageWithFallback";
+import { shareableUrl } from "../middlewares/urlTinkerer";
 import directionsIcon from "../assets/directions.svg";
 import copyToClipboardIcon from "../assets/copyToClipboard.svg";
 
@@ -29,7 +30,9 @@ class PlaceInfo extends Component {
             </div>
           </div>
           <div
-            onClick={() => navigator.clipboard.writeText(window.location.href)} // This won't work everywhere
+            onClick={() =>
+              navigator.clipboard.writeText(shareableUrl(window.location.href))
+            } // This won't work everywhere
             className={styles.buttonIcon}
           >
             <img src={copyToClipboardIcon} alt="copy to clipboard" />
@@ -115,7 +118,7 @@ const styles = {
   mainInfo:
     "p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main",
   placeInfo:
-    "place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column"
+    "place-info absolute top bg-white w-full round w420-mm shadow-darken25 flex-parent flex-parent--column"
 };
 
 PlaceInfo.propTypes = {

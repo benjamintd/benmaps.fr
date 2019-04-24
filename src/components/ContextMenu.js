@@ -6,7 +6,8 @@ import {
   setStateValues,
   triggerMapUpdate,
   resetContextMenu,
-  getReverseGeocode
+  getReverseGeocode,
+  getPlaceInfo
 } from "../actions/index";
 
 class ContextMenu extends Component {
@@ -62,6 +63,7 @@ class ContextMenu extends Component {
     });
     this.props.triggerMapUpdate();
     this.props.resetContextMenu();
+    this.props.getPlaceInfo(this.props.place);
   }
 
   setDirections(k) {
@@ -91,6 +93,7 @@ ContextMenu.propTypes = {
   active: PropTypes.bool,
   coordinates: PropTypes.array,
   getReverseGeocode: PropTypes.func,
+  getPlaceInfo: PropTypes.func,
   position: PropTypes.array,
   place: PropTypes.object,
   resetContextMenu: PropTypes.func,
@@ -112,6 +115,7 @@ const mapDispatchToProps = dispatch => {
   return {
     getReverseGeocode: (key, coordinates, token) =>
       dispatch(getReverseGeocode(key, coordinates, token)),
+    getPlaceInfo: feature => dispatch(getPlaceInfo(feature)),
     resetContextMenu: () => dispatch(resetContextMenu()),
     setStateValues: obj => dispatch(setStateValues(obj)),
     triggerMapUpdate: needMapRepan => dispatch(triggerMapUpdate(needMapRepan))

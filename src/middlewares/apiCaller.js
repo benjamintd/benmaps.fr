@@ -16,8 +16,8 @@ const apiCaller = store => next => action => {
         type: "SET_STATE_VALUE",
         key: "placeInfo",
         value: {
-          description: action.feature.properties.type,
-          label: action.feature.properties.name,
+          description: _.get(action, "feature.properties.type"),
+          label: _.get(action, "feature.properties.name"),
           image: { thumb: "", full: "" }
         }
       });
@@ -209,7 +209,8 @@ function getReverseGeocode(action, next) {
       geometry: {
         type: "Point",
         coordinates: action.coordinates
-      }
+      },
+      properties: {}
     }
   });
 
@@ -226,6 +227,7 @@ function getReverseGeocode(action, next) {
     .then(data => {
       // Success
       if (data.features && data.features.length > 0) {
+        console.log(data.features[0]);
         return next({
           type: "SET_STATE_VALUE",
           key: action.key,
@@ -234,6 +236,10 @@ function getReverseGeocode(action, next) {
             geometry: {
               type: "Point",
               coordinates: action.coordinates
+            },
+            type: "Feature",
+            properties: {
+              name: data.features[0].text || data.features[0].place_name
             }
           }
         });
@@ -248,7 +254,8 @@ function getReverseGeocode(action, next) {
           geometry: {
             type: "Point",
             coordinates: action.coordinates
-          }
+          },
+          properties: {}
         }
       });
     });

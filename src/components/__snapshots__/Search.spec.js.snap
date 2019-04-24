@@ -2,7 +2,7 @@
 
 exports[`renders correctly with search location 1`] = `
 <div
-  className="absolute h42 w-full w420-mm bg-white shadow-darken25 flex-parent flex-parent--row flex-parent--space-between-main"
+  className="absolute h42 w-full w420-mm bg-white shadow-darken25 round flex-parent flex-parent--row flex-parent--space-between-main"
 >
   <div
     className="absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42"
@@ -61,7 +61,7 @@ exports[`renders correctly with search location 1`] = `
     </svg>
   </div>
   <div
-    className="place-info absolute top bg-white w-full w420-mm shadow-darken25 flex-parent flex-parent--column"
+    className="place-info absolute top bg-white w-full round w420-mm shadow-darken25 flex-parent flex-parent--column"
   >
     <img
       alt="Capital city of France"
@@ -110,7 +110,7 @@ exports[`renders correctly with search location 1`] = `
 
 exports[`renders correctly without search location 1`] = `
 <div
-  className="absolute h42 w-full w420-mm bg-white shadow-darken25 flex-parent flex-parent--row flex-parent--space-between-main"
+  className="absolute h42 w-full w420-mm bg-white shadow-darken25 round flex-parent flex-parent--row flex-parent--space-between-main"
 >
   <div
     className="absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42"
