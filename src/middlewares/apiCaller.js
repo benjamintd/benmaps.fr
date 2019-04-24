@@ -209,7 +209,8 @@ function getReverseGeocode(action, next) {
       geometry: {
         type: "Point",
         coordinates: action.coordinates
-      }
+      },
+      properties: {}
     }
   });
 
@@ -253,7 +254,8 @@ function getReverseGeocode(action, next) {
           geometry: {
             type: "Point",
             coordinates: action.coordinates
-          }
+          },
+          properties: {}
         }
       });
     });
