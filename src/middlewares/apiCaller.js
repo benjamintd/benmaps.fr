@@ -238,7 +238,7 @@ function getReverseGeocode(action, next) {
             },
             type: "Feature",
             properties: {
-              name: data.features[0].text
+              name: data.features[0].text || data.features[0].place_name
             }
           }
         });

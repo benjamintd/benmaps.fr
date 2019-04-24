@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import mapboxgl from "mapbox-gl/dist/mapbox-gl";
+import mapboxgl from "mapbox-gl";
 import turfBbox from "@turf/bbox";
 import turfBboxPolygon from "@turf/bbox-polygon";
 import turfBuffer from "@turf/buffer";
@@ -244,7 +244,8 @@ class MapComponent extends Component {
     this.props.setStateValue("routeStatus", status); // pause route updates
     this.props.setStateValue(this.layerToKey(layerId), {
       place_name: "__loading",
-      geometry: geometry
+      geometry: geometry,
+      properties: {}
     });
     this.props.triggerMapUpdate();
   }
