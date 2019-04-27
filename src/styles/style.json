@@ -436,7 +436,7 @@
       "source": "composite",
       "source-layer": "water",
       "layout": {},
-      "paint": { "fill-color": "hsl(211, 74%, 77%)" }
+      "paint": { "fill-color": "#7bdbed" }
     },
     {
       "id": "barrier_line-land-polygon",

@@ -8,6 +8,22 @@ body {
   touch-action: none;
 }
 
+.bg-blue {
+  background-color: #009ab7 !important;
+}
+
+.color-blue {
+  color: #009ab7 !important;
+}
+
+.my-blue {
+  fill-color: #009ab7;
+}
+
+.switch--blue {
+  color: #009ab7;
+}
+
 #map {
   position: absolute;
   top: 0;
@@ -15,16 +31,18 @@ body {
   width: 100%;
 }
 
-.directions-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+.directions-input::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
   color: rgba(255, 255, 255, 0.6);
 }
 
-.directions-input::-moz-placeholder { /* Firefox 19+ */
+.directions-input::-moz-placeholder {
+  /* Firefox 19+ */
   color: rgba(255, 255, 255, 0.6);
 }
 
 .place-info {
-  margin-top: 48px!important;
+  margin-top: 48px !important;
 }
 
 .cover {
@@ -65,14 +83,20 @@ body {
 
 @keyframes subtle-shake {
   from,
-  to { transform: translate3d(0, 0, 0); }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 
   12.5%,
   37.5%,
   62.5%,
-  87.5% { transform: translate3d(-6px, 0, 0); }
+  87.5% {
+    transform: translate3d(-6px, 0, 0);
+  }
 
   25%,
   50%,
-  75% { transform: translate3d(6px, 0, 0); }
+  75% {
+    transform: translate3d(6px, 0, 0);
+  }
 }
