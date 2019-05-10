@@ -208,7 +208,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(205, 87%, 76%)",
+        "line-color": "#94ceeb",
         "line-width": [
           "interpolate",
           ["exponential", 1.3],
@@ -409,7 +409,7 @@
       ],
       "layout": { "line-join": "round", "line-cap": "round" },
       "paint": {
-        "line-color": "hsl(205, 87%, 76%)",
+        "line-color": "#94ceeb",
         "line-width": [
           "interpolate",
           ["exponential", 1.35],
@@ -436,7 +436,7 @@
       "source": "composite",
       "source-layer": "water",
       "layout": {},
-      "paint": { "fill-color": "#7bdbed" }
+      "paint": { "fill-color": "#94ceeb" }
     },
     {
       "id": "barrier_line-land-polygon",
