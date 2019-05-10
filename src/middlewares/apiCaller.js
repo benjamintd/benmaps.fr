@@ -104,7 +104,7 @@ function getRoute(action, next) {
         });
         next({
           type: "TRIGGER_MAP_UPDATE",
-          latestMapRepan: Date.now()
+          latestMapUpdate: Date.now()
         });
 
         return Promise.resolve();
@@ -227,7 +227,6 @@ function getReverseGeocode(action, next) {
     .then(data => {
       // Success
       if (data.features && data.features.length > 0) {
-        console.log(data.features[0]);
         return next({
           type: "SET_STATE_VALUE",
           key: action.key,
