@@ -351,7 +351,6 @@ class MapComponent extends Component {
       }
     });
     geolocateControl.on("geolocate", setGeolocation);
-    this.map.addControl(geolocateControl, "bottom-right");
 
     // Initial ask for location and display on the map
     if (this.props.userLocation) {
@@ -512,9 +511,9 @@ const mapStateToProps = state => {
 };
 
 const loadedPromise = map => {
-  if (map.isStyleLoaded()) return true;
-  return new Promise((resolve, reject) => {
-    map.on("load", () => resolve());
+  if (map.isStyleLoaded()) return Promise.resolve(true);
+  return new Promise(resolve => {
+    map.on("idle", () => resolve(true));
   });
 };
 
