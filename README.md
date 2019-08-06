@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/benjamintd/ben-maps.svg?branch=master)](https://travis-ci.org/benjamintd/ben-maps)
+[![Build Status](https://travis-ci.org/benjamintd/benmaps.fr.svg?branch=master)](https://travis-ci.org/benjamintd/benmaps.fr)
 
 # Ben Maps
 
