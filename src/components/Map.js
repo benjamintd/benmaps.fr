@@ -52,8 +52,7 @@ class MapComponent extends Component {
       dragRotate: false,
       localIdeographFontFamily: "sans-serif"
     });
-    map.touchZoomRotate.disableRotation();
-
+  
     this.map = map;
 
     map.on("load", () => {
