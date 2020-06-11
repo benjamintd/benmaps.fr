@@ -45,3 +45,14 @@ The sprites and glyphs are hosted on the Mapbox infrastructure.
 - More traffic-related features
 - Turn-by-turn directions
 - Ads (just kidding)
+
+### To run
+Rename the `.env.sample` file to `.env` and add your Mapbox token and Mapillary Client ID
+
+Then:
+
+```
+yarn
+yarn build
+yarn start
+```
