@@ -5,13 +5,12 @@ import Geocoder from "./Geocoder";
 import PlaceName from "./PlaceName";
 import CloseButton from "./CloseButton";
 import PlaceInfo from "./PlaceInfo";
-import directionsIcon from "../assets/directions.svg";
 import {
   triggerMapUpdate,
   setDirectionsLocation,
   getPlaceInfo,
   resetStateKeys,
-  setStateValue
+  setStateValue,
 } from "../actions/index";
 
 class Search extends Component {
@@ -22,9 +21,9 @@ class Search extends Component {
       // no place was selected yet
       SearchBar = (
         <Geocoder
-          onSelect={data => this.onSelect(data)}
+          onSelect={(data) => this.onSelect(data)}
           searchString={this.props.searchString}
-          writeSearch={value => {
+          writeSearch={(value) => {
             this.props.triggerMapUpdate();
             this.props.writeSearch(value);
           }}
@@ -56,7 +55,7 @@ class Search extends Component {
             className={"mr30 cursor-pointer right " + this.styles.icon}
             onClick={() => this.clickDirections()}
           >
-            <img src={directionsIcon} alt="directions" />
+            <img src="/images/directions.svg" alt="directions" />
           </div>
         </div>
       );
@@ -106,12 +105,10 @@ class Search extends Component {
 
   get styles() {
     return {
-      main:
-        "absolute h42 w-full w420-mm bg-white shadow-darken25 round flex-parent flex-parent--row flex-parent--space-between-main",
-      icon:
-        "absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42",
+      main: "absolute h42 w-full w420-mm bg-white shadow-darken25 round flex-parent flex-parent--row flex-parent--space-between-main",
+      icon: "absolute flex-parent flex-parent--center-cross flex-parent--center-main w42 h42",
       input: "input px42 h42 border--transparent",
-      results: "results bg-white shadow-darken25 mt6 border-darken10"
+      results: "results bg-white shadow-darken25 mt6 border-darken10",
     };
   }
 }
@@ -126,33 +123,30 @@ Search.propTypes = {
   setMode: PropTypes.func,
   setSearchLocation: PropTypes.func,
   triggerMapUpdate: PropTypes.func,
-  writeSearch: PropTypes.func
+  writeSearch: PropTypes.func,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     placeInfo: state.app.placeInfo,
     searchLocation: state.app.searchLocation,
-    searchString: state.app.searchString
+    searchString: state.app.searchString,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    getPlaceInfo: id => dispatch(getPlaceInfo(id)),
-    resetStateKeys: keys => dispatch(resetStateKeys(keys)),
+    getPlaceInfo: (id) => dispatch(getPlaceInfo(id)),
+    resetStateKeys: (keys) => dispatch(resetStateKeys(keys)),
     setDirectionsLocation: (kind, location) =>
       dispatch(setDirectionsLocation(kind, location)),
-    setMode: mode => dispatch(setStateValue("mode", mode)),
-    setSearchLocation: location =>
+    setMode: (mode) => dispatch(setStateValue("mode", mode)),
+    setSearchLocation: (location) =>
       dispatch(setStateValue("searchLocation", location)),
-    triggerMapUpdate: repan => dispatch(triggerMapUpdate(repan)),
-    writeSearch: input => dispatch(setStateValue("searchString", input))
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    writeSearch: (input) => dispatch(setStateValue("searchString", input)),
   };
 };
 
 export { Search };
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Search);
+export default connect(mapStateToProps, mapDispatchToProps)(Search);
