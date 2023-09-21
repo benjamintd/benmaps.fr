@@ -20,6 +20,11 @@
       "headers": { "cache-control": "s-maxage=31536000,immutable" },
       "dest": "/static/$1"
     },
+    {
+      "src": "/images/(.*)",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "/images/$1"
+    },
     { "src": "/manifest.json", "dest": "/manifest.json" },
     {
       "src": "/service-worker.js",
