@@ -32,7 +32,7 @@ const defaultAppState = {
   contextMenuActive: false,
   contextMenuCoordinates: null,
   contextMenuPosition: null,
-  contextMenuPlace: null
+  contextMenuPlace: null,
 };
 
 const appReducer = (state = defaultAppState, action) => {
@@ -49,7 +49,7 @@ const appReducer = (state = defaultAppState, action) => {
 
     case "RESET_STATE_KEYS": {
       const modifiedState = {};
-      action.keys.forEach(k => {
+      action.keys.forEach((k) => {
         modifiedState[k] = defaultAppState[k];
       });
       return Object.assign({}, state, modifiedState);
@@ -58,7 +58,7 @@ const appReducer = (state = defaultAppState, action) => {
     case "TRIGGER_MAP_UPDATE":
       return Object.assign({}, state, {
         latestMapUpdate: Date.now(),
-        latestMapRepan: action.needMapRepan ? Date.now() : undefined
+        latestMapRepan: action.needMapRepan ? Date.now() : undefined,
       });
 
     case "SET_USER_LOCATION":
@@ -68,19 +68,19 @@ const appReducer = (state = defaultAppState, action) => {
           center: action.coordinates,
           geometry: {
             type: "Point",
-            coordinates: action.coordinates
-          }
-        }
+            coordinates: action.coordinates,
+          },
+        },
       });
 
     case "SET_DIRECTIONS_LOCATION": {
       if (action.kind === "from") {
         return Object.assign({}, state, {
-          directionsFrom: action.location
+          directionsFrom: action.location,
         });
       } else if (action.kind === "to") {
         return Object.assign({}, state, {
-          directionsTo: action.location
+          directionsTo: action.location,
         });
       } else return state;
     }
@@ -111,11 +111,11 @@ const appReducer = (state = defaultAppState, action) => {
         }
 
         return Object.assign({}, state, {
-          route: route
+          route: route,
         });
       } else {
         return Object.assign({}, state, {
-          routeStatus: "error"
+          routeStatus: "error",
         });
       }
     }
@@ -129,10 +129,10 @@ const appReducer = (state = defaultAppState, action) => {
           center: action.coordinates,
           geometry: {
             type: "Point",
-            coordinates: action.coordinates
-          }
+            coordinates: action.coordinates,
+          },
         },
-        contextMenuActive: true
+        contextMenuActive: true,
       });
     }
 
@@ -141,7 +141,7 @@ const appReducer = (state = defaultAppState, action) => {
         contextMenuCoordinates: null,
         contextMenuPosition: null,
         contextMenuPlace: null,
-        contextMenuActive: false
+        contextMenuActive: false,
       });
     }
 
@@ -157,7 +157,7 @@ const appReducer = (state = defaultAppState, action) => {
 function congestionSegments(line, congestionArray) {
   let featureCollection = {
     type: "FeatureCollection",
-    features: []
+    features: [],
   };
   const coordinates = line.coordinates;
   let prevCongestion = congestionArray[0];
@@ -174,11 +174,11 @@ function congestionSegments(line, congestionArray) {
         type: "Feature",
         geometry: {
           type: "LineString",
-          coordinates: currentCoordinates.slice()
+          coordinates: currentCoordinates.slice(),
         },
         properties: {
-          congestion: prevCongestion
-        }
+          congestion: prevCongestion,
+        },
       };
       featureCollection.features.push(segment);
       currentCoordinates = [];
