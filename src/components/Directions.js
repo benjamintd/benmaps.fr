@@ -7,12 +7,11 @@ import CloseButton from "./CloseButton";
 import RoutePanel from "./RoutePanel";
 import ModalityButtons from "./ModalityButtons";
 import MyLocation from "./MyLocation";
-import swapDirectionsIcon from "../assets/swapDirections.svg";
 import {
   triggerMapUpdate,
   setDirectionsLocation,
   setStateValue,
-  resetStateKeys
+  resetStateKeys,
 } from "../actions/index";
 
 class Directions extends Component {
@@ -27,7 +26,7 @@ class Directions extends Component {
           />
           <ModalityButtons
             modality={this.props.modality}
-            onSetModality={modality => {
+            onSetModality={(modality) => {
               this.props.setModality(modality);
               this.props.resetStateKeys(["route", "routeStatus"]);
               this.props.triggerMapUpdate();
@@ -42,7 +41,7 @@ class Directions extends Component {
               className="flex-child absolute left pl12 w42 h-full flex-parent flex-parent--center-cross flex-parent--center-main"
               onClick={() => this.swapDirections()}
             >
-              <img src={swapDirectionsIcon} alt="swap directions" />
+              <img src="/images/swapDirections.svg" alt="swap directions" />
             </div>
 
             <div className="flex-child w-full h-full">
@@ -66,7 +65,7 @@ class Directions extends Component {
                   <Geocoder
                     onSelect={this.setDirectionsLocation("from")}
                     searchString={this.props.directionsFromString}
-                    writeSearch={value => {
+                    writeSearch={(value) => {
                       this.props.writeSearchFrom(value);
                       this.props.triggerMapUpdate();
                     }}
@@ -93,7 +92,7 @@ class Directions extends Component {
                           "searchLocation",
                           "searchString",
                           "routeStatus",
-                          "directionsTo"
+                          "directionsTo",
                         ]);
                       }}
                     />
@@ -102,7 +101,7 @@ class Directions extends Component {
                   <Geocoder
                     onSelect={this.setDirectionsLocation("to")}
                     searchString={this.props.directionsToString}
-                    writeSearch={value => {
+                    writeSearch={(value) => {
                       this.props.writeSearchTo(value);
                       this.props.triggerMapUpdate();
                     }}
@@ -133,7 +132,7 @@ class Directions extends Component {
   }
 
   setDirectionsLocation(kind) {
-    return location => {
+    return (location) => {
       this.props.setDirectionsLocation(kind, location);
       if (kind === "to") this.props.writeSearchTo(location.place_name);
       if (kind === "from") this.props.writeSearchFrom(location.place_name);
@@ -165,7 +164,7 @@ class Directions extends Component {
       "directionsFromString",
       "directionsToString",
       "directionsFrom",
-      "directionsTo"
+      "directionsTo",
     ]);
     this.props.triggerMapUpdate();
   }
@@ -204,7 +203,7 @@ class Directions extends Component {
       results: "absolute w-full bg-white shadow-darken5 border-darken10",
       row: "flex-child hmin42 w-full w420-mm flex-parent flex-parent--row",
       userLocation:
-        "relative bg-white h42 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-mm"
+        "relative bg-white h42 flex-parent flex-parent--center-cross pr12 cursor-pointer w-full w420-mm",
     };
   }
 }
@@ -226,10 +225,10 @@ Directions.propTypes = {
   triggerMapUpdate: PropTypes.func,
   userLocation: PropTypes.object,
   writeSearchFrom: PropTypes.func,
-  writeSearchTo: PropTypes.func
+  writeSearchTo: PropTypes.func,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     directionsFrom: state.app.directionsFrom,
     directionsFromString: state.app.directionsFromString,
@@ -238,27 +237,25 @@ const mapStateToProps = state => {
     modality: state.app.modality,
     route: state.app.route,
     routeStatus: state.app.routeStatus,
-    userLocation: state.app.userLocation
+    userLocation: state.app.userLocation,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    resetStateKeys: keys => dispatch(resetStateKeys(keys)),
+    resetStateKeys: (keys) => dispatch(resetStateKeys(keys)),
     setDirectionsLocation: (kind, location) =>
       dispatch(setDirectionsLocation(kind, location)),
-    setModality: modality => dispatch(setStateValue("modality", modality)),
-    setMode: mode => dispatch(setStateValue("mode", mode)),
-    setRoute: route => dispatch(setStateValue("route", route)),
+    setModality: (modality) => dispatch(setStateValue("modality", modality)),
+    setMode: (mode) => dispatch(setStateValue("mode", mode)),
+    setRoute: (route) => dispatch(setStateValue("route", route)),
     setStateValue: (k, v) => dispatch(setStateValue(k, v)),
-    triggerMapUpdate: repan => dispatch(triggerMapUpdate(repan)),
-    writeSearchFrom: value =>
+    triggerMapUpdate: (repan) => dispatch(triggerMapUpdate(repan)),
+    writeSearchFrom: (value) =>
       dispatch(setStateValue("directionsFromString", value)),
-    writeSearchTo: value => dispatch(setStateValue("directionsToString", value))
+    writeSearchTo: (value) =>
+      dispatch(setStateValue("directionsToString", value)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Directions);
+export default connect(mapStateToProps, mapDispatchToProps)(Directions);

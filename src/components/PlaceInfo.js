@@ -2,8 +2,6 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import ImageWithFallback from "./ImageWithFallback";
 import { shareableUrl } from "../middlewares/urlTinkerer";
-import directionsIcon from "../assets/directions.svg";
-import copyToClipboardIcon from "../assets/copyToClipboard.svg";
 
 class PlaceInfo extends Component {
   render() {
@@ -35,13 +33,13 @@ class PlaceInfo extends Component {
             } // This won't work everywhere
             className={styles.buttonIcon}
           >
-            <img src={copyToClipboardIcon} alt="copy to clipboard" />
+            <img src="/images/copyToClipboard.svg" alt="copy to clipboard" />
           </div>
           <div
             onClick={this.props.clickDirections}
             className={styles.buttonIcon}
           >
-            <img src={directionsIcon} alt="directions" />
+            <img src="/images/directions.svg" alt="directions" />
           </div>
         </div>
         <Address address={this.props.info.address} />
@@ -111,19 +109,18 @@ const Website = ({ url }) => {
 const styles = {
   buttonIcon:
     "bg-white hmin42 wmin42 hmin48-mm wmin48-mm hmax42 wmax42 hmax48-mm wmax48-mm m6 m12-mm round-full shadow-darken10 cursor-pointer flex-parent flex-parent--center-main flex-parent--center-cross",
-  icon:
-    "flex-parent flex-parent--center-cross flex-parent--center-main w42 h42",
+  icon: "flex-parent flex-parent--center-cross flex-parent--center-main w42 h42",
   infoRow:
     "h24 h36-mm py6 pr12 flex-parent flex-parent--row flex-parent--center-cross",
   mainInfo:
     "p6 flex-child flex-child--grow flex-parent flex-parent--column flex-parent--center-main",
   placeInfo:
-    "place-info absolute top bg-white w-full round w420-mm shadow-darken25 flex-parent flex-parent--column"
+    "place-info absolute top bg-white w-full round w420-mm shadow-darken25 flex-parent flex-parent--column",
 };
 
 PlaceInfo.propTypes = {
   clickDirections: PropTypes.func,
-  info: PropTypes.object
+  info: PropTypes.object,
 };
 
 export default PlaceInfo;
