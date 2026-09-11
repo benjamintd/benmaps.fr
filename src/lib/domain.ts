@@ -30,6 +30,8 @@ export type Route = {
   geometry: GeoJSON.LineString;
   summary: string;
   steps: Step[];
+  // Per-segment congestion (driving-traffic only); length = coordinates - 1.
+  congestion?: string[];
 };
 export type Resource<T> =
   | { status: "idle" }

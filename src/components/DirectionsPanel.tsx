@@ -4,15 +4,15 @@ import {
   ArrowLeft,
   ArrowRight,
   Bike,
-  CarFront,
+  Car,
   Footprints,
   LocateFixed,
   LoaderCircle,
   MapPin,
-  Share2,
   X,
 } from "./Icons";
 import { SearchBox } from "./SearchBox";
+import { RouteElevation } from "./RouteElevation";
 import { distance, duration } from "../lib/domain";
 import type {
   Action,
@@ -21,8 +21,8 @@ import type {
   Place,
   TravelMode,
 } from "../lib/domain";
-const modes: { value: TravelMode; label: string; icon: typeof CarFront }[] = [
-  { value: "driving-traffic", label: "Drive", icon: CarFront },
+const modes: { value: TravelMode; label: string; icon: typeof Car }[] = [
+  { value: "driving-traffic", label: "Drive", icon: Car },
   { value: "walking", label: "Walk", icon: Footprints },
   { value: "cycling", label: "Cycle", icon: Bike },
 ];
@@ -31,8 +31,8 @@ type Props = {
   center: Coordinates;
   dispatch: Dispatch<Action>;
   locate: () => void;
+  useLocation: (endpoint: "from" | "to") => void;
   locating: boolean;
-  share: () => void;
   fly: (coordinates: Coordinates) => void;
   retry: () => void;
 };
@@ -41,8 +41,8 @@ export function DirectionsPanel({
   center,
   dispatch,
   locate,
+  useLocation,
   locating,
-  share,
   fly,
   retry,
 }: Props) {
@@ -82,6 +82,8 @@ export function DirectionsPanel({
             key === "from" ? "Choose starting point" : "Choose destination"
           }
           label={key === "from" ? "Starting point" : "Destination"}
+          onUseLocation={() => useLocation(key)}
+          locating={locating}
         />
       )}
     </div>
@@ -97,13 +99,6 @@ export function DirectionsPanel({
           <ArrowLeft size={21} />
         </button>
         <h1>Directions</h1>
-        <button
-          className="icon-button"
-          aria-label="Share directions"
-          onClick={share}
-        >
-          <Share2 size={18} />
-        </button>
       </header>
       <div className="travel-modes" role="group" aria-label="Travel mode">
         {modes.map(({ value, label, icon: Icon }) => (
@@ -182,6 +177,9 @@ export function DirectionsPanel({
                 </button>
               ))}
             </div>
+            {selected && journey.travelMode === "cycling" && (
+              <RouteElevation key={selected.id} route={selected} />
+            )}
             {selected && (
               <div className="steps">
                 <h2>

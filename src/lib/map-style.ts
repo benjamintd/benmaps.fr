@@ -1,28 +1,48 @@
-import { createStyle } from "@clair-maps/style";
 import type { StyleSpecification } from "maplibre-gl";
 import { config } from "./config";
 import type { MapSettings } from "./domain";
-export function mapStyle(settings: MapSettings): StyleSpecification {
-  const style = createStyle({
-    apiKey: config.protomapsKey,
-    font: "commissioner",
-    ...(config.pmtilesUrl
-      ? {
-          source: {
-            type: "vector" as const,
-            url: `pmtiles://${new URL(config.pmtilesUrl, window.location.origin).href}`,
-            attribution:
-              '<a href="https://protomaps.com">Protomaps</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-          },
-        }
-      : {}),
-    fontBase: `${window.location.origin}/clair`,
-    language: "local",
-    bilingual: false,
-    extrusions: settings.threeDimensional,
-    terrain: settings.threeDimensional,
-    iconStyle: "soft",
-  });
+// Clair's hosted style ships fonts, sprites and an empty Protomaps vector
+// source that we point at our own tile provider. "latest" tracks the newest
+// release; pin a versioned URL here if you need reproducible cartography.
+const STYLE_URL = "https://clair.benmaps.fr/styles/latest/light.json";
+let basePromise: Promise<StyleSpecification> | null = null;
+function loadBaseStyle(): Promise<StyleSpecification> {
+  if (!basePromise)
+    basePromise = fetch(STYLE_URL)
+      .then((response) => {
+        if (!response.ok)
+          throw new Error(`Clair style request failed (${response.status})`);
+        return response.json() as Promise<StyleSpecification>;
+      })
+      .catch((error) => {
+        basePromise = null; // Allow a later retry after a transient failure.
+        throw error;
+      });
+  return basePromise;
+}
+export async function mapStyle(
+  settings: MapSettings,
+): Promise<StyleSpecification> {
+  const style = structuredClone(await loadBaseStyle());
+  // Fill Clair's empty vector source with our tiles (PMTiles or Protomaps API).
+  const protomaps = style.sources.protomaps as unknown as {
+    type: string;
+    tiles?: string[];
+    url?: string;
+  };
+  if (protomaps) {
+    if (config.pmtilesUrl) {
+      protomaps.type = "vector";
+      delete protomaps.tiles;
+      protomaps.url = `pmtiles://${new URL(config.pmtilesUrl, window.location.origin).href}`;
+    } else if (config.protomapsKey) {
+      protomaps.tiles = [
+        `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${encodeURIComponent(config.protomapsKey)}`,
+      ];
+    }
+  }
+  if (settings.threeDimensional)
+    style.terrain = { source: "elevation", exaggeration: 1 };
   const token = config.mapboxToken;
   if (settings.basemap === "satellite" && token) {
     style.sources.satellite = {

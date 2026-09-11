@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useReducer, useRef, useState } from "react";
 import {
-  ArrowDownLeft,
   Check,
   ChevronRight,
   Coffee,
@@ -27,7 +26,7 @@ import {
   Landmark,
 } from "./components/Icons";
 import { reducer, pointPlace } from "./lib/domain";
-import type { Coordinates, Place, Resource } from "./lib/domain";
+import type { Coordinates, Place, Resource, View } from "./lib/domain";
 import { defaultCamera, readCamera, readState, writeState } from "./lib/url";
 import { config } from "./lib/config";
 import { categorySearch, errorMessage } from "./lib/api";
@@ -175,7 +174,7 @@ export default function App() {
       shareDialog.current?.showModal();
     }
   }
-  function locate() {
+  function requestLocation(onLocated: (place: Place, requested: View) => void) {
     if (!navigator.geolocation) {
       setNotice(
         "Your browser doesn’t support location. Search for a starting point instead.",
@@ -195,11 +194,7 @@ export default function App() {
           ...pointPlace(coordinates, "Your location"),
           source: "location",
         };
-        if (currentView.current === requestedView) {
-          if (requestedView.kind === "directions")
-            dispatch({ type: "endpoint", endpoint: "from", place });
-          else dispatch({ type: "select-place", place });
-        }
+        onLocated(place, requestedView);
         fly(coordinates, 15);
       },
       (error) => {
@@ -212,6 +207,17 @@ export default function App() {
       },
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 },
     );
+  }
+  function locate() {
+    requestLocation((place, requested) => {
+      if (currentView.current !== requested) return;
+      if (requested.kind === "directions")
+        dispatch({ type: "endpoint", endpoint: "from", place });
+      else dispatch({ type: "select-place", place });
+    });
+  }
+  function useLocationEndpoint(endpoint: "from" | "to") {
+    requestLocation((place) => dispatch({ type: "endpoint", endpoint, place }));
   }
   const place = state.view.kind === "explore" ? state.view.place : null;
   const categoryLabel = categories.find((c) => c.id === category)?.label;
@@ -236,8 +242,17 @@ export default function App() {
           places={places}
           command={command}
           onPick={pick}
+          onSelectRoute={(index) => dispatch({ type: "route-select", index })}
+          onDragEndpoint={(endpoint, coordinates) =>
+            dispatch({
+              type: "endpoint",
+              endpoint,
+              place: pointPlace(coordinates),
+            })
+          }
           onCenter={setCenter}
           onOrientation={setOrientation}
+          onNotice={setNotice}
         />
       </Suspense>
       <nav className="rail" aria-label="Main navigation">
@@ -353,8 +368,8 @@ export default function App() {
                       dispatch({ type: "directions", from: place });
                     }}
                   >
-                    <ArrowDownLeft size={19} />
                     <span>Directions from here</span>
+                    <Navigation size={18} />
                   </button>
                 </div>
               </section>
@@ -451,8 +466,8 @@ export default function App() {
           center={center}
           dispatch={dispatch}
           locate={locate}
+          useLocation={useLocationEndpoint}
           locating={locating}
-          share={() => void share()}
           fly={fly}
           retry={() => setRouteRetry((n) => n + 1)}
         />
@@ -652,7 +667,6 @@ export default function App() {
           <X size={21} />
         </button>
         <Brand />
-        <h1>About Benmaps</h1>
         <p>
           Benmaps uses Clair cartography, Protomaps data, and MapLibre. Search
           and directions are provided by Mapbox.
@@ -662,7 +676,15 @@ export default function App() {
           <span>
             <strong>Made with Clair</strong>
             <small>
-              Clair 0.5.6 with Commissioner labels. Built on OpenStreetMap data.
+              <a
+                href="https://clair.benmaps.fr"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Clair
+              </a>{" "}
+              is a carefully designed basemap, crafted to be used with
+              Protomaps.
             </small>
           </span>
         </div>
@@ -671,9 +693,10 @@ export default function App() {
           <span>
             <strong>Privacy</strong>
             <small>
-              No Benmaps analytics, accounts, or location history. Map tiles,
-              searches, and route requests go to their respective providers.
-              Your location is requested only when you ask.
+              No analytics, accounts, cookies, or location history. Map tiles,
+              searches, and route requests go anonymously to their respective
+              providers. Your location is requested only when you ask and never
+              shared with us.
             </small>
           </span>
         </div>
@@ -687,13 +710,13 @@ export default function App() {
           <ExternalLink size={16} />
         </a>
         <p className="about-fine">
-          Clair 0.5.6 ·{" "}
+          Clair ·{" "}
           <a href="/clair/LICENSE" target="_blank">
             Clair license
           </a>{" "}
           ·{" "}
           <a href="/clair/THIRD_PARTY.md" target="_blank">
-            Map & font credits
+            Map credits
           </a>
         </p>
       </dialog>

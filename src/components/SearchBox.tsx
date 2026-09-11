@@ -1,5 +1,12 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { ArrowUpLeft, LoaderCircle, MapPin, Search, X } from "./Icons";
+import {
+  ArrowUpLeft,
+  LoaderCircle,
+  LocateFixed,
+  MapPin,
+  Search,
+  X,
+} from "./Icons";
 import { errorMessage, retrieve, suggest } from "../lib/api";
 import type { Suggestion } from "../lib/api";
 import type { Coordinates, Place } from "../lib/domain";
@@ -10,6 +17,8 @@ type Props = {
   placeholder?: string;
   label?: string;
   compact?: boolean;
+  onUseLocation?: () => void;
+  locating?: boolean;
 };
 export function SearchBox({
   center,
@@ -17,6 +26,8 @@ export function SearchBox({
   placeholder = "Search",
   label = "Search places",
   compact = false,
+  onUseLocation,
+  locating = false,
 }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Suggestion[]>([]);
@@ -87,7 +98,9 @@ export function SearchBox({
       }
     }
   }
-  const expanded = open && query.trim().length >= 2;
+  const hasQuery = query.trim().length >= 2;
+  // Open on focus (even with no text) when a "use my location" shortcut exists.
+  const expanded = open && (hasQuery || Boolean(onUseLocation));
   return (
     <div
       className={`search-box ${compact ? "compact" : ""}`}
@@ -106,7 +119,7 @@ export function SearchBox({
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={expanded}
-          aria-controls={expanded ? listId : undefined}
+          aria-controls={hasQuery ? listId : undefined}
           aria-activedescendant={
             active >= 0 ? `${listId}-${active}` : undefined
           }
@@ -163,63 +176,94 @@ export function SearchBox({
       </div>
       {expanded && (
         <div className="suggestions">
-          <div id={listId} role="listbox" aria-label="Search suggestions">
-            {(status === "loading" || status === "retrieving") && (
-              <p className="search-status" role="status">
-                <LoaderCircle className="spin" size={16} />
-                {status === "retrieving" ? "Finding this place…" : "Searching…"}
-              </p>
-            )}
-            {status === "error" && (
-              <div className="search-status error" role="alert">
-                {error}
-                <button
-                  className="text-button"
-                  onClick={() => setRetry((n) => n + 1)}
-                >
-                  Try again
-                </button>
+          {onUseLocation && (
+            <button
+              type="button"
+              className="suggestion location-suggestion"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setOpen(false);
+                setQuery("");
+                onUseLocation();
+              }}
+            >
+              <span className="result-icon location-icon">
+                {locating ? (
+                  <LoaderCircle className="spin" size={18} />
+                ) : (
+                  <LocateFixed size={18} />
+                )}
+              </span>
+              <span>
+                <strong>Your location</strong>
+              </span>
+            </button>
+          )}
+          {hasQuery && (
+            <>
+              <div id={listId} role="listbox" aria-label="Search suggestions">
+                {(status === "loading" || status === "retrieving") && (
+                  <p className="search-status" role="status">
+                    <LoaderCircle className="spin" size={16} />
+                    {status === "retrieving"
+                      ? "Finding this place…"
+                      : "Searching…"}
+                  </p>
+                )}
+                {status === "error" && (
+                  <div className="search-status error" role="alert">
+                    {error}
+                    <button
+                      className="text-button"
+                      onClick={() => setRetry((n) => n + 1)}
+                    >
+                      Try again
+                    </button>
+                  </div>
+                )}
+                {status === "ready" && !results.length && (
+                  <p className="search-status">
+                    No places found. Try a city or a fuller address.
+                  </p>
+                )}
+                {status === "ready" &&
+                  results.map((item, i) => (
+                    <button
+                      type="button"
+                      id={`${listId}-${i}`}
+                      role="option"
+                      aria-selected={i === active}
+                      key={item.mapbox_id}
+                      className={`suggestion ${i === active ? "active" : ""}`}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => void select(item)}
+                    >
+                      <span className="result-icon">
+                        <MapPin size={18} />
+                      </span>
+                      <span>
+                        <strong>{item.name}</strong>
+                        <small>
+                          {item.full_address ?? item.place_formatted}
+                        </small>
+                      </span>
+                      <ArrowUpLeft size={16} />
+                    </button>
+                  ))}
               </div>
-            )}
-            {status === "ready" && !results.length && (
-              <p className="search-status">
-                No places found. Try a city or a fuller address.
-              </p>
-            )}
-            {status === "ready" &&
-              results.map((item, i) => (
-                <button
-                  type="button"
-                  id={`${listId}-${i}`}
-                  role="option"
-                  aria-selected={i === active}
-                  key={item.mapbox_id}
-                  className={`suggestion ${i === active ? "active" : ""}`}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => void select(item)}
-                >
-                  <span className="result-icon">
-                    <MapPin size={18} />
-                  </span>
-                  <span>
-                    <strong>{item.name}</strong>
-                    <small>{item.full_address ?? item.place_formatted}</small>
-                  </span>
-                  <ArrowUpLeft size={16} />
-                </button>
-              ))}
-          </div>
-          {config.mapboxToken && (
-            <div className="search-credit">
-              Search by{" "}
-              <a
-                href="https://www.mapbox.com/about/maps/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Mapbox
-              </a>
-            </div>
+              {config.mapboxToken && (
+                <div className="search-credit">
+                  Search by{" "}
+                  <a
+                    href="https://www.mapbox.com/about/maps/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Mapbox
+                  </a>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

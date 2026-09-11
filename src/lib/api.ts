@@ -34,6 +34,9 @@ const routeSchema = z.object({
   legs: z.array(
     z.object({
       summary: z.string().optional(),
+      annotation: z
+        .object({ congestion: z.array(z.string()).optional() })
+        .optional(),
       steps: z
         .array(
           z.object({
@@ -156,6 +159,8 @@ export async function getRoutes(
           overview: "full",
           steps: "true",
           language: "en",
+          // Congestion annotations are only available on the traffic profile.
+          ...(mode === "driving-traffic" ? { annotations: "congestion" } : {}),
         },
         signal,
       ),
@@ -165,26 +170,59 @@ export async function getRoutes(
     throw new Error(
       "We couldn’t calculate this route. Try moving one of the points.",
     );
-  return (data.routes ?? []).map((route, i) => ({
-    id: String(i),
-    distance: route.distance,
-    duration: route.duration,
-    geometry: route.geometry,
-    summary:
-      route.legs
-        .map((leg) => leg.summary)
-        .filter(Boolean)
-        .join(", ") || "Suggested route",
-    steps: route.legs.flatMap((leg) =>
-      (leg.steps ?? []).map((step) => ({
-        instruction: step.maneuver.instruction,
-        distance: step.distance,
-        coordinates: step.maneuver.location,
-        type: step.maneuver.type,
-        modifier: step.maneuver.modifier,
-      })),
-    ),
-  }));
+  return (data.routes ?? []).map((route, i) => {
+    const congestion = route.legs.flatMap(
+      (leg) => leg.annotation?.congestion ?? [],
+    );
+    return {
+      id: String(i),
+      distance: route.distance,
+      duration: route.duration,
+      geometry: route.geometry,
+      congestion: congestion.length ? congestion : undefined,
+      summary:
+        route.legs
+          .map((leg) => leg.summary)
+          .filter(Boolean)
+          .join(", ") || "Suggested route",
+      steps: route.legs.flatMap((leg) =>
+        (leg.steps ?? []).map((step) => ({
+          instruction: step.maneuver.instruction,
+          distance: step.distance,
+          coordinates: step.maneuver.location,
+          type: step.maneuver.type,
+          modifier: step.maneuver.modifier,
+        })),
+      ),
+    };
+  });
+}
+const tilequerySchema = z.object({
+  features: z.array(
+    z.object({ properties: z.object({ ele: z.number().optional() }) }),
+  ),
+});
+// Sample elevations from Mapbox Terrain contours (same source the old app used).
+// Returns one metre value per input coordinate, or null where terrain is missing.
+export async function getElevations(
+  points: Coordinates[],
+  signal: AbortSignal,
+): Promise<(number | null)[]> {
+  return Promise.all(
+    points.map(async ([lon, lat]) => {
+      const data = tilequerySchema.parse(
+        await request(
+          `v4/mapbox.mapbox-terrain-v2/tilequery/${lon},${lat}.json`,
+          { limit: "50", layers: "contour" },
+          signal,
+        ),
+      );
+      const contours = data.features
+        .map((f) => f.properties.ele)
+        .filter((ele): ele is number => typeof ele === "number");
+      return contours.length ? Math.max(...contours) : null;
+    }),
+  );
 }
 export const errorMessage = (error: unknown) =>
   error instanceof z.ZodError

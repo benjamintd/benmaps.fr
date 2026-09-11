@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Map,
   Marker,
+  Popup,
   LngLatBounds,
   ScaleControl,
   AttributionControl,
@@ -31,8 +32,11 @@ type Props = {
   places: Place[];
   command: MapCommand | null;
   onPick: (place: Place) => void;
+  onSelectRoute: (index: number) => void;
+  onDragEndpoint: (endpoint: "from" | "to", coordinates: Coordinates) => void;
   onCenter: (center: Coordinates) => void;
   onOrientation: (orientation: { bearing: number; pitch: number }) => void;
+  onNotice: (message: string) => void;
 };
 function padding(kind: "explore" | "directions") {
   if (window.innerWidth > 700)
@@ -53,6 +57,7 @@ const empty: GeoJSON.FeatureCollection = {
 export default function MapCanvas(props: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
+  const contextPopup = useRef<Popup | null>(null);
   const latest = useRef(props);
   latest.current = props;
   const [status, setStatus] = useState("Loading map…");
@@ -68,7 +73,6 @@ export default function MapCanvas(props: Props) {
     try {
       map = new Map({
         container: container.current,
-        style: mapStyle(latest.current.state.settings),
         ...readCamera(new URL(window.location.href)),
         minZoom: 1,
         maxZoom: 20,
@@ -85,6 +89,16 @@ export default function MapCanvas(props: Props) {
     appliedStyle.current = JSON.stringify(latest.current.state.settings);
     setStatus("Loading map…");
     setError(null);
+    // Clair's style is fetched over the network, so apply it once it arrives.
+    mapStyle(latest.current.state.settings)
+      .then((style) => {
+        if (mapRef.current === map) map.setStyle(style);
+      })
+      .catch(() =>
+        setError(
+          "Some map details couldn’t load. Check your connection or try again.",
+        ),
+      );
     map.addControl(
       new AttributionControl({
         compact: true,
@@ -152,6 +166,16 @@ export default function MapCanvas(props: Props) {
       )
         return;
       const features = map.queryRenderedFeatures(event.point);
+      // Clicking an alternative route line selects it (prefer a non-selected one).
+      const routeHits = features.filter(
+        (f) => f.layer.id === "journey-line" || f.layer.id === "journey-casing",
+      );
+      if (routeHits.length) {
+        const hit =
+          routeHits.find((f) => !f.properties?.selected) ?? routeHits[0];
+        latest.current.onSelectRoute(Number(hit.properties?.index) || 0);
+        return;
+      }
       const feature = features.find(
         (f) =>
           f.layer.type === "symbol" &&
@@ -175,14 +199,57 @@ export default function MapCanvas(props: Props) {
     map.on("mousemove", (event) => {
       map.getCanvas().style.cursor = map
         .queryRenderedFeatures(event.point)
-        .some((f) => f.layer.type === "symbol")
+        .some(
+          (f) =>
+            f.layer.type === "symbol" ||
+            f.layer.id === "journey-line" ||
+            f.layer.id === "journey-casing",
+        )
         ? "pointer"
         : "";
+    });
+    // Right-click drops a popup pinned to the point with copyable coordinates.
+    map.on("contextmenu", (event) => {
+      const lng = event.lngLat.lng;
+      const lat = event.lngLat.lat;
+      const text = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      contextPopup.current?.remove();
+      const menu = document.createElement("div");
+      menu.className = "context-menu";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "context-coords";
+      const value = document.createElement("strong");
+      value.textContent = text;
+      const hint = document.createElement("small");
+      hint.textContent = "Copy coordinates";
+      button.append(value, hint);
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          latest.current.onNotice("Coordinates copied.");
+        } catch {
+          latest.current.onNotice(text);
+        }
+        contextPopup.current?.remove();
+      });
+      menu.appendChild(button);
+      contextPopup.current = new Popup({
+        closeButton: false,
+        closeOnClick: true,
+        className: "context-popup",
+        offset: 12,
+      })
+        .setLngLat([lng, lat])
+        .setDOMContent(menu)
+        .addTo(map);
     });
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
     return () => {
       resize.disconnect();
+      contextPopup.current?.remove();
+      contextPopup.current = null;
       map.remove();
       mapRef.current = null;
       styleReady.current = false;
@@ -194,11 +261,25 @@ export default function MapCanvas(props: Props) {
     appliedStyle.current = styleKey;
     setError(null);
     styleReady.current = false;
-    map.setStyle(mapStyle(props.state.settings));
-    map.easeTo({
-      pitch: props.state.settings.threeDimensional ? 30 : 0,
-      duration: 600,
-    });
+    let cancelled = false;
+    mapStyle(props.state.settings)
+      .then((style) => {
+        if (cancelled || mapRef.current !== map) return;
+        map.setStyle(style);
+        map.easeTo({
+          pitch: props.state.settings.threeDimensional ? 30 : 0,
+          duration: 600,
+        });
+      })
+      .catch(() => {
+        if (!cancelled)
+          setError(
+            "Some map details couldn’t load. Check your connection or try again.",
+          );
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [styleKey, props.state.settings]);
   // Rehydrate sources after every style load; the React domain is the source of truth.
   useEffect(() => {
@@ -209,42 +290,106 @@ export default function MapCanvas(props: Props) {
     const routes =
       journey?.routes.status === "ready" ? journey.routes.data : [];
     const selected = journey?.selected ?? 0;
+    type RouteProps = {
+      index: number;
+      selected: boolean;
+      congestion: string | null;
+    };
+    const features: GeoJSON.Feature<GeoJSON.LineString, RouteProps>[] = [];
+    routes.forEach((route, i) => {
+      const isSelected = i === selected;
+      const coords = route.geometry.coordinates;
+      const congestion = route.congestion;
+      // Only paint congestion on the selected route, and only when the
+      // annotation lines up with the geometry (driving-traffic mode).
+      if (isSelected && congestion && congestion.length === coords.length - 1) {
+        let start = 0;
+        for (let s = 0; s < congestion.length; s++) {
+          if (
+            s === congestion.length - 1 ||
+            congestion[s + 1] !== congestion[s]
+          ) {
+            features.push({
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: coords.slice(start, s + 2),
+              },
+              properties: {
+                index: i,
+                selected: true,
+                congestion: congestion[s],
+              },
+            });
+            start = s + 1;
+          }
+        }
+      } else {
+        features.push({
+          type: "Feature",
+          geometry: route.geometry,
+          properties: { index: i, selected: isSelected, congestion: null },
+        });
+      }
+    });
+    // Draw alternatives first so the selected route stays on top.
+    features.sort(
+      (a, b) => Number(a.properties.selected) - Number(b.properties.selected),
+    );
     const data: GeoJSON.FeatureCollection = {
       type: "FeatureCollection",
-      features: routes
-        .map((route, i) => ({
-          type: "Feature" as const,
-          geometry: route.geometry,
-          properties: { selected: i === selected },
-        }))
-        .sort(
-          (a, b) =>
-            Number(a.properties.selected) - Number(b.properties.selected),
-        ),
+      features,
     };
     if (!map.getSource("journey")) {
+      // Keep route lines beneath the basemap labels so place names stay legible.
+      const firstSymbol = map
+        .getStyle()
+        .layers?.find((layer) => layer.type === "symbol")?.id;
       map.addSource("journey", { type: "geojson", data: empty });
-      map.addLayer({
-        id: "journey-casing",
-        type: "line",
-        source: "journey",
-        layout: { "line-cap": "round", "line-join": "round" },
-        paint: {
-          "line-color": "#ffffff",
-          "line-width": 10,
-          "line-opacity": 0.95,
+      map.addLayer(
+        {
+          id: "journey-casing",
+          type: "line",
+          source: "journey",
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            "line-color": "#ffffff",
+            "line-width": 10,
+            "line-opacity": 0.95,
+          },
         },
-      });
-      map.addLayer({
-        id: "journey-line",
-        type: "line",
-        source: "journey",
-        layout: { "line-cap": "round", "line-join": "round" },
-        paint: {
-          "line-color": ["case", ["get", "selected"], "#2e6ea2", "#97b8ee"],
-          "line-width": ["case", ["get", "selected"], 6, 4],
+        firstSymbol,
+      );
+      map.addLayer(
+        {
+          id: "journey-line",
+          type: "line",
+          source: "journey",
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            // Selected route: tint moderate/heavy/severe traffic; otherwise blue.
+            // Alternatives stay a muted blue.
+            "line-color": [
+              "case",
+              ["get", "selected"],
+              [
+                "match",
+                ["coalesce", ["get", "congestion"], ""],
+                "moderate",
+                "#f0a03a",
+                "heavy",
+                "#e2603f",
+                "severe",
+                "#a63043",
+                "#2e6ea2",
+              ],
+              "#97b8ee",
+            ],
+            "line-width": ["case", ["get", "selected"], 6, 4],
+          },
         },
-      });
+        firstSymbol,
+      );
     }
     (map.getSource("journey") as GeoJSONSource).setData(data);
   }, [props.state.view, epoch]);
@@ -252,26 +397,40 @@ export default function MapCanvas(props: Props) {
     const map = mapRef.current;
     if (!map) return;
     const view = props.state.view;
-    const list: { place: Place; kind: string; label: string }[] =
-      props.places.map((place, i) => ({
-        place,
-        kind: "result",
-        label: String(i + 1),
-      }));
+    const list: {
+      place: Place;
+      kind: string;
+      label: string;
+      endpoint?: "from" | "to";
+    }[] = props.places.map((place, i) => ({
+      place,
+      kind: "result",
+      label: String(i + 1),
+    }));
     if (view.kind === "explore" && view.place)
       list.push({ place: view.place, kind: "selected", label: "" });
     if (view.kind === "directions") {
       if (view.journey.from)
-        list.push({ place: view.journey.from, kind: "origin", label: "A" });
+        list.push({
+          place: view.journey.from,
+          kind: "origin",
+          label: "A",
+          endpoint: "from",
+        });
       if (view.journey.to)
-        list.push({ place: view.journey.to, kind: "selected", label: "B" });
+        list.push({
+          place: view.journey.to,
+          kind: "selected",
+          label: "B",
+          endpoint: "to",
+        });
     }
-    const markers = list.map(({ place, kind, label }) => {
+    const markers = list.map(({ place, kind, label, endpoint }) => {
       const el = document.createElement("button");
       el.type = "button";
-      el.className = `map-marker ${kind}`;
+      el.className = `map-marker ${kind}${endpoint ? " draggable" : ""}`;
       el.setAttribute("aria-label", place.name);
-      el.title = place.name;
+      el.title = endpoint ? `${place.name} — drag to move` : place.name;
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("viewBox", "0 0 32 39");
       const path = document.createElementNS(
@@ -293,13 +452,35 @@ export default function MapCanvas(props: Props) {
       const inner = document.createElement("span");
       inner.textContent = label || "•";
       graphic.appendChild(inner);
+      let dragged = false;
       el.addEventListener("click", (event) => {
         event.stopPropagation();
+        // A drag ends with a synthetic click; ignore it so we don't re-pick.
+        if (dragged) {
+          dragged = false;
+          return;
+        }
         latest.current.onPick(place);
       });
-      return new Marker({ element: el, anchor: "bottom" })
+      const marker = new Marker({
+        element: el,
+        anchor: "bottom",
+        draggable: Boolean(endpoint),
+      })
         .setLngLat(place.coordinates)
         .addTo(map);
+      if (endpoint) {
+        marker.on("dragstart", () => {
+          dragged = true;
+          el.classList.add("dragging");
+        });
+        marker.on("dragend", () => {
+          el.classList.remove("dragging");
+          const { lng, lat } = marker.getLngLat();
+          latest.current.onDragEndpoint(endpoint, [lng, lat]);
+        });
+      }
+      return marker;
     });
     return () => markers.forEach((marker) => marker.remove());
   }, [props.state.view, props.places]);

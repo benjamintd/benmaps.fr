@@ -68,6 +68,22 @@ button {
 button:hover:not(:disabled) {
   background-color: #f6f5f3;
 }
+/* Link-style actions opt out of the default gray fill: tint the text instead. */
+.start-here:hover:not(:disabled),
+.location-link:hover:not(:disabled) {
+  background-color: transparent;
+  color: #245986;
+}
+/* Rail buttons show the hover wash on the icon chip, not the whole column. */
+.rail-links button:hover:not(:disabled) {
+  background-color: transparent;
+}
+.rail-links button:hover:not(:disabled) > span {
+  background: #f6f5f3;
+}
+.rail-links button.active:hover:not(:disabled) > span {
+  background: #e2ecf9;
+}
 svg {
   flex-shrink: 0;
   vertical-align: middle;
@@ -627,6 +643,16 @@ button small {
   height: 34px;
   border-radius: 50%;
 }
+.location-suggestion strong {
+  color: var(--blue);
+}
+.location-suggestion:last-child {
+  border-bottom: none;
+}
+.location-icon {
+  background: #edf5fb;
+  color: var(--blue);
+}
 .search-credit {
   text-align: right;
   font-size: 9px;
@@ -1091,6 +1117,56 @@ button small {
   padding: 15px;
   text-align: center;
 }
+.elevation {
+  padding: 6px 23px 14px;
+  border-top: 1px solid var(--border);
+}
+.elevation-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #626975;
+  padding: 14px 23px;
+}
+.elevation-summary,
+.elevation-flat {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: #626975;
+  padding: 8px 0 10px;
+}
+.elevation-flat {
+  padding: 14px 23px;
+}
+.elevation-summary span,
+.elevation-flat span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.elevation-flat em {
+  font-style: normal;
+  color: #8a919c;
+}
+.elevation-chart {
+  display: block;
+  width: 100%;
+  height: 72px;
+}
+.elevation-fill {
+  fill: #2abaf7;
+  fill-opacity: 0.18;
+}
+.elevation-stroke {
+  fill: none;
+  stroke: #2abaf7;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
 .map-marker {
   height: 39px;
   width: 32px;
@@ -1137,6 +1213,41 @@ button small {
 }
 .map-marker:hover {
   filter: drop-shadow(0 3px 5px #17396573);
+}
+.context-popup .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px #20242c29;
+  overflow: hidden;
+}
+.context-popup .maplibregl-popup-tip {
+  border-top-color: #fff;
+  border-bottom-color: #fff;
+}
+.context-coords {
+  display: block;
+  text-align: left;
+  padding: 11px 15px;
+  min-width: 150px;
+}
+.context-coords strong {
+  display: block;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.context-coords small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.map-marker.draggable {
+  cursor: grab;
+}
+.map-marker.draggable.dragging {
+  cursor: grabbing;
+  filter: drop-shadow(0 6px 8px #17396580);
 }
 .map-loading,
 .map-notice {
