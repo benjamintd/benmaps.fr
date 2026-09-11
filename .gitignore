@@ -1,15 +1,12 @@
-# dependencies
-/node_modules
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
+node_modules/
+dist/
+public/clair/
+.env*
+!.env.example
+!.env.sample
 .DS_Store
-.env
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*.tsbuildinfo
+playwright-report/
+test-results/
+.sites-runtime/
+.vercel

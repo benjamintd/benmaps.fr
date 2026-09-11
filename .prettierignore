@@ -1,0 +1,5 @@
+node_modules/
+dist/
+public/clair/
+vendor/*.tgz
+package-lock.json
