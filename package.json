@@ -17,6 +17,7 @@
   "dependencies": {
     "@clair-maps/style": "file:vendor/clair-maps-style-0.5.6.tgz",
     "@heroicons/react": "^2.2.0",
+    "lucide-react": "^1.45.0",
     "maplibre-gl": "6.9.0",
     "pmtiles": "^4.3.0",
     "react": "^19.1.1",

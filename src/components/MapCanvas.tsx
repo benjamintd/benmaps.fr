@@ -32,6 +32,7 @@ type Props = {
   command: MapCommand | null;
   onPick: (place: Place) => void;
   onCenter: (center: Coordinates) => void;
+  onOrientation: (orientation: { bearing: number; pitch: number }) => void;
 };
 function padding(kind: "explore" | "directions") {
   if (window.innerWidth > 700)
@@ -122,6 +123,15 @@ export default function MapCanvas(props: Props) {
           : "Some map details couldn’t load. Check your connection or try again.",
       );
     });
+    // Update during gestures and camera animations, not just after they end.
+    const syncOrientation = () =>
+      latest.current.onOrientation({
+        bearing: map.getBearing(),
+        pitch: map.getPitch(),
+      });
+    map.on("rotate", syncOrientation);
+    map.on("pitch", syncOrientation);
+    syncOrientation();
     map.on("moveend", () => {
       const c = map.getCenter();
       const center: Coordinates = [c.lng, c.lat];

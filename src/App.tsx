@@ -20,7 +20,6 @@ import {
   Satellite,
   Share2,
   ShieldCheck,
-  SlidersHorizontal,
   TrafficCone,
   Trees,
   Utensils,
@@ -29,7 +28,7 @@ import {
 } from "./components/Icons";
 import { reducer, pointPlace } from "./lib/domain";
 import type { Coordinates, Place, Resource } from "./lib/domain";
-import { defaultCamera, readState, writeState } from "./lib/url";
+import { defaultCamera, readCamera, readState, writeState } from "./lib/url";
 import { config } from "./lib/config";
 import { categorySearch, errorMessage } from "./lib/api";
 import { useDirections } from "./hooks/useDirections";
@@ -72,6 +71,10 @@ export default function App() {
   const currentView = useRef(state.view);
   currentView.current = state.view;
   const [center, setCenter] = useState<Coordinates>(defaultCamera.center);
+  const [orientation, setOrientation] = useState<{
+    bearing: number;
+    pitch: number;
+  }>(() => readCamera(new URL(window.location.href)));
   const [command, setCommand] = useState<MapCommand | null>(null);
   const commandId = useRef(0);
   const [layersOpen, setLayersOpen] = useState(false);
@@ -234,6 +237,7 @@ export default function App() {
           command={command}
           onPick={pick}
           onCenter={setCenter}
+          onOrientation={setOrientation}
         />
       </Suspense>
       <nav className="rail" aria-label="Main navigation">
@@ -460,8 +464,26 @@ export default function App() {
           title="Reset bearing and tilt"
           onClick={() => setCommand({ id: ++commandId.current, type: "north" })}
         >
-          <Navigation size={20} />
-          <small>N</small>
+          <svg
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+            style={{
+              transform: `rotateX(${orientation.pitch}deg) rotateZ(${-orientation.bearing}deg)`,
+            }}
+          >
+            <circle
+              cx="16"
+              cy="16"
+              r="14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              opacity="0.25"
+            />
+            <path d="M16 4 21 16 16 14 11 16Z" fill="#ce574c" />
+            <path d="M16 28 11 16 16 18 21 16Z" fill="currentColor" />
+            <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+          </svg>
         </button>
         <button
           className="map-control"
@@ -599,7 +621,6 @@ export default function App() {
             <Layers size={20} />
           </span>
           <span>Layers</span>
-          <SlidersHorizontal size={15} />
         </button>
       </div>
       {state.settings.traffic && (

@@ -326,21 +326,12 @@ button small {
   color: #626975;
 }
 .compass {
-  position: relative;
-  height: 51px;
-  gap: 0;
+  perspective: 100px;
 }
 .compass svg {
-  color: #de7767;
-  transform: rotate(-30deg);
-  margin-bottom: 10px;
-  width: 19px;
-}
-.compass small {
-  font-size: 8px;
-  position: absolute;
-  bottom: 6px;
-  font-weight: 500;
+  width: 32px;
+  height: 32px;
+  transform-origin: center;
 }
 .zoom-controls {
   border-radius: 12px;
