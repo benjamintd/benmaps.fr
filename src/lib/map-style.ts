@@ -17,8 +17,8 @@ export function mapStyle(settings: MapSettings): StyleSpecification {
         }
       : {}),
     fontBase: `${window.location.origin}/clair`,
-    language: "en",
-    bilingual: true,
+    language: "local",
+    bilingual: false,
     extrusions: settings.threeDimensional,
     terrain: settings.threeDimensional,
     iconStyle: "soft",
