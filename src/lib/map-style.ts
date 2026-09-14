@@ -10,7 +10,7 @@ const baseStyles = new Map<boolean, Promise<StyleSpecification>>();
 function loadBaseStyle(threeDimensional: boolean): Promise<StyleSpecification> {
   let pending = baseStyles.get(threeDimensional);
   if (!pending) {
-    pending = fetch(`${STYLE_URL}${threeDimensional ? "?3d=1" : ""}`)
+    pending = fetch(`${STYLE_URL}${threeDimensional ? "?3d=1&terrain=1" : ""}`)
       .then((response) => {
         if (!response.ok)
           throw new Error(`Clair style request failed (${response.status})`);
@@ -47,8 +47,6 @@ export async function mapStyle(
       ];
     }
   }
-  if (settings.threeDimensional)
-    style.terrain = { source: "elevation", exaggeration: 1 };
   const token = config.mapboxToken;
   if (settings.basemap === "satellite" && token) {
     style.sources.satellite = {

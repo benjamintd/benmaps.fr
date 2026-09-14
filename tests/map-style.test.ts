@@ -11,10 +11,23 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
     ok: true,
     json: async () => ({
       version: 8,
-      sources: {},
+      sources: {
+        elevation: { type: "raster-dem", tiles: ["https://example.test/dem"] },
+        ...(input.includes("terrain=1")
+          ? {
+              terrain: {
+                type: "raster-dem",
+                tiles: ["https://example.test/dem"],
+              },
+            }
+          : {}),
+      },
+      ...(input.includes("terrain=1")
+        ? { terrain: { source: "terrain", exaggeration: 1 } }
+        : {}),
       layers: [
         { id: "ground", type: "background" },
-        ...(input.endsWith("?3d=1")
+        ...(input.endsWith("?3d=1&terrain=1")
           ? [
               {
                 id: "building-extrusion",
@@ -26,7 +39,9 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
             ]
           : []),
       ],
-      ...(input.endsWith("?3d=1") ? { light: { intensity: 0.4 } } : {}),
+      ...(input.endsWith("?3d=1&terrain=1")
+        ? { light: { intensity: 0.4 } }
+        : {}),
     }),
   }));
   vi.stubGlobal("fetch", request);
@@ -43,7 +58,8 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
   expect(prepare).toHaveBeenCalledWith(volume);
   expect(volume.light).toEqual({ intensity: 0.4 });
   expect(volume.projection).toEqual({ type: "mercator" });
-  expect(volume.terrain?.source).toBe("elevation");
+  expect(volume.terrain?.source).toBe("terrain");
+  expect(volume.sources.terrain).not.toBe(volume.sources.elevation);
   const satellite = await mapStyle({
     ...settings,
     threeDimensional: true,
@@ -56,6 +72,6 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
   expect(restored.projection).toEqual({ type: "mercator" });
   expect(request.mock.calls.map(([url]) => url)).toEqual([
     "https://clair.benmaps.fr/styles/latest/light.json",
-    "https://clair.benmaps.fr/styles/latest/light.json?3d=1",
+    "https://clair.benmaps.fr/styles/latest/light.json?3d=1&terrain=1",
   ]);
 });

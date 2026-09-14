@@ -2,8 +2,8 @@ import type { Map, StyleSpecification } from "maplibre-gl";
 
 export const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
-  "https://clair.benmaps.fr/extensions/0.2.3/clair-3d.js";
-// Explicitly select the growing draft collection for next.benmaps.fr.
+  "https://clair.benmaps.fr/extensions/latest/clair-3d.js";
+// Follow the latest preview collection; the approved channel currently has no models.
 export const LANDMARKS_CATALOGUE_URL =
   import.meta.env.VITE_OPEN_LANDMARKS_CATALOGUE_URL ||
   "https://open-landmarks.benmaps.fr/api/v1/collections/paris/preview.json";
