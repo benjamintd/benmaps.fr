@@ -1,4 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
+const prepare = vi.hoisted(() => vi.fn((style) => style));
+vi.mock("../src/lib/clair-3d", () => ({ prepareLandmarkStyle: prepare }));
 vi.mock("../src/lib/config", () => ({ config: { mapboxToken: "test-token" } }));
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -38,6 +40,7 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
   expect(flat.layers.some((l) => l.type === "fill-extrusion")).toBe(false);
   const volume = await mapStyle({ ...settings, threeDimensional: true });
   expect(volume.layers.some((l) => l.type === "fill-extrusion")).toBe(true);
+  expect(prepare).toHaveBeenCalledWith(volume);
   expect(volume.light).toEqual({ intensity: 0.4 });
   expect(volume.projection).toEqual({ type: "mercator" });
   expect(volume.terrain?.source).toBe("elevation");

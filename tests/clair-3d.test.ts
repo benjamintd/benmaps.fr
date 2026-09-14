@@ -53,6 +53,7 @@ it("rapid toggles remove a late attachment before starting the next one", async 
   expect(addClair3D).toHaveBeenLastCalledWith(
     map,
     expect.objectContaining({
+      replacementMode: "reserve",
       trees: true,
       landmarks: true,
       maxResident: 3,

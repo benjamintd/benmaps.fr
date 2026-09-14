@@ -1,8 +1,8 @@
-import type { Map } from "maplibre-gl";
+import type { Map, StyleSpecification } from "maplibre-gl";
 
 export const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
-  "https://clair.benmaps.fr/extensions/0.2.1/clair-3d.js";
+  "https://clair.benmaps.fr/extensions/0.2.2/clair-3d.js";
 // Explicitly select the growing draft collection for next.benmaps.fr.
 export const LANDMARKS_CATALOGUE_URL =
   import.meta.env.VITE_OPEN_LANDMARKS_CATALOGUE_URL ||
@@ -10,6 +10,7 @@ export const LANDMARKS_CATALOGUE_URL =
 
 type Extension = { remove(): void };
 type SDK = {
+  prepareClair3DStyle?(style: StyleSpecification): StyleSpecification;
   addClair3D(map: Map, options: Record<string, unknown>): Promise<Extension>;
 };
 type Options = {
@@ -17,10 +18,24 @@ type Options = {
   loadSDK?: () => Promise<SDK>;
 };
 
+let sdkModule: Promise<SDK> | undefined;
+function loadHostedSDK(): Promise<SDK> {
+  return (sdkModule ??= import(/* @vite-ignore */ CLAIR_3D_URL).catch(
+    (error) => {
+      sdkModule = undefined;
+      throw error;
+    },
+  ));
+}
+export async function prepareLandmarkStyle(style: StyleSpecification) {
+  const sdk = await loadHostedSDK();
+  return sdk.prepareClair3DStyle?.(style) ?? style;
+}
+
 /** One serialized SDK lifetime per map, including rapid toggles during imports. */
 export function createClair3D(
   map: Map,
-  { onError, loadSDK = () => import(/* @vite-ignore */ CLAIR_3D_URL) }: Options,
+  { onError, loadSDK = loadHostedSDK }: Options,
 ) {
   let extension: Extension | undefined;
   let generation = 0;
@@ -42,6 +57,7 @@ export function createClair3D(
             landmarks: true,
             maxResident: 3,
             maxTrees: 1500,
+            replacementMode: "reserve",
             replacementLayerIds: ["building-extrusion"],
             onError: (error: unknown) => {
               if (!disposed && run === generation) onError(error);
