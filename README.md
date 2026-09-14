@@ -91,6 +91,9 @@ npm run check
 npm test
 npm run build
 npm run format:check
+# One-time browser install, then map gesture and responsive layout checks:
+npx playwright install chromium --only-shell
+npm run test:browser
 ```
 
 Tests cover route invalidation, stale responses, route selection bounds,
@@ -104,3 +107,8 @@ Application code retains its MIT license. Clair is distributed under its own
 license; fonts, map data, and imagery retain their upstream terms. The build
 copies Clair assets and notices to `/clair/`; map attribution stays visible.
 See [vendor/README.md](vendor/README.md) for the pinned dependency's provenance.
+
+Cycling profiles use sampled Mapbox terrain contours, so ascent/descent values
+are estimates. Missing samples appear as gaps. The browser tests use provider
+fixtures while exercising real MapLibre rendering, route selection, endpoint
+dragging, the elevation chart, and search focus spacing.

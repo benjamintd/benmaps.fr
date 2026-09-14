@@ -12,7 +12,8 @@
     "test": "vitest run",
     "check": "tsc -b",
     "format": "prettier --write src tests scripts *.ts *.json *.md *.html",
-    "format:check": "prettier --check src tests scripts *.ts *.json *.md *.html"
+    "format:check": "prettier --check src tests scripts *.ts *.json *.md *.html",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@clair-maps/style": "file:vendor/clair-maps-style-0.5.6.tgz",

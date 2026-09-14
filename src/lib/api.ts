@@ -208,21 +208,32 @@ export async function getElevations(
   points: Coordinates[],
   signal: AbortSignal,
 ): Promise<(number | null)[]> {
-  return Promise.all(
-    points.map(async ([lon, lat]) => {
-      const data = tilequerySchema.parse(
-        await request(
-          `v4/mapbox.mapbox-terrain-v2/tilequery/${lon},${lat}.json`,
-          { limit: "50", layers: "contour" },
-          signal,
-        ),
-      );
-      const contours = data.features
-        .map((f) => f.properties.ele)
-        .filter((ele): ele is number => typeof ele === "number");
-      return contours.length ? Math.max(...contours) : null;
+  const elevations: (number | null)[] = Array(points.length).fill(null);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(6, points.length) }, async () => {
+      while (next < points.length) {
+        signal.throwIfAborted();
+        const index = next++;
+        const [lon, lat] = points[index];
+        const data = tilequerySchema.parse(
+          await request(
+            `v4/mapbox.mapbox-terrain-v2/tilequery/${lon},${lat}.json`,
+            { limit: "50", layers: "contour" },
+            signal,
+          ),
+        );
+        const contours = data.features
+          .map((f) => f.properties.ele)
+          .filter(
+            (ele): ele is number =>
+              typeof ele === "number" && Number.isFinite(ele),
+          );
+        elevations[index] = contours.length ? Math.max(...contours) : null;
+      }
     }),
   );
+  return elevations;
 }
 export const errorMessage = (error: unknown) =>
   error instanceof z.ZodError

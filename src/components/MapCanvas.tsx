@@ -2,6 +2,8 @@ import type * as GeoJSON from "geojson";
 import { useEffect, useRef, useState } from "react";
 import {
   Map,
+  MapMouseEvent,
+  MapTouchEvent,
   Marker,
   Popup,
   LngLatBounds,
@@ -50,6 +52,21 @@ function padding(kind: "explore" | "directions") {
         left: 35,
       };
 }
+const routeLayers = ["journey-line", "journey-casing"];
+function routeAtPoint(map: Map, point: { x: number; y: number }, radius = 8) {
+  const layers = routeLayers.filter((id) => map.getLayer(id));
+  if (!layers.length) return undefined;
+  const hits = map.queryRenderedFeatures(
+    [
+      [point.x - radius, point.y - radius],
+      [point.x + radius, point.y + radius],
+    ],
+    { layers },
+  );
+  const hit = hits.find((feature) => !feature.properties?.selected) ?? hits[0];
+  const index = hit?.properties?.index;
+  return Number.isInteger(index) ? (index as number) : undefined;
+}
 const empty: GeoJSON.FeatureCollection = {
   type: "FeatureCollection",
   features: [],
@@ -58,6 +75,7 @@ export default function MapCanvas(props: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const contextPopup = useRef<Popup | null>(null);
+  const suppressClickUntil = useRef(0);
   const latest = useRef(props);
   latest.current = props;
   const [status, setStatus] = useState("Loading map…");
@@ -160,22 +178,22 @@ export default function MapCanvas(props: Props) {
       window.history.replaceState(null, "", url);
     });
     map.on("click", (event) => {
+      if (performance.now() < suppressClickUntil.current) return;
       if (
         event.originalEvent.target instanceof Element &&
         event.originalEvent.target.closest(".map-marker")
       )
         return;
-      const features = map.queryRenderedFeatures(event.point);
-      // Clicking an alternative route line selects it (prefer a non-selected one).
-      const routeHits = features.filter(
-        (f) => f.layer.id === "journey-line" || f.layer.id === "journey-casing",
+      const index = routeAtPoint(
+        map,
+        event.point,
+        "touches" in event.originalEvent ? 14 : 8,
       );
-      if (routeHits.length) {
-        const hit =
-          routeHits.find((f) => !f.properties?.selected) ?? routeHits[0];
-        latest.current.onSelectRoute(Number(hit.properties?.index) || 0);
+      if (index !== undefined) {
+        latest.current.onSelectRoute(index);
         return;
       }
+      const features = map.queryRenderedFeatures(event.point);
       const feature = features.find(
         (f) =>
           f.layer.type === "symbol" &&
@@ -197,16 +215,13 @@ export default function MapCanvas(props: Props) {
       });
     });
     map.on("mousemove", (event) => {
-      map.getCanvas().style.cursor = map
-        .queryRenderedFeatures(event.point)
-        .some(
-          (f) =>
-            f.layer.type === "symbol" ||
-            f.layer.id === "journey-line" ||
-            f.layer.id === "journey-casing",
-        )
-        ? "pointer"
-        : "";
+      map.getCanvas().style.cursor =
+        routeAtPoint(map, event.point) !== undefined ||
+        map
+          .queryRenderedFeatures(event.point)
+          .some((feature) => feature.layer.type === "symbol")
+          ? "pointer"
+          : "";
     });
     // Right-click drops a popup pinned to the point with copyable coordinates.
     map.on("contextmenu", (event) => {
@@ -393,10 +408,18 @@ export default function MapCanvas(props: Props) {
     }
     (map.getSource("journey") as GeoJSONSource).setData(data);
   }, [props.state.view, epoch]);
+  const viewKind = props.state.view.kind;
+  const selectedPlace =
+    props.state.view.kind === "explore" ? props.state.view.place : null;
+  const from =
+    props.state.view.kind === "directions"
+      ? props.state.view.journey.from
+      : null;
+  const to =
+    props.state.view.kind === "directions" ? props.state.view.journey.to : null;
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    const view = props.state.view;
     const list: {
       place: Place;
       kind: string;
@@ -407,29 +430,33 @@ export default function MapCanvas(props: Props) {
       kind: "result",
       label: String(i + 1),
     }));
-    if (view.kind === "explore" && view.place)
-      list.push({ place: view.place, kind: "selected", label: "" });
-    if (view.kind === "directions") {
-      if (view.journey.from)
+    if (selectedPlace)
+      list.push({ place: selectedPlace, kind: "selected", label: "" });
+    if (viewKind === "directions") {
+      if (from)
         list.push({
-          place: view.journey.from,
+          place: from,
           kind: "origin",
           label: "A",
           endpoint: "from",
         });
-      if (view.journey.to)
+      if (to)
         list.push({
-          place: view.journey.to,
+          place: to,
           kind: "selected",
           label: "B",
           endpoint: "to",
         });
     }
+    const cleanups: (() => void)[] = [];
     const markers = list.map(({ place, kind, label, endpoint }) => {
       const el = document.createElement("button");
       el.type = "button";
       el.className = `map-marker ${kind}${endpoint ? " draggable" : ""}`;
-      el.setAttribute("aria-label", place.name);
+      el.setAttribute(
+        "aria-label",
+        endpoint ? `${label}: ${place.name}` : place.name,
+      );
       el.title = endpoint ? `${place.name} — drag to move` : place.name;
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("viewBox", "0 0 32 39");
@@ -470,20 +497,44 @@ export default function MapCanvas(props: Props) {
         .setLngLat(place.coordinates)
         .addTo(map);
       if (endpoint) {
+        // MapLibre listens for release on its canvas. Controls and panels are
+        // siblings of that canvas, so forward outside releases to finish the drag.
+        const finishOutsideMap = (event: MouseEvent | TouchEvent) => {
+          if (
+            !el.classList.contains("dragging") ||
+            (event.target instanceof Node &&
+              map.getContainer().contains(event.target))
+          )
+            return;
+          if (event.type === "mouseup")
+            map.fire(new MapMouseEvent("mouseup", map, event as MouseEvent));
+          else
+            map.fire(new MapTouchEvent("touchend", map, event as TouchEvent));
+        };
+        document.addEventListener("mouseup", finishOutsideMap, true);
+        document.addEventListener("touchend", finishOutsideMap, true);
+        cleanups.push(() => {
+          document.removeEventListener("mouseup", finishOutsideMap, true);
+          document.removeEventListener("touchend", finishOutsideMap, true);
+        });
         marker.on("dragstart", () => {
           dragged = true;
           el.classList.add("dragging");
         });
         marker.on("dragend", () => {
           el.classList.remove("dragging");
+          suppressClickUntil.current = performance.now() + 250;
           const { lng, lat } = marker.getLngLat();
           latest.current.onDragEndpoint(endpoint, [lng, lat]);
         });
       }
       return marker;
     });
-    return () => markers.forEach((marker) => marker.remove());
-  }, [props.state.view, props.places]);
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+      markers.forEach((marker) => marker.remove());
+    };
+  }, [viewKind, selectedPlace, from, to, props.places, retry]);
   const route =
     props.state.view.kind === "directions" &&
     props.state.view.journey.routes.status === "ready"

@@ -63,6 +63,7 @@ function Brand({ small = false }: { small?: boolean }) {
     </span>
   );
 }
+const noPlaces: Place[] = [];
 export default function App() {
   const [state, dispatch] = useReducer(reducer, undefined, () =>
     readState(new URL(window.location.href)),
@@ -224,7 +225,7 @@ export default function App() {
   const places =
     nearby.status === "ready" && state.view.kind === "explore"
       ? nearby.data
-      : [];
+      : noPlaces;
   return (
     <main
       className={`app ${state.view.kind === "directions" ? "routing" : ""} ${place || category ? "has-detail" : ""}`}
@@ -369,7 +370,7 @@ export default function App() {
                     }}
                   >
                     <span>Directions from here</span>
-                    <Navigation size={18} />
+                    <Navigation size={22} />
                   </button>
                 </div>
               </section>

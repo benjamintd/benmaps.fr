@@ -1,7 +1,6 @@
 import type { Dispatch } from "react";
 import {
   ArrowDownUp,
-  ArrowLeft,
   ArrowRight,
   Bike,
   Car,
@@ -91,14 +90,14 @@ export function DirectionsPanel({
   return (
     <section className="panel directions-panel" aria-label="Route planner">
       <header className="panel-header">
+        <h1>Directions</h1>
         <button
           className="icon-button"
-          aria-label="Back to explore"
+          aria-label="Close directions"
           onClick={() => dispatch({ type: "explore" })}
         >
-          <ArrowLeft size={21} />
+          <X size={21} />
         </button>
-        <h1>Directions</h1>
       </header>
       <div className="travel-modes" role="group" aria-label="Travel mode">
         {modes.map(({ value, label, icon: Icon }) => (

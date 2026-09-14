@@ -196,15 +196,25 @@ button small {
   z-index: 4;
 }
 .search-bar {
+  --search-radius: 17px;
   display: flex;
   align-items: center;
   background: white;
-  border-radius: 17px;
+  border-radius: var(--search-radius);
   box-shadow: var(--shadow);
   height: 57px;
-  padding: 0 10px 0 0;
+  padding: 6px;
+  gap: 4px;
   flex-shrink: 0;
   z-index: 3;
+}
+.search-bar > .search-box {
+  height: 100%;
+}
+.search-bar .search-input-wrap {
+  height: 100%;
+  padding: 0 10px;
+  border-radius: calc(var(--search-radius) - 6px);
 }
 .search-box {
   position: relative;
@@ -941,7 +951,15 @@ button small {
   border: 0;
   color: white;
 }
-.endpoint-row .search-box {
+.endpoint-row .search-bar > .search-box {
+  height: 100%;
+}
+.search-bar .search-input-wrap {
+  height: 100%;
+  padding: 0 10px;
+  border-radius: calc(var(--search-radius) - 6px);
+}
+.search-box {
   background: #f6f5f3;
   border-radius: 8px;
 }
@@ -1129,40 +1147,34 @@ button small {
   color: #626975;
   padding: 14px 23px;
 }
-.elevation-summary,
-.elevation-flat {
+.elevation-summary {
   display: flex;
   align-items: center;
   gap: 16px;
   font-size: 12px;
-  color: #626975;
+  color: var(--muted);
   padding: 8px 0 10px;
 }
-.elevation-flat {
-  padding: 14px 23px;
-}
-.elevation-summary span,
-.elevation-flat span {
+.elevation-summary span {
   display: inline-flex;
   align-items: center;
   gap: 3px;
 }
-.elevation-flat em {
-  font-style: normal;
-  color: #8a919c;
+.elevation-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
 }
 .elevation-chart {
   display: block;
   width: 100%;
   height: 72px;
 }
-.elevation-fill {
-  fill: #2abaf7;
-  fill-opacity: 0.18;
-}
 .elevation-stroke {
   fill: none;
-  stroke: #2abaf7;
+  stroke: var(--accent);
   stroke-width: 1.5;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -1463,8 +1475,8 @@ dialog::backdrop {
     pointer-events: none;
   }
   .search-bar {
+    --search-radius: 16px;
     height: 54px;
-    border-radius: 16px;
     pointer-events: auto;
   }
   .search-input-wrap {
