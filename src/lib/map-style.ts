@@ -24,6 +24,7 @@ export async function mapStyle(
   settings: MapSettings,
 ): Promise<StyleSpecification> {
   const style = structuredClone(await loadBaseStyle());
+  style.projection = { type: settings.threeDimensional ? "globe" : "mercator" };
   // Fill Clair's empty vector source with our tiles (PMTiles or Protomaps API).
   const protomaps = style.sources.protomaps as unknown as {
     type: string;
