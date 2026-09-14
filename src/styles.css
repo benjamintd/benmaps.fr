@@ -307,6 +307,7 @@ button small {
   border-top: 1px solid var(--border);
 }
 .layers-anchor {
+  --layer-control-size: 52px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -316,6 +317,7 @@ button small {
   z-index: 6;
 }
 .layers-toggle {
+  height: var(--layer-control-size);
   background: white;
   border: 1px solid #f6f5f3;
   box-shadow: var(--shadow);
@@ -1208,6 +1210,9 @@ button small {
   max-width: calc(100vw - 40px);
   z-index: 8;
 }
+.map-loading {
+  pointer-events: none;
+}
 .map-notice {
   max-width: 430px;
   color: #855f3f;
@@ -1433,6 +1438,7 @@ dialog::backdrop {
     height: 15px;
   }
   .layers-anchor {
+    --layer-control-size: 42px;
     left: 14px;
     bottom: 310px;
   }
@@ -1594,8 +1600,9 @@ dialog::backdrop {
     max-width: none;
     font-size: 11px;
   }
-  .has-detail .map-notice {
-    bottom: calc(46dvh + 41px);
+  .has-detail .map-notice,
+  .has-detail .map-loading {
+    bottom: calc(46dvh + 100px);
   }
   .traffic-legend {
     bottom: 286px;
@@ -1807,4 +1814,111 @@ dialog::backdrop {
 }
 .about-item > svg {
   color: var(--accent);
+}
+
+/* A single blur per floating surface. Highlights are static CSS gradients and
+   inset shadows; nested controls and suggestion lists do not add blur layers. */
+.app {
+  --glass-fill: #fff;
+  --glass-panel-fill: #fff;
+  --glass-shadow:
+    inset 0 1px 0 #ffffffeb, inset 0 -1px 0 #20242c0a, 0 4px 16px #20242c14,
+    0 1px 3px #20242c0d;
+}
+:is(
+  .search-bar,
+  .category-bar button,
+  .map-controls > .map-control,
+  .zoom-controls,
+  .layers-toggle,
+  .about-toggle,
+  .panel,
+  .layers-panel,
+  .traffic-legend,
+  .map-loading,
+  .map-notice,
+  .about-dialog,
+  .share-dialog
+) {
+  background-color: var(--glass-fill);
+  background-image: linear-gradient(
+    145deg,
+    #ffffff55,
+    #ffffff00 45%,
+    #ffffff14
+  );
+  border-color: #ffffffb3;
+  box-shadow: var(--glass-shadow);
+}
+:is(.panel, .layers-panel, .about-dialog, .share-dialog) {
+  background-color: var(--glass-panel-fill);
+}
+.layers-anchor .about-toggle {
+  width: var(--layer-control-size);
+  height: var(--layer-control-size);
+  border-radius: 50%;
+}
+.zoom-controls .map-control {
+  background: transparent;
+}
+:is(
+    .layers-toggle,
+    .about-toggle,
+    .map-controls > .map-control,
+    .category-bar button
+  ):hover:not(:disabled) {
+  background-color: #fffffff5;
+}
+.category-bar button.active {
+  background-color: #edf5fb;
+  border-color: #b2c8f3;
+}
+.layers-toggle.active {
+  background-color: #edf5fb;
+}
+.suggestions {
+  background: #fffffff7;
+  border-color: #ffffffb3;
+  box-shadow: var(--glass-shadow);
+}
+@supports (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .app {
+    --glass-filter: blur(12px) saturate(1.1);
+    --glass-fill: #ffffffc9;
+    --glass-panel-fill: #ffffffe8;
+  }
+  :is(
+    .search-bar,
+    .category-bar button,
+    .map-controls > .map-control,
+    .zoom-controls,
+    .layers-toggle,
+    .about-toggle,
+    .panel,
+    .layers-panel,
+    .traffic-legend,
+    .map-loading,
+    .map-notice,
+    .about-dialog,
+    .share-dialog
+  ) {
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .app {
+    --glass-filter: none;
+    --glass-fill: #fff;
+    --glass-panel-fill: #fff;
+  }
+  .app dialog::backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .suggestions {
+    background: #fff;
+  }
 }
