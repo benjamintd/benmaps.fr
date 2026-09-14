@@ -1854,8 +1854,9 @@ dialog::backdrop {
   background-color: var(--glass-panel-fill);
 }
 .layers-anchor .about-toggle {
-  width: var(--layer-control-size);
-  height: var(--layer-control-size);
+  width: 28px;
+  height: 28px;
+  padding: 4px;
   border-radius: 50%;
 }
 .zoom-controls .map-control {
