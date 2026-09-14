@@ -5,7 +5,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!assets/|clair/|icons/|favicon\\.(?:svg|png|ico)$|apple-touch-icon\\.png$|social-preview\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$).*)",
+      "source": "/((?!assets/|clair/|trees/|icons/|favicon\\.(?:svg|png|ico)$|apple-touch-icon\\.png$|social-preview\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$).*)",
       "destination": "/index.html"
     }
   ],

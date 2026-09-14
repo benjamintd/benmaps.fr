@@ -296,6 +296,25 @@ export default function MapCanvas(props: Props) {
       cancelled = true;
     };
   }, [styleKey, props.state.settings]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !props.state.settings.threeDimensional) return;
+    let cancelled = false;
+    let trees: import("../lib/trees/renderer").TreeController | undefined;
+    const onError = () => {
+      if (!cancelled) latest.current.onNotice("3D trees couldn’t load.");
+    };
+    void import("../lib/trees/renderer")
+      .then(({ attachTrees }) => {
+        if (!cancelled && mapRef.current === map)
+          trees = attachTrees(map, onError);
+      })
+      .catch(onError);
+    return () => {
+      cancelled = true;
+      trees?.remove();
+    };
+  }, [props.state.settings.threeDimensional, retry]);
   // Rehydrate sources after every style load; the React domain is the source of truth.
   useEffect(() => {
     const map = mapRef.current;

@@ -132,3 +132,20 @@ node scripts/generate-brand-assets.mjs
 
 This uses the Chromium installation from the browser checks. No browser or
 additional image-generation dependencies are required by the Vercel build.
+
+## Procedural trees
+
+3D mode lazy-loads a Three.js custom layer adapted from the Clair 3D experiment.
+Real Protomaps tree points become instanced crowns and trunks from zoom 16, after
+the globe has transitioned to Mercator. Trees sample terrain elevation and sit
+below labels. Shape variation is stable; missing dimensions use estimates.
+
+The renderer caps each view at 3,000 trees, coalesces tile updates, and has no
+continuous animation loop. Switching 3D off restores the flat canopies and frees
+GPU resources. Styles can be replaced without retaining duplicate renderers.
+Coverage follows the tile data; forests are not filled with invented trees.
+
+The port lives in `src/lib/trees/` and ships with Benmaps, independently of the
+Clair style service. Original code and adaptations retain Clair's license;
+Three.js is MIT. Notices are served under `/trees/`. The browser regression uses
+a small synthetic MVT fixture to exercise actual WebGL rendering and lifecycle.
