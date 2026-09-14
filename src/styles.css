@@ -951,15 +951,7 @@ button small {
   border: 0;
   color: white;
 }
-.endpoint-row .search-bar > .search-box {
-  height: 100%;
-}
-.search-bar .search-input-wrap {
-  height: 100%;
-  padding: 0 10px;
-  border-radius: calc(var(--search-radius) - 6px);
-}
-.search-box {
+.endpoint-row .search-box {
   background: #f6f5f3;
   border-radius: 8px;
 }
