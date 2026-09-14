@@ -74,16 +74,6 @@ button:hover:not(:disabled) {
   background-color: transparent;
   color: #245986;
 }
-/* Rail buttons show the hover wash on the icon chip, not the whole column. */
-.rail-links button:hover:not(:disabled) {
-  background-color: transparent;
-}
-.rail-links button:hover:not(:disabled) > span {
-  background: #f6f5f3;
-}
-.rail-links button.active:hover:not(:disabled) > span {
-  background: #e2ecf9;
-}
 svg {
   flex-shrink: 0;
   vertical-align: middle;
@@ -106,24 +96,12 @@ button small {
 }
 .map-canvas {
   position: absolute;
-  inset: 0 0 0 76px;
+  inset: 0;
   z-index: -1;
 }
 .maplibregl-canvas:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: -3px;
-}
-.rail {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 76px;
-  background: #ffffff;
-  border-right: 1px solid #e4e3df;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding: 22px 5px;
-  z-index: 5;
 }
 .brand {
   display: inline-flex;
@@ -141,52 +119,9 @@ button small {
 .brand-dot {
   color: var(--blue);
 }
-.brand-button {
-  padding: 0;
-  border-radius: 13px;
-}
-.small-brand svg {
-  width: 38px;
-  height: 38px;
-}
-.rail-links {
-  margin-top: 39px;
-  display: flex;
-  flex-direction: column;
-  gap: 23px;
-  width: 100%;
-}
-.rail-links button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  border-radius: 12px;
-  padding: 0;
-}
-.rail-links button > span {
-  width: 49px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-}
-.rail-links button.active {
-  color: var(--blue);
-}
-.rail-links button.active > span {
-  background: #edf5fb;
-}
-.rail-about {
-  margin-top: auto;
-  padding: 10px;
-  color: #626975;
-  border-radius: 12px;
-}
 .explore-panel {
   position: absolute;
-  left: 96px;
+  left: max(20px, env(safe-area-inset-left));
   top: 20px;
   width: 360px;
   display: flex;
@@ -292,7 +227,7 @@ button small {
 }
 .category-bar {
   position: absolute;
-  left: 478px;
+  left: 402px;
   top: 26px;
   right: 72px;
   display: flex;
@@ -372,8 +307,11 @@ button small {
   border-top: 1px solid var(--border);
 }
 .layers-anchor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   position: absolute;
-  left: 96px;
+  left: max(20px, env(safe-area-inset-left));
   bottom: 34px;
   z-index: 6;
 }
@@ -873,7 +811,7 @@ button small {
 }
 .directions-panel {
   position: absolute;
-  left: 96px;
+  left: max(20px, env(safe-area-inset-left));
   top: 20px;
   width: 360px;
   max-height: calc(100dvh - 130px);
@@ -1345,6 +1283,8 @@ button small {
   background: #ffffff20 !important;
 }
 dialog {
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
   border: 1px solid #e4e3df;
   border-radius: 23px;
   padding: 35px;
@@ -1453,9 +1393,6 @@ dialog::backdrop {
 @media (max-width: 700px) {
   .map-canvas {
     left: 0;
-  }
-  .rail {
-    display: none;
   }
   .explore-panel {
     left: 12px;
@@ -1837,9 +1774,6 @@ dialog::backdrop {
   --border: var(--line);
   color: var(--ink);
   background: var(--wash);
-}
-.rail {
-  background: var(--paper);
 }
 .secondary-button,
 .start-here {

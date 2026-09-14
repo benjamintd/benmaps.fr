@@ -112,3 +112,23 @@ Cycling profiles use sampled Mapbox terrain contours, so ascent/descent values
 are estimates. Missing samples appear as gaps. The browser tests use provider
 fixtures while exercising real MapLibre rendering, route selection, endpoint
 dragging, the elevation chart, and search focus spacing.
+
+## Site identity
+
+`index.html` supplies the description, canonical URL, Open Graph and Twitter
+previews, favicon links, and web app manifest. `vite.config.ts` uses Vercel's
+build environment to enable indexing and the sitemap only in production;
+preview builds use `noindex` and their own origin for social images. The `next`
+branch uses `next.benmaps.fr`. The canonical URL remains `https://benmaps.fr/`.
+
+The manifest includes regular and maskable home-screen icons. Installed views
+still need an internet connection for maps, search, and directions. To regenerate
+the committed PNG/ICO assets and social preview from the existing SVG logo:
+
+```sh
+node scripts/prepare-assets.mjs
+node scripts/generate-brand-assets.mjs
+```
+
+This uses the Chromium installation from the browser checks. No browser or
+additional image-generation dependencies are required by the Vercel build.

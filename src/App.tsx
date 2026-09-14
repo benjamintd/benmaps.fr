@@ -3,7 +3,6 @@ import {
   Check,
   ChevronRight,
   Coffee,
-  Compass,
   Map as MapIcon,
   ExternalLink,
   Info,
@@ -15,7 +14,6 @@ import {
   Navigation,
   Plus,
   Minus,
-  Route as RouteIcon,
   Satellite,
   Share2,
   ShieldCheck,
@@ -42,9 +40,9 @@ const categories = [
   { id: "park", label: "Parks", icon: Trees, color: "green" },
   { id: "museum", label: "Museums", icon: Landmark, color: "purple" },
 ];
-function Brand({ small = false }: { small?: boolean }) {
+function Brand() {
   return (
-    <span className={`brand ${small ? "small-brand" : ""}`}>
+    <span className="brand">
       <svg viewBox="0 0 40 40" aria-hidden="true">
         <rect width="40" height="40" rx="13" fill="currentColor" />
         <path
@@ -55,11 +53,9 @@ function Brand({ small = false }: { small?: boolean }) {
           strokeLinecap="round"
         />
       </svg>
-      {!small && (
-        <span>
-          benmaps<span className="brand-dot">.</span>
-        </span>
-      )}
+      <span>
+        benmaps<span className="brand-dot">.</span>
+      </span>
     </span>
   );
 }
@@ -155,10 +151,6 @@ export default function App() {
         place,
       });
     } else select(place);
-  }
-  function explore() {
-    dispatch({ type: "explore" });
-    setCategory(null);
   }
   function chooseCategory(id: string) {
     dispatch({ type: "explore" });
@@ -256,49 +248,6 @@ export default function App() {
           onNotice={setNotice}
         />
       </Suspense>
-      <nav className="rail" aria-label="Main navigation">
-        <button
-          className="brand-button"
-          aria-label="Benmaps home"
-          onClick={explore}
-        >
-          <Brand small />
-        </button>
-        <div className="rail-links">
-          <button
-            className={state.view.kind === "explore" ? "active" : ""}
-            aria-label="Explore"
-            aria-current={state.view.kind === "explore" ? "page" : undefined}
-            onClick={explore}
-          >
-            <span>
-              <Compass size={22} />
-            </span>
-            <small>Explore</small>
-          </button>
-          <button
-            className={state.view.kind === "directions" ? "active" : ""}
-            aria-label="Directions"
-            aria-current={state.view.kind === "directions" ? "page" : undefined}
-            onClick={() => {
-              setCategory(null);
-              dispatch({ type: "directions" });
-            }}
-          >
-            <span>
-              <RouteIcon size={22} />
-            </span>
-            <small>Directions</small>
-          </button>
-        </div>
-        <button
-          className="rail-about"
-          aria-label="About Benmaps"
-          onClick={() => about.current?.showModal()}
-        >
-          <Info size={21} />
-        </button>
-      </nav>
       {state.view.kind === "explore" ? (
         <>
           <div className="explore-panel">
@@ -638,6 +587,15 @@ export default function App() {
           </span>
           <span>Layers</span>
         </button>
+        <button
+          className="map-control about-toggle"
+          aria-label="About Benmaps"
+          aria-haspopup="dialog"
+          title="About Benmaps"
+          onClick={() => about.current?.showModal()}
+        >
+          <Info size={20} />
+        </button>
       </div>
       {state.settings.traffic && (
         <div className="traffic-legend">
@@ -659,7 +617,7 @@ export default function App() {
           </button>
         </div>
       )}
-      <dialog ref={about} className="about-dialog">
+      <dialog ref={about} className="about-dialog" aria-label="About Benmaps">
         <button
           className="icon-button dialog-close"
           aria-label="Close about"
