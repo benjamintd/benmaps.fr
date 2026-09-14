@@ -2,7 +2,7 @@ import type { Map, StyleSpecification } from "maplibre-gl";
 
 export const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
-  "https://clair.benmaps.fr/extensions/0.2.2/clair-3d.js";
+  "https://clair.benmaps.fr/extensions/0.2.3/clair-3d.js";
 // Explicitly select the growing draft collection for next.benmaps.fr.
 export const LANDMARKS_CATALOGUE_URL =
   import.meta.env.VITE_OPEN_LANDMARKS_CATALOGUE_URL ||
@@ -57,7 +57,6 @@ export function createClair3D(
             landmarks: true,
             maxResident: 3,
             maxTrees: 1500,
-            replacementMode: "reserve",
             replacementLayerIds: ["building-extrusion"],
             onError: (error: unknown) => {
               if (!disposed && run === generation) onError(error);

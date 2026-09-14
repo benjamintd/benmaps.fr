@@ -118,7 +118,7 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
   await expect
     .poll(() => page.evaluate(() => window.treeTestMap?.isStyleLoaded()))
     .toBe(true);
-  expect(requests.some((url) => url.includes("/extensions/0.2.2/"))).toBe(
+  expect(requests.some((url) => url.includes("/extensions/0.2.3/"))).toBe(
     false,
   );
   await page.getByRole("button", { name: "Layers", exact: true }).click();

@@ -136,7 +136,7 @@ additional image-generation dependencies are required by the Vercel build.
 ## 3D trees and landmarks
 
 The `next` application consumes Clair's versioned CDN SDK at
-`https://clair.benmaps.fr/extensions/0.2.2/clair-3d.js`. The 3D toggle loads its
+`https://clair.benmaps.fr/extensions/0.2.3/clair-3d.js`. The 3D toggle loads its
 renderer and procedural trees together. Flat maps request no SDK, index or models.
 The SDK owns style reloads; the application serializes asynchronous attachment
 and removes late results when 3D is disabled or the map is destroyed.
@@ -156,7 +156,7 @@ styles and traffic overlays can change without adding another renderer.
 Credits link to Open Landmarks' component licenses and editable sources alongside
 the existing map attribution. Model metadata carries per-model provenance. Basemap
 replacement uses polygon-area overlap against loaded tile geometry and filters
-matched feature IDs. Benmaps opts into `replacementMode: "reserve"`: index
+matched feature IDs. Benmaps uses the default `replacementMode: "reserve"`: index
 footprints are reserved before GLB downloads, including failed or capped models.
 Each 3D style is prepared before `setStyle`, keeping extrusions transparent until
 discovery and filtering settle. Metadata failures release that initial gate;
