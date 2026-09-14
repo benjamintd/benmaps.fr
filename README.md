@@ -133,22 +133,30 @@ node scripts/generate-brand-assets.mjs
 This uses the Chromium installation from the browser checks. No browser or
 additional image-generation dependencies are required by the Vercel build.
 
-## Procedural trees
+## 3D trees and landmarks
 
-3D mode lazy-loads a Three.js custom layer adapted from the Clair 3D experiment.
-Real Protomaps tree points become instanced crowns and trunks from zoom 16, after
-the globe has transitioned to Mercator. Trees sample terrain elevation and sit
-below labels. Shape variation is stable; missing dimensions use estimates.
+The `next` application consumes Clair's versioned CDN SDK at
+`https://clair.benmaps.fr/extensions/0.2.0/clair-3d.js`. The 3D toggle loads its
+renderer and procedural trees together. Flat maps request no SDK, index or models.
+The SDK owns style reloads; the application serializes asynchronous attachment
+and removes late results when 3D is disabled or the map is destroyed.
 
-The renderer caps each view at 3,000 trees, coalesces tile updates, and has no
-continuous animation loop. Switching 3D off restores the flat canopies and frees
-GPU resources. Styles can be replaced without retaining duplicate renderers.
-Coverage follows the tile data; forests are not filled with invented trees.
+Open Landmarks independently hosts the index, model files and editable sources.
+This preview explicitly selects the draft Paris collection via `preview.json`;
+the SDK resolves and pins its release for each map session. Configure
+`VITE_OPEN_LANDMARKS_CATALOGUE_URL` to select a pinned catalogue or the approved
+`latest.json` pointer.
+`VITE_CLAIR_3D_URL` optionally overrides the pinned SDK URL.
 
-The port lives in `src/lib/trees/` and ships with Benmaps, independently of the
-Clair style service. Original code and adaptations retain Clair's license;
-Three.js is MIT. Notices are served under `/trees/`. The browser regression uses
-a small synthetic MVT fixture to exercise actual WebGL rendering and lifecycle.
+Models load from zoom 15; instanced trees use real Protomaps points from zoom 16.
+The SDK caps residency at three models and 1,500 trees. No model files or Three.js
+renderer are bundled into the application. Both use Mercator and terrain elevation;
+styles and traffic overlays can change without adding another renderer.
+
+Credits link to Open Landmarks' component licenses and editable sources alongside
+the existing map attribution. Model metadata carries per-model provenance. Basemap
+replacement uses footprint masks; snapshot-specific feature IDs are deliberately
+unset for the live Protomaps API, whose snapshot is not guaranteed to match.
 
 ## Shared views
 
@@ -165,3 +173,4 @@ Browser history and direct hash changes are reflected in the application.
 Routes, search results, photos and current traffic are fetched again; provider
 changes or a different screen size may change those details. Ephemeral loading
 states, notices, focus and geolocation permissions are not part of a shared view.
+

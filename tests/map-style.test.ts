@@ -39,7 +39,7 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
   const volume = await mapStyle({ ...settings, threeDimensional: true });
   expect(volume.layers.some((l) => l.type === "fill-extrusion")).toBe(true);
   expect(volume.light).toEqual({ intensity: 0.4 });
-  expect(volume.projection).toEqual({ type: "globe" });
+  expect(volume.projection).toEqual({ type: "mercator" });
   expect(volume.terrain?.source).toBe("elevation");
   const satellite = await mapStyle({
     ...settings,

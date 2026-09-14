@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-test("3D trees load on demand, render under labels in globe mode, and survive style changes", async ({
+test("3D trees load on demand, render under labels through the Clair CDN SDK, and survive style changes", async ({
   page,
 }, testInfo) => {
   const tile = await readFile(
@@ -31,23 +31,20 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
       response,
       body: body.replace(
         "mapRef.current = map;",
-        "window.treeTestMap = map; mapRef.current = map;",
+        `window.treeTestMap = map;
+        const addLayer = map.addLayer.bind(map);
+        map.addLayer = (layer, before) => {
+          if (layer.id === "open-landmarks-trees") {
+            const render = layer.render.bind(layer);
+            layer.render = (...args) => { render(...args); window.treeDraws = (window.treeDraws || 0) + 1; };
+          }
+          return addLayer(layer, before);
+        };
+        mapRef.current = map;`,
       ),
     });
   });
-  await page.route("**/src/lib/trees/renderer.ts", async (route) => {
-    const response = await route.fetch();
-    const body = await response.text();
-    expect(body).toContain("renderer.render(scene, camera);");
-    await route.fulfill({
-      response,
-      body: body.replace(
-        "renderer.render(scene, camera);",
-        "renderer.render(scene, camera); window.treeDraws = (window.treeDraws || 0) + 1;",
-      ),
-    });
-  });
-  await page.route("https://clair.benmaps.fr/**", (r) =>
+  await page.route("https://clair.benmaps.fr/styles/**", (r) =>
     r.fulfill({
       json: {
         version: 8,
@@ -84,6 +81,16 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
       },
     }),
   );
+  await page.route("https://open-landmarks.benmaps.fr/**", (route) =>
+    route.fulfill({
+      json: {
+        bounds: [2.224, 48.815, 2.422, 48.903],
+        maxHeightM: 0,
+        index: { zoom: 12, template: "/unused/{x}/{y}.json", occupied: [] },
+        assetBase: "/",
+      },
+    }),
+  );
   await page.route("https://api.protomaps.com/**", (r) =>
     r.fulfill({
       body: r.request().url().includes("/14/8298/5636.mvt")
@@ -111,7 +118,7 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
   await expect
     .poll(() => page.evaluate(() => window.treeTestMap?.isStyleLoaded()))
     .toBe(true);
-  expect(requests.some((url) => url.includes("/src/lib/trees/renderer"))).toBe(
+  expect(requests.some((url) => url.includes("/extensions/0.2.0/"))).toBe(
     false,
   );
   await page.getByRole("button", { name: "Layers", exact: true }).click();
@@ -129,11 +136,13 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
     .toBe("none");
   expect(
     await page.evaluate(() => window.treeTestMap.getProjection().type),
-  ).toBe("globe");
+  ).toBe("mercator");
   const order = await page.evaluate(() =>
     window.treeTestMap.getStyle().layers.map((l) => l.id),
   );
-  expect(order.indexOf("benmaps-trees")).toBeLessThan(order.indexOf("labels"));
+  expect(order.indexOf("open-landmarks-trees")).toBeLessThan(
+    order.indexOf("labels"),
+  );
   await page.getByRole("button", { name: "Close map appearance" }).click();
   await page.screenshot({ path: testInfo.outputPath("trees.png") });
   // A style replacement must reconstruct the custom layer and render again.
@@ -153,7 +162,9 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
   await toggle.uncheck();
   await expect
     .poll(() =>
-      page.evaluate(() => !!window.treeTestMap.getLayer("benmaps-trees")),
+      page.evaluate(
+        () => !!window.treeTestMap.getLayer("open-landmarks-trees"),
+      ),
     )
     .toBe(false);
   await expect
@@ -168,7 +179,9 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
   await toggle.check();
   await expect
     .poll(() =>
-      page.evaluate(() => !!window.treeTestMap.getLayer("benmaps-trees")),
+      page.evaluate(
+        () => !!window.treeTestMap.getLayer("open-landmarks-trees"),
+      ),
     )
     .toBe(true);
   await page.evaluate(() => window.treeTestMap.jumpTo({ zoom: 3 }));
@@ -189,5 +202,5 @@ test("3D trees load on demand, render under labels in globe mode, and survive st
     .toBeGreaterThan(distantDraws);
   expect(errors).toEqual([]);
   await expect(page.locator(".map-notice")).toHaveCount(0);
-  await expect(page.getByText("3D trees couldn’t load.")).toHaveCount(0);
+  await expect(page.getByText("Some 3D details couldn’t load.")).toHaveCount(0);
 });

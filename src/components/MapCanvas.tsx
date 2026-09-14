@@ -18,6 +18,7 @@ import { Protocol } from "pmtiles";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { mapStyle } from "../lib/map-style";
 import { hasBasemap } from "../lib/config";
+import { createClair3D } from "../lib/clair-3d";
 import { wikidataId } from "../lib/wikidata";
 import { pointPlace, journeyKey } from "../lib/domain";
 import type { AppState, Coordinates, Place } from "../lib/domain";
@@ -76,6 +77,7 @@ const empty: GeoJSON.FeatureCollection = {
 export default function MapCanvas(props: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
+  const threeD = useRef<ReturnType<typeof createClair3D> | null>(null);
   const contextPopup = useRef<Popup | null>(null);
   const suppressClickUntil = useRef(0);
   const latest = useRef(props);
@@ -109,6 +111,7 @@ export default function MapCanvas(props: Props) {
         maxZoom: 20,
         maxPitch: 60,
         attributionControl: false,
+        canvasContextAttributes: { antialias: true },
       });
     } catch {
       setError(
@@ -117,6 +120,9 @@ export default function MapCanvas(props: Props) {
       return;
     }
     mapRef.current = map;
+    threeD.current = createClair3D(map, {
+      onError: () => latest.current.onNotice("Some 3D details couldn’t load."),
+    });
     const initialStyleKey = JSON.stringify(latest.current.state.settings);
     appliedStyle.current = initialStyleKey;
     setStatus("Loading map…");
@@ -136,8 +142,10 @@ export default function MapCanvas(props: Props) {
     map.addControl(
       new AttributionControl({
         compact: true,
-        customAttribution:
-          '<a href="https://clair.benmaps.fr" target="_blank">Clair</a>',
+        customAttribution: [
+          '<a href="https://clair.benmaps.fr" target="_blank" rel="noopener">Clair</a>',
+          '<a href="https://open-landmarks.benmaps.fr/licenses/" target="_blank" rel="noopener">Open Landmarks contributors · CC BY 4.0</a>',
+        ],
       }),
       "bottom-right",
     );
@@ -281,6 +289,8 @@ export default function MapCanvas(props: Props) {
       resize.disconnect();
       contextPopup.current?.remove();
       contextPopup.current = null;
+      void threeD.current?.remove();
+      threeD.current = null;
       map.remove();
       mapRef.current = null;
       styleReady.current = false;
@@ -320,23 +330,7 @@ export default function MapCanvas(props: Props) {
     };
   }, [styleKey, props.state.settings]);
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !props.state.settings.threeDimensional) return;
-    let cancelled = false;
-    let trees: import("../lib/trees/renderer").TreeController | undefined;
-    const onError = () => {
-      if (!cancelled) latest.current.onNotice("3D trees couldn’t load.");
-    };
-    void import("../lib/trees/renderer")
-      .then(({ attachTrees }) => {
-        if (!cancelled && mapRef.current === map)
-          trees = attachTrees(map, onError);
-      })
-      .catch(onError);
-    return () => {
-      cancelled = true;
-      trees?.remove();
-    };
+    void threeD.current?.setEnabled(props.state.settings.threeDimensional);
   }, [props.state.settings.threeDimensional, retry]);
   // Rehydrate sources after every style load; the React domain is the source of truth.
   useEffect(() => {

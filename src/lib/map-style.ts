@@ -27,7 +27,8 @@ export async function mapStyle(
   settings: MapSettings,
 ): Promise<StyleSpecification> {
   const style = structuredClone(await loadBaseStyle(settings.threeDimensional));
-  style.projection = { type: settings.threeDimensional ? "globe" : "mercator" };
+  // Clair 3D renders in Mercator; terrain and extrusions remain independent.
+  style.projection = { type: "mercator" };
   // Fill Clair's empty vector source with our tiles (PMTiles or Protomaps API).
   const protomaps = style.sources.protomaps as unknown as {
     type: string;
