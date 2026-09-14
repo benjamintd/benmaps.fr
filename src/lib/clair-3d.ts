@@ -2,7 +2,7 @@ import type { Map } from "maplibre-gl";
 
 export const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
-  "https://clair.benmaps.fr/extensions/0.2.0/clair-3d.js";
+  "https://clair.benmaps.fr/extensions/0.2.1/clair-3d.js";
 // Explicitly select the growing draft collection for next.benmaps.fr.
 export const LANDMARKS_CATALOGUE_URL =
   import.meta.env.VITE_OPEN_LANDMARKS_CATALOGUE_URL ||
