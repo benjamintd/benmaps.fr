@@ -59,8 +59,8 @@ an unpublished npm registry package.
   explicit loading/error/retry states, and a render error boundary.
 
 No Benmaps analytics, accounts, or location history. Provider search results are
-kept in memory only; share links contain coordinates and routing mode rather
-than persisted Mapbox result metadata. Map, search, routing, and knowledge
+kept in memory only; shared URLs carry coordinates, place display details and
+view settings. Provider session tokens and result lists are not serialized. Map, search, routing, and knowledge
 requests go to the relevant providers.
 
 ## State and boundaries
@@ -149,3 +149,19 @@ The port lives in `src/lib/trees/` and ships with Benmaps, independently of the
 Clair style service. Original code and adaptations retain Clair's license;
 Three.js is MIT. Notices are served under `/trees/`. The browser regression uses
 a small synthetic MVT fixture to exercise actual WebGL rendering and lifecycle.
+
+## Shared views
+
+The URL restores `basemap=satellite`, `traffic=1`, `3d=1`, selected places and
+endpoints (including names, addresses, categories and Wikidata IDs), travel mode,
+and the selected alternative (`route=2` means the second route). Camera centre,
+zoom, bearing and pitch remain in the hash; loading a shared route keeps that
+camera instead of fitting the route again.
+
+Nearby categories retain their search centre (`category`, `near`). Search drafts
+use `q`, `from_q` and `to_q`; `layers=1` and `about=1` restore the open panels.
+Defaults are omitted, values are validated and text lengths are bounded.
+Browser history and direct hash changes are reflected in the application.
+Routes, search results, photos and current traffic are fetched again; provider
+changes or a different screen size may change those details. Ephemeral loading
+states, notices, focus and geolocation permissions are not part of a shared view.

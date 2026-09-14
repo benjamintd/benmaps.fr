@@ -19,14 +19,16 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { mapStyle } from "../lib/map-style";
 import { hasBasemap } from "../lib/config";
 import { wikidataId } from "../lib/wikidata";
-import { pointPlace } from "../lib/domain";
+import { pointPlace, journeyKey } from "../lib/domain";
 import type { AppState, Coordinates, Place } from "../lib/domain";
-import { cameraHash, readCamera } from "../lib/url";
+import { cameraHash, readCamera, hasCamera } from "../lib/url";
+import type { Camera } from "../lib/url";
 import { LoaderCircle, MapPin, TriangleAlert } from "./Icons";
 setWorkerUrl(workerUrl);
 const protocol = new Protocol();
 addProtocol("pmtiles", protocol.tile);
 export type MapCommand =
+  | { id: number; type: "camera"; camera: Camera }
   | { id: number; type: "zoom-in" | "zoom-out" | "north" }
   | { id: number; type: "fly"; coordinates: Coordinates; zoom?: number };
 type Props = {
@@ -85,6 +87,14 @@ export default function MapCanvas(props: Props) {
   const styleKey = JSON.stringify(props.state.settings);
   const appliedStyle = useRef(styleKey);
   const styleReady = useRef(false);
+  const applied3D = useRef(props.state.settings.threeDimensional);
+  const appliedCameraCommand = useRef<number | null>(null);
+  const preserveRouteCamera = useRef(
+    hasCamera(new URL(window.location.href)) &&
+      props.state.view.kind === "directions"
+      ? journeyKey(props.state.view.journey)
+      : null,
+  );
   useEffect(() => {
     if (!container.current || !hasBasemap) return;
     let map: Map;
@@ -92,6 +102,9 @@ export default function MapCanvas(props: Props) {
       map = new Map({
         container: container.current,
         ...readCamera(new URL(window.location.href)),
+        ...(hasCamera(new URL(window.location.href))
+          ? {}
+          : { pitch: latest.current.state.settings.threeDimensional ? 30 : 0 }),
         minZoom: 1,
         maxZoom: 20,
         maxPitch: 60,
@@ -104,19 +117,22 @@ export default function MapCanvas(props: Props) {
       return;
     }
     mapRef.current = map;
-    appliedStyle.current = JSON.stringify(latest.current.state.settings);
+    const initialStyleKey = JSON.stringify(latest.current.state.settings);
+    appliedStyle.current = initialStyleKey;
     setStatus("Loading map…");
     setError(null);
     // Clair's style is fetched over the network, so apply it once it arrives.
     mapStyle(latest.current.state.settings)
       .then((style) => {
-        if (mapRef.current === map) map.setStyle(style);
+        if (mapRef.current === map && appliedStyle.current === initialStyleKey)
+          map.setStyle(style);
       })
-      .catch(() =>
-        setError(
-          "Some map details couldn’t load. Check your connection or try again.",
-        ),
-      );
+      .catch(() => {
+        if (mapRef.current === map && appliedStyle.current === initialStyleKey)
+          setError(
+            "Some map details couldn’t load. Check your connection or try again.",
+          );
+      });
     map.addControl(
       new AttributionControl({
         compact: true,
@@ -274,6 +290,12 @@ export default function MapCanvas(props: Props) {
     const map = mapRef.current;
     if (!map || appliedStyle.current === styleKey) return;
     appliedStyle.current = styleKey;
+    const dimensionalityChanged =
+      applied3D.current !== props.state.settings.threeDimensional;
+    applied3D.current = props.state.settings.threeDimensional;
+    const restoringCamera =
+      props.command?.type === "camera" &&
+      props.command.id !== appliedCameraCommand.current;
     setError(null);
     styleReady.current = false;
     let cancelled = false;
@@ -281,10 +303,11 @@ export default function MapCanvas(props: Props) {
       .then((style) => {
         if (cancelled || mapRef.current !== map) return;
         map.setStyle(style);
-        map.easeTo({
-          pitch: props.state.settings.threeDimensional ? 30 : 0,
-          duration: 600,
-        });
+        if (dimensionalityChanged && !restoringCamera)
+          map.easeTo({
+            pitch: props.state.settings.threeDimensional ? 30 : 0,
+            duration: 600,
+          });
       })
       .catch(() => {
         if (!cancelled)
@@ -562,6 +585,15 @@ export default function MapCanvas(props: Props) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !route) return;
+    const key =
+      latest.current.state.view.kind === "directions"
+        ? journeyKey(latest.current.state.view.journey)
+        : null;
+    if (key && preserveRouteCamera.current === key) {
+      preserveRouteCamera.current = null;
+      return;
+    }
+    preserveRouteCamera.current = null;
     const bounds = new LngLatBounds();
     route.geometry.coordinates.forEach((c) => bounds.extend([c[0], c[1]]));
     // fitBounds adds its padding to any existing camera padding.
@@ -576,7 +608,15 @@ export default function MapCanvas(props: Props) {
     const map = mapRef.current,
       command = props.command;
     if (!map || !command) return;
-    if (command.type === "zoom-in") map.zoomIn();
+    if (command.type === "camera") {
+      appliedCameraCommand.current = command.id;
+      preserveRouteCamera.current =
+        latest.current.state.view.kind === "directions"
+          ? journeyKey(latest.current.state.view.journey)
+          : null;
+      map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 });
+      map.jumpTo(command.camera);
+    } else if (command.type === "zoom-in") map.zoomIn();
     else if (command.type === "zoom-out") map.zoomOut();
     else if (command.type === "north") map.easeTo({ bearing: 0, pitch: 0 });
     else if (command.type === "fly") {

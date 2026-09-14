@@ -34,6 +34,8 @@ type Props = {
   locating: boolean;
   fly: (coordinates: Coordinates) => void;
   retry: () => void;
+  searches: { from: string; to: string };
+  onSearchChange: (endpoint: "from" | "to", value: string) => void;
 };
 export function DirectionsPanel({
   journey,
@@ -44,6 +46,8 @@ export function DirectionsPanel({
   locating,
   fly,
   retry,
+  searches,
+  onSearchChange,
 }: Props) {
   const selected =
     journey.routes.status === "ready"
@@ -73,6 +77,8 @@ export function DirectionsPanel({
         <SearchBox
           key={key}
           compact
+          value={searches[key]}
+          onValueChange={(value) => onSearchChange(key, value)}
           center={center}
           onSelect={(place) =>
             dispatch({ type: "endpoint", endpoint: key, place })

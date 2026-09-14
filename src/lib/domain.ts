@@ -55,6 +55,7 @@ export type MapSettings = {
 };
 export type AppState = { view: View; settings: MapSettings };
 export type Action =
+  | { type: "restore"; state: AppState }
   | { type: "explore" }
   | { type: "select-place"; place: Place }
   | { type: "directions"; from?: Place; to?: Place }
@@ -77,6 +78,7 @@ export function journeyKey(journey: Journey): string | null {
 }
 const emptyRoutes = { status: "idle" } as const;
 export function reducer(state: AppState, action: Action): AppState {
+  if (action.type === "restore") return action.state;
   if (action.type === "explore")
     return { ...state, view: { kind: "explore", place: null } };
   if (action.type === "select-place")
@@ -131,7 +133,6 @@ export function reducer(state: AppState, action: Action): AppState {
       return journeyKey(journey) === action.key
         ? update({
             routes: { status: "loading", key: action.key },
-            selected: 0,
           })
         : state;
     case "route-result":
@@ -150,7 +151,8 @@ export function reducer(state: AppState, action: Action): AppState {
               message:
                 "No route found. Try different points or a different travel mode.",
             },
-        selected: 0,
+        selected:
+          journey.selected < action.routes.length ? journey.selected : 0,
       });
     case "route-error":
       return journeyKey(journey) === action.key &&

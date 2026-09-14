@@ -19,6 +19,8 @@ type Props = {
   compact?: boolean;
   onUseLocation?: () => void;
   locating?: boolean;
+  value?: string;
+  onValueChange?: (value: string) => void;
 };
 export function SearchBox({
   center,
@@ -28,14 +30,21 @@ export function SearchBox({
   compact = false,
   onUseLocation,
   locating = false,
+  value,
+  onValueChange,
 }: Props) {
-  const [query, setQuery] = useState("");
+  const [localQuery, setLocalQuery] = useState("");
+  const query = value ?? localQuery;
+  function setQuery(next: string) {
+    setLocalQuery(next);
+    onValueChange?.(next);
+  }
   const [results, setResults] = useState<Suggestion[]>([]);
   const [status, setStatus] = useState<
     "idle" | "loading" | "ready" | "retrieving" | "error"
   >("idle");
   const [error, setError] = useState("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(Boolean(value));
   const [active, setActive] = useState(-1);
   const [retry, setRetry] = useState(0);
   const session = useRef(crypto.randomUUID());

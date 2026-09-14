@@ -105,6 +105,14 @@ test("select a map alternative, drag both endpoints, and show flat cycling eleva
     page.getByRole("button", { name: /11 min.*Alternative street/ }),
   ).toHaveAttribute("aria-pressed", "true");
   await page.waitForTimeout(1000);
+  expect(new URL(page.url()).searchParams.get("route")).toBe("2");
+  const sharedCamera = new URL(page.url()).hash;
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: /11 min.*Alternative street/ }),
+  ).toHaveAttribute("aria-pressed", "true");
+  expect(new URL(page.url()).hash).toBe(sharedCamera);
+  await page.waitForTimeout(1000);
   for (const endpoint of ["from", "to"] as const) {
     const selector =
       endpoint === "from" ? ".map-marker.origin" : ".map-marker.selected";

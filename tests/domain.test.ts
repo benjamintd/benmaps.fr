@@ -89,14 +89,14 @@ describe("journey state invariants", () => {
   });
 });
 describe("share links and legacy URLs", () => {
-  it("round trips coordinates and modes without persisting provider search details", () => {
+  it("round trips coordinates, modes and place display names", () => {
     const state = reducer(defaultState, { type: "directions", from, to });
     const url = writeState(
       new URL("https://benmaps.fr/?pin=1,2#14/48.86/2.33"),
       state,
     );
     expect(url.searchParams.has("pin")).toBe(false);
-    expect(url.toString()).not.toContain("Louvre");
+    expect(url.searchParams.get("from_name")).toBe("Louvre");
     const restored = journey(readState(url));
     expect(restored.from?.coordinates).toEqual(from.coordinates);
     expect(restored.to?.coordinates).toEqual(to.coordinates);

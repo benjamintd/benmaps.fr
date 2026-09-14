@@ -5,25 +5,28 @@ import type { MapSettings } from "./domain";
 // source that we point at our own tile provider. "latest" tracks the newest
 // release; pin a versioned URL here if you need reproducible cartography.
 const STYLE_URL = "https://clair.benmaps.fr/styles/latest/light.json";
-let basePromise: Promise<StyleSpecification> | null = null;
-function loadBaseStyle(): Promise<StyleSpecification> {
-  if (!basePromise)
-    basePromise = fetch(STYLE_URL)
+const baseStyles = new Map<boolean, Promise<StyleSpecification>>();
+function loadBaseStyle(threeDimensional: boolean): Promise<StyleSpecification> {
+  let pending = baseStyles.get(threeDimensional);
+  if (!pending) {
+    pending = fetch(`${STYLE_URL}${threeDimensional ? "?3d=1" : ""}`)
       .then((response) => {
         if (!response.ok)
           throw new Error(`Clair style request failed (${response.status})`);
         return response.json() as Promise<StyleSpecification>;
       })
       .catch((error) => {
-        basePromise = null; // Allow a later retry after a transient failure.
+        baseStyles.delete(threeDimensional);
         throw error;
       });
-  return basePromise;
+    baseStyles.set(threeDimensional, pending);
+  }
+  return pending;
 }
 export async function mapStyle(
   settings: MapSettings,
 ): Promise<StyleSpecification> {
-  const style = structuredClone(await loadBaseStyle());
+  const style = structuredClone(await loadBaseStyle(settings.threeDimensional));
   style.projection = { type: settings.threeDimensional ? "globe" : "mercator" };
   // Fill Clair's empty vector source with our tiles (PMTiles or Protomaps API).
   const protomaps = style.sources.protomaps as unknown as {

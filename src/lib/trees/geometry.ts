@@ -32,7 +32,12 @@ export function createTrees(
   crown.computeVertexNormals();
   const canopy = new InstancedMesh(
     crown,
-    new MeshLambertMaterial({ color: "#ffffff" }),
+    new MeshLambertMaterial({
+      color: "#ffffff",
+      emissive: canopyColor,
+      // Keep shaded faces near the lightness of Clair’s flat tree canopies.
+      emissiveIntensity: 0.55,
+    }),
     records.length,
   );
   const trunks = new InstancedMesh(
@@ -64,7 +69,7 @@ export function createTrees(
     transform.updateMatrix();
     canopy.setMatrixAt(i, transform.matrix);
     // Use the basemap's actual canopy color; vary brightness, never hue.
-    color.set(canopyColor).multiplyScalar(0.78 + t.seed * 0.16);
+    color.set(canopyColor).multiplyScalar(0.96 + t.seed * 0.08);
     canopy.setColorAt(i, color);
     transform.position.set(x, base + t.height * 0.24 * ratio, z);
     transform.scale.set(ratio, t.height * 0.48 * ratio, ratio);

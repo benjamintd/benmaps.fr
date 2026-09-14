@@ -25,7 +25,7 @@ import {
 } from "./components/Icons";
 import { reducer, pointPlace } from "./lib/domain";
 import type { Coordinates, Place, Resource, View } from "./lib/domain";
-import { defaultCamera, readCamera, readState, writeState } from "./lib/url";
+import { readCamera, readState, readUiState, writeState } from "./lib/url";
 import { config } from "./lib/config";
 import { categorySearch, errorMessage } from "./lib/api";
 import { useDirections } from "./hooks/useDirections";
@@ -61,22 +61,34 @@ function Brand() {
 }
 const noPlaces: Place[] = [];
 export default function App() {
+  const [initialUrl] = useState(() => new URL(window.location.href));
+  const [initialUi] = useState(() => readUiState(initialUrl));
   const [state, dispatch] = useReducer(reducer, undefined, () =>
-    readState(new URL(window.location.href)),
+    readState(initialUrl),
   );
   const currentView = useRef(state.view);
   currentView.current = state.view;
-  const [center, setCenter] = useState<Coordinates>(defaultCamera.center);
+  const [center, setCenter] = useState<Coordinates>(
+    () => readCamera(initialUrl).center,
+  );
   const [orientation, setOrientation] = useState<{
     bearing: number;
     pitch: number;
   }>(() => readCamera(new URL(window.location.href)));
   const [command, setCommand] = useState<MapCommand | null>(null);
   const commandId = useRef(0);
-  const [layersOpen, setLayersOpen] = useState(false);
-  const [category, setCategory] = useState<string | null>(null);
+  const [layersOpen, setLayersOpen] = useState(initialUi.layersOpen);
+  const [aboutOpen, setAboutOpen] = useState(initialUi.aboutOpen);
+  const [search, setSearch] = useState(initialUi.search);
+  const [searches, setSearches] = useState({
+    from: initialUi.fromSearch,
+    to: initialUi.toSearch,
+  });
+  const [category, setCategory] = useState<string | null>(initialUi.category);
   const [nearby, setNearby] = useState<Resource<Place[]>>({ status: "idle" });
-  const [categoryCenter, setCategoryCenter] = useState(center);
+  const [categoryCenter, setCategoryCenter] = useState(
+    initialUi.categoryCenter,
+  );
   const [categoryRetry, setCategoryRetry] = useState(0);
   const [routeRetry, setRouteRetry] = useState(0);
   const [notice, setNotice] = useState("");
@@ -86,13 +98,56 @@ export default function App() {
   const shareDialog = useRef<HTMLDialogElement>(null);
   const layerPanel = useRef<HTMLDivElement>(null);
   useDirections(state.view, dispatch, routeRetry);
+  const sharedUi = {
+    layersOpen,
+    aboutOpen,
+    category,
+    categoryCenter,
+    search,
+    fromSearch: searches.from,
+    toSearch: searches.to,
+  };
+  useEffect(() => {
+    if (aboutOpen && !about.current?.open) about.current?.showModal();
+    else if (!aboutOpen && about.current?.open) about.current.close();
+  }, [aboutOpen]);
+  useEffect(() => {
+    function restore() {
+      const url = new URL(window.location.href),
+        ui = readUiState(url),
+        camera = readCamera(url);
+      dispatch({ type: "restore", state: readState(url) });
+      setLayersOpen(ui.layersOpen);
+      setAboutOpen(ui.aboutOpen);
+      setCategory(ui.category);
+      setCategoryCenter(ui.categoryCenter);
+      setSearch(ui.search);
+      setSearches({ from: ui.fromSearch, to: ui.toSearch });
+      setCenter(camera.center);
+      setCommand({ id: ++commandId.current, type: "camera", camera });
+    }
+    window.addEventListener("popstate", restore);
+    window.addEventListener("hashchange", restore);
+    return () => {
+      window.removeEventListener("popstate", restore);
+      window.removeEventListener("hashchange", restore);
+    };
+  }, []);
   useEffect(() => {
     window.history.replaceState(
       null,
       "",
-      writeState(new URL(window.location.href), state),
+      writeState(new URL(window.location.href), state, sharedUi),
     );
-  }, [state]);
+  }, [
+    state,
+    layersOpen,
+    aboutOpen,
+    category,
+    categoryCenter,
+    search,
+    searches,
+  ]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 6000);
@@ -158,7 +213,11 @@ export default function App() {
     setCategoryCenter(center);
   }
   async function share() {
-    const url = writeState(new URL(window.location.href), state).toString();
+    const url = writeState(
+      new URL(window.location.href),
+      state,
+      sharedUi,
+    ).toString();
     try {
       await navigator.clipboard.writeText(url);
       setNotice("Link copied.");
@@ -252,7 +311,12 @@ export default function App() {
         <>
           <div className="explore-panel">
             <div className="search-bar">
-              <SearchBox center={center} onSelect={select} />
+              <SearchBox
+                center={center}
+                onSelect={select}
+                value={search}
+                onValueChange={setSearch}
+              />
               <span className="search-divider" />
               <button
                 className="icon-button search-directions"
@@ -420,6 +484,10 @@ export default function App() {
           locating={locating}
           fly={fly}
           retry={() => setRouteRetry((n) => n + 1)}
+          searches={searches}
+          onSearchChange={(endpoint, value) =>
+            setSearches((old) => ({ ...old, [endpoint]: value }))
+          }
         />
       )}
       <div className="map-controls">
@@ -592,7 +660,7 @@ export default function App() {
           aria-label="About Benmaps"
           aria-haspopup="dialog"
           title="About Benmaps"
-          onClick={() => about.current?.showModal()}
+          onClick={() => setAboutOpen(true)}
         >
           <Info size={20} />
         </button>
@@ -617,11 +685,17 @@ export default function App() {
           </button>
         </div>
       )}
-      <dialog ref={about} className="about-dialog" aria-label="About Benmaps">
+      <dialog
+        ref={about}
+        className="about-dialog"
+        aria-label="About Benmaps"
+        onClose={() => setAboutOpen(false)}
+        onCancel={() => setAboutOpen(false)}
+      >
         <button
           className="icon-button dialog-close"
           aria-label="Close about"
-          onClick={() => about.current?.close()}
+          onClick={() => setAboutOpen(false)}
         >
           <X size={21} />
         </button>
