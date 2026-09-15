@@ -178,7 +178,7 @@ for (const emptyModel of [false, true])
     await expect.poll(() => requested, { timeout: 15_000 }).toBe(1);
     const inspect = () =>
       page.evaluate((id) => {
-        const map = (window as any).landmarkMap;
+        const map = window.__map!;
         return {
           opacity:
             map.getPaintProperty(
@@ -193,7 +193,7 @@ for (const emptyModel of [false, true])
                 layer.paint?.["fill-extrusion-opacity"] === 0 &&
                 JSON.stringify(layer.filter).includes(String(id)),
             ),
-          filters: (window as any).filterChanges,
+          filters: window.filterChanges,
           loaded: map.isSourceLoaded("buildings"),
         };
       }, fixture.expectedIds[0]);
@@ -204,10 +204,10 @@ for (const emptyModel of [false, true])
     });
     const expectGroundVisible = async () => {
       const color = await page.evaluate(async () => {
-        const map = (window as any).landmarkMap;
+        const map = window.__map!;
         return new Promise<number[]>((resolve) => {
           map.once("render", () => {
-            const gl = map.getCanvas().getContext("webgl2");
+            const gl = map.getCanvas().getContext("webgl2")!;
             const pixel = new Uint8Array(4);
             // This corner stays outside the fixture buildings at the tested bearing.
             gl.readPixels(
@@ -232,7 +232,7 @@ for (const emptyModel of [false, true])
     const partitionFilters = (await inspect()).filters;
     for (let i = 0; i < 6; i++) {
       await page.evaluate(async (i) => {
-        const map = (window as any).landmarkMap;
+        const map = window.__map!;
         await new Promise<void>((resolve) => {
           map.once("moveend", () => resolve());
           map.easeTo({
@@ -252,13 +252,9 @@ for (const emptyModel of [false, true])
     }
     expect(requested).toBe(1);
     for (let i = 0; i < 2; i++) {
-      await page.evaluate(() =>
-        (window as any).landmarkMap.jumpTo({ zoom: 14.7 }),
-      );
+      await page.evaluate(() => window.__map!.jumpTo({ zoom: 14.7 }));
       await expect.poll(async () => (await inspect()).replaced).toBe(false);
-      await page.evaluate(() =>
-        (window as any).landmarkMap.jumpTo({ zoom: 17.1 }),
-      );
+      await page.evaluate(() => window.__map!.jumpTo({ zoom: 17.1 }));
       await expect.poll(async () => (await inspect()).replaced).toBe(true);
       expect(requested).toBe(1);
       await expectGroundVisible();
@@ -283,7 +279,7 @@ for (const emptyModel of [false, true])
       );
       await page.evaluate(
         (center) =>
-          (window as any).landmarkMap.jumpTo({
+          window.__map!.jumpTo({
             center,
             zoom: 19,
             pitch: 0,
@@ -295,9 +291,9 @@ for (const emptyModel of [false, true])
       const color = await page.evaluate(
         () =>
           new Promise<number[]>((resolve) => {
-            const map = (window as any).landmarkMap;
+            const map = window.__map!;
             map.once("render", () => {
-              const gl = map.getCanvas().getContext("webgl2"),
+              const gl = map.getCanvas().getContext("webgl2")!,
                 pixel = new Uint8Array(4);
               gl.readPixels(
                 Math.floor(gl.drawingBufferWidth / 2),

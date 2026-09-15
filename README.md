@@ -151,8 +151,7 @@ This preview explicitly selects the draft Paris collection via `preview.json`;
 the SDK resolves and pins its release for each map session. Configure
 `VITE_OPEN_LANDMARKS_CATALOGUE_URL` to select a pinned catalogue or the approved
 `latest.json` pointer.
-`VITE_CLAIR_3D_URL` optionally overrides the SDK URL. The moving alias currently
-resolves to immutable SDK 0.2.8.
+`VITE_CLAIR_3D_URL` optionally overrides the SDK URL. The moving alias resolves to an immutable versioned SDK.
 
 Models load from zoom 15; instanced trees use real Protomaps points from zoom 16.
 The SDK caps residency at three models and 1,500 trees. No model files or Three.js
