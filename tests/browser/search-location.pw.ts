@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { captureMap } from "./support/map";
 
 declare global {
   interface Window {
@@ -84,6 +85,84 @@ test("a current location result selects the place", async ({ page }) => {
   ).toBeVisible();
   expect(new URL(page.url()).searchParams.get("pin")).toBe("2.35,48.87");
 });
+
+for (const located of [false, true]) {
+  test(`searches use ${located ? "the user location" : "the map center"} after moving the map`, async ({
+    page,
+    context,
+  }) => {
+    await captureMap(page);
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ longitude: 2.35, latitude: 48.87 });
+    const categoryRequests: URL[] = [];
+    const suggestionRequests: URL[] = [];
+    await page.route(
+      "https://api.mapbox.com/search/searchbox/v1/category/**",
+      (route) => {
+        categoryRequests.push(new URL(route.request().url()));
+        return route.fulfill({ json: { features: [] } });
+      },
+    );
+    await page.route(
+      "https://api.mapbox.com/search/searchbox/v1/suggest?**",
+      (route) => {
+        suggestionRequests.push(new URL(route.request().url()));
+        return route.fulfill({ json: { suggestions: [] } });
+      },
+    );
+    await page.goto("/#13/48.86/2.34/0/0");
+    await expect.poll(() => page.evaluate(() => !!window.__map)).toBe(true);
+    if (located) {
+      await page
+        .getByRole("button", { name: "My location", exact: true })
+        .click();
+      await expect(
+        page.getByRole("heading", { name: "Your location", exact: true }),
+      ).toBeVisible();
+    }
+    await page.evaluate(() => {
+      window.__map!.stop();
+      window.__map!.jumpTo({ center: [4, 45], zoom: 13 });
+    });
+    const expectedCenter = located ? [2.35, 48.87] : [4, 45];
+    const proximity = (url: URL) =>
+      url.searchParams.get("proximity")!.split(",").map(Number);
+    for (const name of ["Restaurants", "Coffee"]) {
+      const before = categoryRequests.length;
+      await page.getByRole("button", { name, exact: true }).click();
+      await expect.poll(() => categoryRequests.length).toBe(before + 1);
+      const actual = proximity(categoryRequests.at(-1)!);
+      expect(actual[0]).toBeCloseTo(expectedCenter[0], 5);
+      expect(actual[1]).toBeCloseTo(expectedCenter[1], 5);
+    }
+    const before = categoryRequests.length;
+    await page
+      .getByRole("button", {
+        name: located ? "Search near me" : "Search this area",
+        exact: true,
+      })
+      .click();
+    await expect.poll(() => categoryRequests.length).toBe(before + 1);
+    expect(proximity(categoryRequests.at(-1)!)[0]).toBeCloseTo(
+      expectedCenter[0],
+      5,
+    );
+    expect(proximity(categoryRequests.at(-1)!)[1]).toBeCloseTo(
+      expectedCenter[1],
+      5,
+    );
+    await page.getByRole("combobox", { name: "Search places" }).fill("Cafe");
+    await expect.poll(() => suggestionRequests.length).toBeGreaterThan(0);
+    expect(proximity(suggestionRequests.at(-1)!)[0]).toBeCloseTo(
+      expectedCenter[0],
+      5,
+    );
+    expect(proximity(suggestionRequests.at(-1)!)[1]).toBeCloseTo(
+      expectedCenter[1],
+      5,
+    );
+  });
+}
 
 test("dismissing a pending search retrieval restores usable suggestions", async ({
   page,

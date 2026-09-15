@@ -46,6 +46,8 @@ export default function App() {
   const [center, setCenter] = useState<Coordinates>(
     () => cameraOrDefault(initialUrl).center,
   );
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+  const searchCenter = userLocation ?? center;
   const [orientation, setOrientation] = useState<{
     bearing: number;
     pitch: number;
@@ -124,7 +126,7 @@ export default function App() {
     } else select(place);
   }
   function chooseCategory(id: CategoryId) {
-    dispatch({ type: "choose-category", id, center });
+    dispatch({ type: "choose-category", id, center: searchCenter });
   }
   async function share() {
     const url = writeState(new URL(window.location.href), state).toString();
@@ -140,6 +142,8 @@ export default function App() {
     view: state.view,
     onNotice: setNotice,
     onLocated: (place, endpoint) => {
+      setUserLocation(place.coordinates);
+      if (category) setUi({ categoryCenter: place.coordinates });
       if (endpoint) dispatch({ type: "endpoint", endpoint, place });
       else dispatch({ type: "select-place", place });
       fly(place.coordinates, 15);
@@ -186,7 +190,7 @@ export default function App() {
           <div className="explore-panel">
             <div className="search-bar">
               <SearchBox
-                center={center}
+                center={searchCenter}
                 onSelect={select}
                 value={search}
                 onValueChange={(value) => setUi({ search: value })}
@@ -263,7 +267,9 @@ export default function App() {
               >
                 <header className="panel-header">
                   <div>
-                    <span className="eyebrow">Around this area</span>
+                    <span className="eyebrow">
+                      {userLocation ? "Around you" : "Around this area"}
+                    </span>
                     <h1>{categoryLabel}</h1>
                   </div>
                   <button
@@ -277,12 +283,12 @@ export default function App() {
                 <button
                   className="search-area"
                   onClick={() => {
-                    setUi({ categoryCenter: center });
+                    setUi({ categoryCenter: searchCenter });
                     setCategoryRetry((n) => n + 1);
                   }}
                 >
                   <Crosshair size={16} />
-                  Search this area
+                  {userLocation ? "Search near me" : "Search this area"}
                 </button>
                 {nearby.status === "loading" && (
                   <p className="search-status">
@@ -299,7 +305,9 @@ export default function App() {
                   <>
                     {!nearby.data.length && (
                       <p className="search-status">
-                        No places found here. Move the map and try another area.
+                        {userLocation
+                          ? "No places found near you. Try another category."
+                          : "No places found here. Move the map and try another area."}
                       </p>
                     )}
                     <div className="nearby-list">
@@ -349,7 +357,7 @@ export default function App() {
       ) : (
         <DirectionsPanel
           journey={state.view.journey}
-          center={center}
+          center={searchCenter}
           dispatch={dispatch}
           locate={locate}
           locating={locating}

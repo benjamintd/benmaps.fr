@@ -69,7 +69,7 @@ export function MapAppearance({
                 <MapIcon size={29} />
               </span>
               <span>
-                Clair {settings.basemap === "clair" && <Check size={15} />}
+                Default {settings.basemap === "clair" && <Check size={15} />}
               </span>
             </button>
             <button
