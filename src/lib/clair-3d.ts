@@ -3,10 +3,10 @@ import type { Map } from "maplibre-gl";
 const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
   "https://clair.benmaps.fr/extensions/latest/clair-3d.js";
-// Follow the latest preview collection; the approved channel currently has no models.
+// Follow the global preview dataset; the approved channel currently has no models.
 export const LANDMARKS_CATALOGUE_URL =
   import.meta.env.VITE_OPEN_LANDMARKS_CATALOGUE_URL ||
-  "https://open-landmarks.benmaps.fr/api/v1/collections/paris/preview.json";
+  "https://open-landmarks.benmaps.fr/api/v1/preview.json";
 
 type Extension = { remove(): void };
 type SDK = {
