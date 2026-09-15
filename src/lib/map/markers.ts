@@ -7,6 +7,20 @@ type Callbacks = {
   onDragEndpoint: (endpoint: "from" | "to", coordinates: Coordinates) => void;
 };
 
+/** Keep the user's position independent of selected places and route markers. */
+export function addUserLocationMarker(map: Map, coordinates: Coordinates) {
+  const el = document.createElement("div");
+  el.className = "user-location-marker";
+  el.setAttribute("role", "img");
+  el.setAttribute("aria-label", "Your location");
+  const marker = new Marker({ element: el, anchor: "center" })
+    .setLngLat(coordinates)
+    .addTo(map);
+  return () => {
+    marker.remove();
+  };
+}
+
 /** Owns marker DOM, gestures and document listeners until the returned cleanup. */
 export function addPlaceMarkers(
   map: Map,
@@ -27,7 +41,7 @@ export function addPlaceMarkers(
     kind: "result",
     label: String(i + 1),
   }));
-  if (selectedPlace)
+  if (selectedPlace && selectedPlace.source !== "location")
     list.push({ place: selectedPlace, kind: "selected", label: "" });
   if (view.kind === "directions") {
     if (from)

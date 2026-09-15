@@ -1084,6 +1084,18 @@ button small {
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
+.user-location-marker {
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #4285f4;
+  box-shadow:
+    0 1px 5px #0005,
+    0 0 0 12px #4285f426;
+  pointer-events: none;
+  z-index: 1;
+}
 .map-marker {
   height: 39px;
   width: 32px;

@@ -10,7 +10,7 @@ import {
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { Protocol } from "pmtiles";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { addPlaceMarkers } from "../lib/map/markers";
+import { addPlaceMarkers, addUserLocationMarker } from "../lib/map/markers";
 import { routeAtPoint, updateRoutes } from "../lib/map/routes";
 import { isPointerTarget, placeAtPoint } from "../lib/map/picking";
 import { createContextMenu } from "../lib/map/context-menu";
@@ -37,6 +37,7 @@ export type MapCommand =
 type Props = {
   state: AppState;
   places: Place[];
+  userLocation: Coordinates | null;
   command: MapCommand | null;
   onPick: (place: Place) => void;
   onSelectRoute: (index: number) => void;
@@ -278,6 +279,11 @@ export default function MapCanvas(props: Props) {
     updateRoutes(map, props.state.view);
   }, [props.state.view, epoch]);
   const viewKind = props.state.view.kind;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !props.userLocation) return;
+    return addUserLocationMarker(map, props.userLocation);
+  }, [props.userLocation, retry]);
   const selectedPlace =
     props.state.view.kind === "explore" ? props.state.view.place : null;
   const from =

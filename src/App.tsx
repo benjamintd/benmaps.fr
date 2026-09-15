@@ -170,6 +170,7 @@ export default function App() {
         <MapCanvas
           state={state}
           places={places}
+          userLocation={userLocation}
           command={command}
           onPick={pick}
           onSelectRoute={(index) => dispatch({ type: "route-select", index })}

@@ -56,15 +56,25 @@ test("a delayed location result cannot change a new view or move its camera", as
   await expect(
     page.getByRole("button", { name: "My location", exact: true }),
   ).toBeEnabled();
+  await expect(page.getByRole("img", { name: "Your location" })).toHaveCount(0);
 });
 
-test("a current location result selects the place", async ({ page }) => {
+test("the location dot persists across views and moves when located again", async ({
+  page,
+}, testInfo) => {
+  await captureMap(page);
+  await page.route(
+    "https://api.mapbox.com/search/searchbox/v1/category/**",
+    (route) => route.fulfill({ json: { features: [] } }),
+  );
   await page.addInitScript(() => {
     navigator.geolocation.getCurrentPosition = (success) => {
       window.completeLocation = success;
     };
   });
   await page.goto("/#13/48.86/2.34/0/0");
+  const dot = page.getByRole("img", { name: "Your location", exact: true });
+  await expect(dot).toHaveCount(0);
   await page.getByRole("button", { name: "My location", exact: true }).click();
   await page.evaluate(() =>
     window.completeLocation({
@@ -84,6 +94,50 @@ test("a current location result selects the place", async ({ page }) => {
     page.getByRole("heading", { name: "Your location", exact: true }),
   ).toBeVisible();
   expect(new URL(page.url()).searchParams.get("pin")).toBe("2.35,48.87");
+  await expect(dot).toBeVisible();
+  await expect(page.locator(".map-marker.selected")).toHaveCount(0);
+  await page.getByRole("button", { name: "Close place", exact: true }).click();
+  await expect(dot).toBeVisible();
+  await page.getByRole("button", { name: "Restaurants", exact: true }).click();
+  await expect(dot).toBeVisible();
+  await page.getByRole("button", { name: "Plan a route", exact: true }).click();
+  await expect(dot).toBeVisible();
+  await page
+    .getByRole("button", { name: "Close directions", exact: true })
+    .click();
+  await page.getByRole("button", { name: "My location", exact: true }).click();
+  await page.evaluate(() =>
+    window.completeLocation({
+      coords: { longitude: 2.36, latitude: 48.88, accuracy: 1 },
+      timestamp: Date.now(),
+    } as GeolocationPosition),
+  );
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("pin"))
+    .toBe("2.36,48.88");
+  await expect(dot).toHaveCount(1);
+  await page.evaluate(() => {
+    window.__map!.stop();
+    window.__map!.jumpTo({ center: [2.36, 48.88], zoom: 15 });
+  });
+  await expect
+    .poll(async () => {
+      const expected = await page.evaluate(() => {
+        const map = window.__map!;
+        const point = map.project([2.36, 48.88]);
+        const rect = map.getContainer().getBoundingClientRect();
+        return { x: point.x + rect.left, y: point.y + rect.top };
+      });
+      const bounds = await dot.boundingBox();
+      return bounds
+        ? Math.hypot(
+            bounds.x + bounds.width / 2 - expected.x,
+            bounds.y + bounds.height / 2 - expected.y,
+          )
+        : Infinity;
+    })
+    .toBeLessThan(1);
+  await page.screenshot({ path: testInfo.outputPath("location-dot.png") });
 });
 
 for (const located of [false, true]) {
