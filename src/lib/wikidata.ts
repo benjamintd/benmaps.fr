@@ -1,5 +1,6 @@
 import { z } from "zod";
-import type { Coordinates, Place } from "./domain";
+import type { Place } from "./domain";
+import { metersBetween } from "./geography";
 export type PlaceInfo = {
   id: string;
   label: string;
@@ -73,15 +74,6 @@ function normalize(name: string) {
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
-}
-export function metersBetween(a: Coordinates, b: Coordinates) {
-  const rad = Math.PI / 180;
-  const dLat = (b[1] - a[1]) * rad,
-    dLon = (b[0] - a[0]) * rad;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(a[1] * rad) * Math.cos(b[1] * rad) * Math.sin(dLon / 2) ** 2;
-  return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 export function matchesPlace(entity: Entity, place: Place): boolean {
   const names = [

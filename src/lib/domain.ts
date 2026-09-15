@@ -1,5 +1,6 @@
 import type * as GeoJSON from "geojson";
 import { z } from "zod";
+import type { CategoryId } from "./categories";
 
 export const coordinatesSchema = z.tuple([
   z.number().finite().min(-180).max(180),
@@ -53,7 +54,17 @@ export type MapSettings = {
   traffic: boolean;
   threeDimensional: boolean;
 };
-export type AppState = { view: View; settings: MapSettings };
+/** Panel and search-field state. URL-serialized alongside the view and settings. */
+export type UiState = {
+  layersOpen: boolean;
+  aboutOpen: boolean;
+  category: CategoryId | null;
+  categoryCenter: Coordinates;
+  search: string;
+  fromSearch: string;
+  toSearch: string;
+};
+export type AppState = { view: View; settings: MapSettings; ui: UiState };
 export type Action =
   | { type: "restore"; state: AppState }
   | { type: "explore" }
@@ -66,11 +77,9 @@ export type Action =
   | { type: "route-result"; key: string; routes: Route[] }
   | { type: "route-error"; key: string; message: string }
   | { type: "route-select"; index: number }
-  | { type: "settings"; settings: Partial<MapSettings> };
-export const defaultState: AppState = {
-  view: { kind: "explore", place: null },
-  settings: { basemap: "clair", traffic: false, threeDimensional: false },
-};
+  | { type: "settings"; settings: Partial<MapSettings> }
+  | { type: "ui"; ui: Partial<UiState> }
+  | { type: "choose-category"; id: CategoryId; center: Coordinates };
 export function journeyKey(journey: Journey): string | null {
   return journey.from && journey.to
     ? `${journey.travelMode}:${journey.from.coordinates.join(",")};${journey.to.coordinates.join(",")}`
@@ -85,9 +94,24 @@ export function reducer(state: AppState, action: Action): AppState {
     return { ...state, view: { kind: "explore", place: action.place } };
   if (action.type === "settings")
     return { ...state, settings: { ...state.settings, ...action.settings } };
+  if (action.type === "ui")
+    return { ...state, ui: { ...state.ui, ...action.ui } };
+  // Toggling a category always returns to a clean explore view.
+  if (action.type === "choose-category")
+    return {
+      ...state,
+      view: { kind: "explore", place: null },
+      ui: {
+        ...state.ui,
+        category: state.ui.category === action.id ? null : action.id,
+        categoryCenter: action.center,
+      },
+    };
+  // Planning a route hides any nearby-search results behind the panel.
   if (action.type === "directions")
     return {
       ...state,
+      ui: { ...state.ui, category: null },
       view: {
         kind: "directions",
         journey: {

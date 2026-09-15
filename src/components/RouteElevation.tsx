@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, LoaderCircle } from "./Icons";
+import { ArrowDown, ArrowUp, Spinner } from "./Icons";
 import { getElevations } from "../lib/api";
 import { config } from "../lib/config";
 import { distance } from "../lib/domain";
@@ -52,7 +52,7 @@ export function RouteElevation({ route }: { route: Route }) {
   if (state.status === "loading")
     return (
       <div className="elevation elevation-loading">
-        <LoaderCircle className="spin" size={16} />
+        <Spinner className="spin" size={16} />
         Reading elevation…
       </div>
     );

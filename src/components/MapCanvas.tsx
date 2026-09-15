@@ -1,33 +1,35 @@
-import type * as GeoJSON from "geojson";
 import { useEffect, useRef, useState } from "react";
 import {
   Map,
-  MapMouseEvent,
-  MapTouchEvent,
-  Marker,
-  Popup,
   LngLatBounds,
   ScaleControl,
   AttributionControl,
   addProtocol,
   setWorkerUrl,
 } from "maplibre-gl";
-import type { GeoJSONSource } from "maplibre-gl";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { Protocol } from "pmtiles";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { addPlaceMarkers } from "../lib/map/markers";
+import { routeAtPoint, updateRoutes } from "../lib/map/routes";
+import { isPointerTarget, placeAtPoint } from "../lib/map/picking";
+import { createContextMenu } from "../lib/map/context-menu";
 import { mapStyle } from "../lib/map-style";
 import { hasBasemap } from "../lib/config";
 import { createClair3D } from "../lib/clair-3d";
-import { wikidataId } from "../lib/wikidata";
-import { pointPlace, journeyKey } from "../lib/domain";
+import { journeyKey } from "../lib/domain";
 import type { AppState, Coordinates, Place } from "../lib/domain";
-import { cameraHash, readCamera, hasCamera } from "../lib/url";
+import { cameraHash, cameraOrDefault, readCamera } from "../lib/url";
 import type { Camera } from "../lib/url";
-import { LoaderCircle, MapPin, TriangleAlert } from "./Icons";
+import { Spinner, MapPin, TriangleAlert } from "./Icons";
 setWorkerUrl(workerUrl);
 const protocol = new Protocol();
 addProtocol("pmtiles", protocol.tile);
+declare global {
+  interface Window {
+    __onMapCreated?: (map: Map) => void;
+  }
+}
 export type MapCommand =
   | { id: number; type: "camera"; camera: Camera }
   | { id: number; type: "zoom-in" | "zoom-out" | "north" }
@@ -55,34 +57,15 @@ function padding(kind: "explore" | "directions") {
         left: 35,
       };
 }
-const routeLayers = ["journey-line", "journey-casing"];
-function routeAtPoint(map: Map, point: { x: number; y: number }, radius = 8) {
-  const layers = routeLayers.filter((id) => map.getLayer(id));
-  if (!layers.length) return undefined;
-  const hits = map.queryRenderedFeatures(
-    [
-      [point.x - radius, point.y - radius],
-      [point.x + radius, point.y + radius],
-    ],
-    { layers },
-  );
-  const hit = hits.find((feature) => !feature.properties?.selected) ?? hits[0];
-  const index = hit?.properties?.index;
-  return Number.isInteger(index) ? (index as number) : undefined;
-}
-const empty: GeoJSON.FeatureCollection = {
-  type: "FeatureCollection",
-  features: [],
-};
 export default function MapCanvas(props: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const threeD = useRef<ReturnType<typeof createClair3D> | null>(null);
-  const contextPopup = useRef<Popup | null>(null);
+  const contextMenu = useRef<ReturnType<typeof createContextMenu> | null>(null);
   const suppressClickUntil = useRef(0);
   const latest = useRef(props);
   latest.current = props;
-  const [status, setStatus] = useState("Loading map…");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [epoch, setEpoch] = useState(0);
   const [retry, setRetry] = useState(0);
@@ -92,7 +75,7 @@ export default function MapCanvas(props: Props) {
   const applied3D = useRef(props.state.settings.threeDimensional);
   const appliedCameraCommand = useRef<number | null>(null);
   const preserveRouteCamera = useRef(
-    hasCamera(new URL(window.location.href)) &&
+    readCamera(new URL(window.location.href)) !== null &&
       props.state.view.kind === "directions"
       ? journeyKey(props.state.view.journey)
       : null,
@@ -101,10 +84,12 @@ export default function MapCanvas(props: Props) {
     if (!container.current || !hasBasemap) return;
     let map: Map;
     try {
+      const url = new URL(window.location.href);
       map = new Map({
         container: container.current,
-        ...readCamera(new URL(window.location.href)),
-        ...(hasCamera(new URL(window.location.href))
+        ...cameraOrDefault(url),
+        // Without a shared framing, 3D opens tilted rather than flat.
+        ...(readCamera(url)
           ? {}
           : { pitch: latest.current.state.settings.threeDimensional ? 30 : 0 }),
         minZoom: 1,
@@ -120,12 +105,16 @@ export default function MapCanvas(props: Props) {
       return;
     }
     mapRef.current = map;
+    // Development-only seam for browser tests: hands over the live map before
+    // any style or layer work, so a test can observe or wrap it. Tree-shaken
+    // out of production builds, where import.meta.env.DEV is statically false.
+    if (import.meta.env.DEV) window.__onMapCreated?.(map);
     threeD.current = createClair3D(map, {
       onError: () => latest.current.onNotice("Some 3D details couldn’t load."),
     });
     const initialStyleKey = JSON.stringify(latest.current.state.settings);
     appliedStyle.current = initialStyleKey;
-    setStatus("Loading map…");
+    setLoading(true);
     setError(null);
     // Clair's style is fetched over the network, so apply it once it arrives.
     mapStyle(latest.current.state.settings)
@@ -157,9 +146,7 @@ export default function MapCanvas(props: Props) {
       styleReady.current = true;
       setEpoch((n) => n + 1);
     });
-    map.on("idle", () => {
-      setStatus("");
-    });
+    map.on("idle", () => setLoading(false));
     map.on("error", (event) => {
       const message = event.error?.message ?? "";
       if (/abort/i.test(message)) return;
@@ -172,7 +159,7 @@ export default function MapCanvas(props: Props) {
             "$1[redacted]",
           ),
         );
-      setStatus("");
+      setLoading(false);
       setError(
         /403|401/.test(message)
           ? "The map provider denied this request. Check your key’s allowed domains."
@@ -217,78 +204,26 @@ export default function MapCanvas(props: Props) {
         latest.current.onSelectRoute(index);
         return;
       }
-      const features = map.queryRenderedFeatures(event.point);
-      const feature = features.find(
-        (f) =>
-          f.layer.type === "symbol" &&
-          (f.properties?.["name:en"] || f.properties?.name),
-      );
-      const coordinates: Coordinates =
-        feature?.geometry.type === "Point"
-          ? [feature.geometry.coordinates[0], feature.geometry.coordinates[1]]
-          : [event.lngLat.lng, event.lngLat.lat];
-      latest.current.onPick({
-        ...pointPlace(
-          coordinates,
-          feature
-            ? String(feature.properties["name:en"] || feature.properties.name)
-            : undefined,
-        ),
-        category: feature?.properties.kind,
-        wikidata: wikidataId(feature?.properties.wikidata),
-      });
+      latest.current.onPick(placeAtPoint(map, event.point, event.lngLat));
     });
     map.on("mousemove", (event) => {
       map.getCanvas().style.cursor =
         routeAtPoint(map, event.point) !== undefined ||
-        map
-          .queryRenderedFeatures(event.point)
-          .some((feature) => feature.layer.type === "symbol")
+        isPointerTarget(map, event.point)
           ? "pointer"
           : "";
     });
     // Right-click drops a popup pinned to the point with copyable coordinates.
-    map.on("contextmenu", (event) => {
-      const lng = event.lngLat.lng;
-      const lat = event.lngLat.lat;
-      const text = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-      contextPopup.current?.remove();
-      const menu = document.createElement("div");
-      menu.className = "context-menu";
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "context-coords";
-      const value = document.createElement("strong");
-      value.textContent = text;
-      const hint = document.createElement("small");
-      hint.textContent = "Copy coordinates";
-      button.append(value, hint);
-      button.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(text);
-          latest.current.onNotice("Coordinates copied.");
-        } catch {
-          latest.current.onNotice(text);
-        }
-        contextPopup.current?.remove();
-      });
-      menu.appendChild(button);
-      contextPopup.current = new Popup({
-        closeButton: false,
-        closeOnClick: true,
-        className: "context-popup",
-        offset: 12,
-      })
-        .setLngLat([lng, lat])
-        .setDOMContent(menu)
-        .addTo(map);
+    contextMenu.current = createContextMenu(map, {
+      onCopied: (message) => latest.current.onNotice(message),
     });
+    map.on("contextmenu", (event) => contextMenu.current?.openAt(event.lngLat));
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
     return () => {
       resize.disconnect();
-      contextPopup.current?.remove();
-      contextPopup.current = null;
+      contextMenu.current?.remove();
+      contextMenu.current = null;
       void threeD.current?.remove();
       threeD.current = null;
       map.remove();
@@ -296,6 +231,7 @@ export default function MapCanvas(props: Props) {
       styleReady.current = false;
     };
   }, [retry]);
+  // Equal settings restored from the URL must not cancel an in-flight style.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || appliedStyle.current === styleKey) return;
@@ -328,7 +264,10 @@ export default function MapCanvas(props: Props) {
     return () => {
       cancelled = true;
     };
-  }, [styleKey, props.state.settings]);
+    // styleKey already encodes every setting; command is read as a one-shot
+    // snapshot, so widening these deps would re-run the style swap spuriously.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [styleKey]);
   useEffect(() => {
     void threeD.current?.setEnabled(props.state.settings.threeDimensional);
   }, [props.state.settings.threeDimensional, retry]);
@@ -336,113 +275,7 @@ export default function MapCanvas(props: Props) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !styleReady.current) return;
-    const view = props.state.view;
-    const journey = view.kind === "directions" ? view.journey : null;
-    const routes =
-      journey?.routes.status === "ready" ? journey.routes.data : [];
-    const selected = journey?.selected ?? 0;
-    type RouteProps = {
-      index: number;
-      selected: boolean;
-      congestion: string | null;
-    };
-    const features: GeoJSON.Feature<GeoJSON.LineString, RouteProps>[] = [];
-    routes.forEach((route, i) => {
-      const isSelected = i === selected;
-      const coords = route.geometry.coordinates;
-      const congestion = route.congestion;
-      // Only paint congestion on the selected route, and only when the
-      // annotation lines up with the geometry (driving-traffic mode).
-      if (isSelected && congestion && congestion.length === coords.length - 1) {
-        let start = 0;
-        for (let s = 0; s < congestion.length; s++) {
-          if (
-            s === congestion.length - 1 ||
-            congestion[s + 1] !== congestion[s]
-          ) {
-            features.push({
-              type: "Feature",
-              geometry: {
-                type: "LineString",
-                coordinates: coords.slice(start, s + 2),
-              },
-              properties: {
-                index: i,
-                selected: true,
-                congestion: congestion[s],
-              },
-            });
-            start = s + 1;
-          }
-        }
-      } else {
-        features.push({
-          type: "Feature",
-          geometry: route.geometry,
-          properties: { index: i, selected: isSelected, congestion: null },
-        });
-      }
-    });
-    // Draw alternatives first so the selected route stays on top.
-    features.sort(
-      (a, b) => Number(a.properties.selected) - Number(b.properties.selected),
-    );
-    const data: GeoJSON.FeatureCollection = {
-      type: "FeatureCollection",
-      features,
-    };
-    if (!map.getSource("journey")) {
-      // Keep route lines beneath the basemap labels so place names stay legible.
-      const firstSymbol = map
-        .getStyle()
-        .layers?.find((layer) => layer.type === "symbol")?.id;
-      map.addSource("journey", { type: "geojson", data: empty });
-      map.addLayer(
-        {
-          id: "journey-casing",
-          type: "line",
-          source: "journey",
-          layout: { "line-cap": "round", "line-join": "round" },
-          paint: {
-            "line-color": "#ffffff",
-            "line-width": 10,
-            "line-opacity": 0.95,
-          },
-        },
-        firstSymbol,
-      );
-      map.addLayer(
-        {
-          id: "journey-line",
-          type: "line",
-          source: "journey",
-          layout: { "line-cap": "round", "line-join": "round" },
-          paint: {
-            // Selected route: tint moderate/heavy/severe traffic; otherwise blue.
-            // Alternatives stay a muted blue.
-            "line-color": [
-              "case",
-              ["get", "selected"],
-              [
-                "match",
-                ["coalesce", ["get", "congestion"], ""],
-                "moderate",
-                "#f0a03a",
-                "heavy",
-                "#e2603f",
-                "severe",
-                "#a63043",
-                "#2e6ea2",
-              ],
-              "#97b8ee",
-            ],
-            "line-width": ["case", ["get", "selected"], 6, 4],
-          },
-        },
-        firstSymbol,
-      );
-    }
-    (map.getSource("journey") as GeoJSONSource).setData(data);
+    updateRoutes(map, props.state.view);
   }, [props.state.view, epoch]);
   const viewKind = props.state.view.kind;
   const selectedPlace =
@@ -456,120 +289,13 @@ export default function MapCanvas(props: Props) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    const list: {
-      place: Place;
-      kind: string;
-      label: string;
-      endpoint?: "from" | "to";
-    }[] = props.places.map((place, i) => ({
-      place,
-      kind: "result",
-      label: String(i + 1),
-    }));
-    if (selectedPlace)
-      list.push({ place: selectedPlace, kind: "selected", label: "" });
-    if (viewKind === "directions") {
-      if (from)
-        list.push({
-          place: from,
-          kind: "origin",
-          label: "A",
-          endpoint: "from",
-        });
-      if (to)
-        list.push({
-          place: to,
-          kind: "selected",
-          label: "B",
-          endpoint: "to",
-        });
-    }
-    const cleanups: (() => void)[] = [];
-    const markers = list.map(({ place, kind, label, endpoint }) => {
-      const el = document.createElement("button");
-      el.type = "button";
-      el.className = `map-marker ${kind}${endpoint ? " draggable" : ""}`;
-      el.setAttribute(
-        "aria-label",
-        endpoint ? `${label}: ${place.name}` : place.name,
-      );
-      el.title = endpoint ? `${place.name} — drag to move` : place.name;
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 32 39");
-      const path = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path",
-      );
-      path.setAttribute(
-        "d",
-        "M16 1C7.7 1 1 7.7 1 16c0 10.6 15 22 15 22s15-11.4 15-22C31 7.7 24.3 1 16 1Z",
-      );
-      path.setAttribute("fill", kind === "origin" ? "#53646e" : "#2e6ea2");
-      path.setAttribute("stroke", "white");
-      path.setAttribute("stroke-width", "2");
-      svg.appendChild(path);
-      const graphic = document.createElement("div");
-      graphic.className = "marker-graphic";
-      graphic.appendChild(svg);
-      el.appendChild(graphic);
-      const inner = document.createElement("span");
-      inner.textContent = label || "•";
-      graphic.appendChild(inner);
-      let dragged = false;
-      el.addEventListener("click", (event) => {
-        event.stopPropagation();
-        // A drag ends with a synthetic click; ignore it so we don't re-pick.
-        if (dragged) {
-          dragged = false;
-          return;
-        }
-        latest.current.onPick(place);
-      });
-      const marker = new Marker({
-        element: el,
-        anchor: "bottom",
-        draggable: Boolean(endpoint),
-      })
-        .setLngLat(place.coordinates)
-        .addTo(map);
-      if (endpoint) {
-        // MapLibre listens for release on its canvas. Controls and panels are
-        // siblings of that canvas, so forward outside releases to finish the drag.
-        const finishOutsideMap = (event: MouseEvent | TouchEvent) => {
-          if (
-            !el.classList.contains("dragging") ||
-            (event.target instanceof Node &&
-              map.getContainer().contains(event.target))
-          )
-            return;
-          if (event.type === "mouseup")
-            map.fire(new MapMouseEvent("mouseup", map, event as MouseEvent));
-          else
-            map.fire(new MapTouchEvent("touchend", map, event as TouchEvent));
-        };
-        document.addEventListener("mouseup", finishOutsideMap, true);
-        document.addEventListener("touchend", finishOutsideMap, true);
-        cleanups.push(() => {
-          document.removeEventListener("mouseup", finishOutsideMap, true);
-          document.removeEventListener("touchend", finishOutsideMap, true);
-        });
-        marker.on("dragstart", () => {
-          dragged = true;
-          el.classList.add("dragging");
-        });
-        marker.on("dragend", () => {
-          el.classList.remove("dragging");
-          suppressClickUntil.current = performance.now() + 250;
-          const { lng, lat } = marker.getLngLat();
-          latest.current.onDragEndpoint(endpoint, [lng, lat]);
-        });
-      }
-      return marker;
+    return addPlaceMarkers(map, latest.current.state.view, props.places, {
+      onPick: (place) => latest.current.onPick(place),
+      onDragEndpoint: (endpoint, coordinates) => {
+        suppressClickUntil.current = performance.now() + 250;
+        latest.current.onDragEndpoint(endpoint, coordinates);
+      },
     });
-    return () => {
-      cleanups.forEach((cleanup) => cleanup());
-      markers.forEach((marker) => marker.remove());
-    };
   }, [viewKind, selectedPlace, from, to, props.places, retry]);
   const route =
     props.state.view.kind === "directions" &&
@@ -658,10 +384,10 @@ export default function MapCanvas(props: Props) {
             ×
           </button>
         </div>
-      ) : status ? (
+      ) : loading ? (
         <div className="map-loading" role="status">
-          <LoaderCircle size={15} className="spin" />
-          {status}
+          <Spinner size={15} className="spin" />
+          Loading map…
         </div>
       ) : null}
     </>

@@ -1,7 +1,0 @@
-Procedural tree geometry adapted from Clair 3D 0.1.1 by Benjamin Tran Dinh.
-Source: packages/clair-3d at Clair commit 799e4b0f7bf977cd58e867a9f8be77f014d9f525.
-The original tree code and its adaptations retain the Clair license (LICENSE.txt).
-Three.js 0.186.0 retains its MIT license (THREE-LICENSE.txt).
-Tree positions come from Protomaps / OpenStreetMap; existing map attribution applies.
-Dimensions are illustrative when source measurements are absent. No model assets,
-textures, synthesized forest positions, or landmark models are included.

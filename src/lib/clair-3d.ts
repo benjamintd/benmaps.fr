@@ -1,6 +1,6 @@
-import type { Map, StyleSpecification } from "maplibre-gl";
+import type { Map } from "maplibre-gl";
 
-export const CLAIR_3D_URL =
+const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
   "https://clair.benmaps.fr/extensions/latest/clair-3d.js";
 // Follow the latest preview collection; the approved channel currently has no models.
@@ -10,7 +10,6 @@ export const LANDMARKS_CATALOGUE_URL =
 
 type Extension = { remove(): void };
 type SDK = {
-  prepareClair3DStyle?(style: StyleSpecification): StyleSpecification;
   addClair3D(map: Map, options: Record<string, unknown>): Promise<Extension>;
 };
 type Options = {
@@ -27,11 +26,6 @@ function loadHostedSDK(): Promise<SDK> {
     },
   ));
 }
-export async function prepareLandmarkStyle(style: StyleSpecification) {
-  const sdk = await loadHostedSDK();
-  return sdk.prepareClair3DStyle?.(style) ?? style;
-}
-
 /** One serialized SDK lifetime per map, including rapid toggles during imports. */
 export function createClair3D(
   map: Map,
@@ -56,6 +50,10 @@ export function createClair3D(
             trees: true,
             landmarks: true,
             maxResident: 3,
+            // Keep basemap buildings until a replacement actually exists.
+            replacementMode: "loaded",
+            maxCached: 6,
+            maxCacheBytes: 16 * 1024 * 1024,
             maxTrees: 1500,
             replacementLayerIds: ["building-extrusion"],
             onError: (error: unknown) => {

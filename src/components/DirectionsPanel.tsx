@@ -1,12 +1,12 @@
 import type { Dispatch } from "react";
 import {
-  ArrowDownUp,
+  ArrowsUpDown,
   ArrowRight,
   Bike,
   Car,
   Footprints,
-  LocateFixed,
-  LoaderCircle,
+  Crosshair,
+  Spinner,
   MapPin,
   X,
 } from "./Icons";
@@ -29,8 +29,7 @@ type Props = {
   journey: Journey;
   center: Coordinates;
   dispatch: Dispatch<Action>;
-  locate: () => void;
-  useLocation: (endpoint: "from" | "to") => void;
+  locate: (endpoint?: "from" | "to") => void;
   locating: boolean;
   fly: (coordinates: Coordinates) => void;
   retry: () => void;
@@ -42,7 +41,6 @@ export function DirectionsPanel({
   center,
   dispatch,
   locate,
-  useLocation,
   locating,
   fly,
   retry,
@@ -87,7 +85,7 @@ export function DirectionsPanel({
             key === "from" ? "Choose starting point" : "Choose destination"
           }
           label={key === "from" ? "Starting point" : "Destination"}
-          onUseLocation={() => useLocation(key)}
+          onUseLocation={() => locate(key)}
           locating={locating}
         />
       )}
@@ -128,15 +126,19 @@ export function DirectionsPanel({
           aria-label="Swap starting point and destination"
           onClick={() => dispatch({ type: "swap" })}
         >
-          <ArrowDownUp size={20} />
+          <ArrowsUpDown size={20} />
         </button>
       </div>
       {!journey.from && (
-        <button className="location-link" onClick={locate} disabled={locating}>
+        <button
+          className="location-link"
+          onClick={() => locate()}
+          disabled={locating}
+        >
           {locating ? (
-            <LoaderCircle className="spin" size={17} />
+            <Spinner className="spin" size={17} />
           ) : (
-            <LocateFixed size={17} />
+            <Crosshair size={17} />
           )}
           Use my location
         </button>
@@ -144,7 +146,7 @@ export function DirectionsPanel({
       <div className="route-content" aria-live="polite">
         {journey.routes.status === "loading" && (
           <div className="route-empty">
-            <LoaderCircle className="spin" size={28} />
+            <Spinner className="spin" size={28} />
             <h2>Finding a route…</h2>
           </div>
         )}

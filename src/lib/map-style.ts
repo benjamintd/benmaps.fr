@@ -1,5 +1,4 @@
 import type { StyleSpecification } from "maplibre-gl";
-import { prepareLandmarkStyle } from "./clair-3d";
 import { config } from "./config";
 import type { MapSettings } from "./domain";
 // Clair's hosted style ships fonts, sprites and an empty Protomaps vector
@@ -127,5 +126,5 @@ export async function mapStyle(
       },
     });
   }
-  return settings.threeDimensional ? prepareLandmarkStyle(style) : style;
+  return style;
 }

@@ -1,23 +1,27 @@
 import { expect, it } from "vitest";
-import { readState, readUiState, writeState, readCamera } from "../src/lib/url";
-import { defaultState, reducer, journeyKey } from "../src/lib/domain";
+import {
+  readState,
+  writeState,
+  readCamera,
+  cameraOrDefault,
+} from "../src/lib/url";
+import { reducer, journeyKey } from "../src/lib/domain";
+import { defaultState } from "./fixtures";
 import type { Route } from "../src/lib/domain";
 it("round trips layers, pin details, nearby context and open panels without changing the camera", () => {
   const original = new URL(
     "https://benmaps.fr/?basemap=satellite&traffic=1&3d=1&pin=2.343689,48.861514&pin_name=Maison&pin_address=12+rue+du+Louvre&pin_category=museum&pin_wikidata=Q19675&category=cafe&near=2.31,48.85&layers=1&about=1&q=coffee#18.543/48.8615142/2.3433801/22.15/43.75",
   );
-  const state = readState(original),
-    ui = readUiState(original);
-  const restored = writeState(original, state, ui);
+  const state = readState(original);
+  const restored = writeState(original, state);
   expect(readState(restored)).toEqual(state);
-  expect(readUiState(restored)).toEqual(ui);
   expect(restored.hash).toBe(original.hash);
   expect(state.settings).toEqual({
     basemap: "satellite",
     traffic: true,
     threeDimensional: true,
   });
-  expect(readCamera(restored).pitch).toBe(43.75);
+  expect(readCamera(restored)?.pitch).toBe(43.75);
   expect(state.view.kind === "explore" && state.view.place?.wikidata).toBe(
     "Q19675",
   );
@@ -76,8 +80,8 @@ it("ignores invalid enums, coordinates and route indices and bounds display text
   );
   const state = readState(url);
   expect(state.settings).toEqual(defaultState.settings);
-  expect(readUiState(url).category).toBeNull();
-  expect(readUiState(url).categoryCenter).toEqual(readCamera(url).center);
+  expect(state.ui.category).toBeNull();
+  expect(state.ui.categoryCenter).toEqual(cameraOrDefault(url).center);
   expect(state.view.kind === "explore" && state.view.place?.name).toHaveLength(
     200,
   );

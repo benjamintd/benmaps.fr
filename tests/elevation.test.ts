@@ -2,6 +2,15 @@ import { describe, expect, it } from "vitest";
 import { sampleLine, elevationStats } from "../src/lib/elevation";
 
 describe("cycling elevation", () => {
+  it("keeps date-line route samples near the route instead of crossing Greenwich", () => {
+    const points = sampleLine([
+      [179.99, 0],
+      [-179.99, 0],
+    ]);
+    expect(points[0]).toEqual([179.99, 0]);
+    expect(points.at(-1)).toEqual([-179.99, 0]);
+    expect(points.every(([lng]) => Math.abs(lng) >= 179.99)).toBe(true);
+  });
   it("samples short rides densely and includes both endpoints", () => {
     const points = sampleLine([
       [2, 48],

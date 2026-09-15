@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Place, Resource } from "../lib/domain";
 import { getPlaceInfo } from "../lib/wikidata";
 import type { PlaceInfo } from "../lib/wikidata";
-import { ExternalLink, Info, Link, LoaderCircle, Phone } from "./Icons";
+import { ExternalLink, Info, Link, Spinner, Phone } from "./Icons";
 export function PlaceEnrichment({ place }: { place: Place }) {
   const [info, setInfo] = useState<Resource<PlaceInfo | null>>({
     status: "idle",
@@ -31,7 +31,7 @@ export function PlaceEnrichment({ place }: { place: Place }) {
   if (info.status === "loading")
     return (
       <p className="enrichment-loading">
-        <LoaderCircle size={16} className="spin" />
+        <Spinner size={16} className="spin" />
         Looking up this place…
       </p>
     );

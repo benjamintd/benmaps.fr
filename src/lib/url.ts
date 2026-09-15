@@ -1,5 +1,6 @@
 import { coordinatesSchema, pointPlace } from "./domain";
-import type { AppState, Coordinates, Place } from "./domain";
+import type { AppState, Coordinates, Place, UiState } from "./domain";
+import { isCategoryId } from "./categories";
 export type Camera = {
   center: Coordinates;
   zoom: number;
@@ -17,7 +18,12 @@ function coords(text: string | null): Coordinates | null {
   const result = coordinatesSchema.safeParse(text.split(",").map(Number));
   return result.success ? result.data : null;
 }
-export function readCamera(url: URL): Camera {
+/**
+ * The camera encoded in the URL, or null when it carries none. Callers that
+ * need a camera regardless fall back to `defaultCamera`; callers deciding
+ * whether the user arrived with a framing test for null.
+ */
+export function readCamera(url: URL): Camera | null {
   const values = url.hash.slice(1).split("/").map(Number);
   if (values.length >= 3) {
     const [zoom, lat, lng, bearing = 0, pitch = 0] = values;
@@ -52,37 +58,36 @@ export function readCamera(url: URL): Camera {
       center: [legacy[0], legacy[1]],
       zoom: legacy[2],
     };
-  return defaultCamera;
+  return null;
 }
-const categoryIds = ["restaurant", "cafe", "park", "museum"];
-export type SharedUiState = {
-  layersOpen: boolean;
-  aboutOpen: boolean;
-  category: string | null;
-  categoryCenter: Coordinates;
-  search: string;
-  fromSearch: string;
-  toSearch: string;
-};
+/** The URL's camera, or the Paris default when it carries none. */
+export function cameraOrDefault(url: URL): Camera {
+  return readCamera(url) ?? defaultCamera;
+}
 function textParam(url: URL, key: string, max: number): string {
-  return (url.searchParams.get(key) ?? "")
-    .replace(/[\u0000-\u001f\u007f]/g, "")
-    .slice(0, max);
+  return (
+    (url.searchParams.get(key) ?? "")
+      // Control characters are stripped on purpose: they corrupt shared links.
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u001f\u007f]/g, "")
+      .slice(0, max)
+  );
 }
-export function readUiState(url: URL): SharedUiState {
+function readUiState(url: URL): UiState {
   const category = url.searchParams.get("category");
   return {
     layersOpen: url.searchParams.get("layers") === "1",
     aboutOpen: url.searchParams.get("about") === "1",
-    category: category && categoryIds.includes(category) ? category : null,
+    category: isCategoryId(category) ? category : null,
     categoryCenter:
-      coords(url.searchParams.get("near")) ?? readCamera(url).center,
+      coords(url.searchParams.get("near")) ?? cameraOrDefault(url).center,
     search: textParam(url, "q", 256),
     fromSearch: textParam(url, "from_q", 256),
     toSearch: textParam(url, "to_q", 256),
   };
 }
 export function readState(url: URL): AppState {
+  const ui = readUiState(url);
   const get = (key: string): Place | null => {
     const c = coords(url.searchParams.get(key));
     if (!c) return null;
@@ -124,6 +129,7 @@ export function readState(url: URL): AppState {
     const requestedRoute = Number(url.searchParams.get("route"));
     return {
       settings,
+      ui,
       view: {
         kind: "directions",
         journey: {
@@ -150,17 +156,15 @@ export function readState(url: URL): AppState {
   );
   return {
     settings,
+    ui,
     view: {
       kind: "explore",
       place: get("pin") ?? (legacy ? pointPlace(legacy) : null),
     },
   };
 }
-export function writeState(
-  url: URL,
-  state: AppState,
-  ui: SharedUiState = readUiState(url),
-): URL {
+export function writeState(url: URL, state: AppState): URL {
+  const ui = state.ui;
   const next = new URL(url);
   next.pathname = "/";
   for (const key of ["pin", "from", "to"]) {
@@ -205,7 +209,7 @@ export function writeState(
   if (state.view.kind === "explore") {
     putPlace("pin", state.view.place);
     if (ui.search) next.searchParams.set("q", ui.search.slice(0, 256));
-    if (ui.category && categoryIds.includes(ui.category)) {
+    if (ui.category) {
       next.searchParams.set("category", ui.category);
       next.searchParams.set("near", ui.categoryCenter.join(","));
     }
@@ -221,9 +225,6 @@ export function writeState(
       next.searchParams.set("to_q", ui.toSearch.slice(0, 256));
   }
   return next;
-}
-export function hasCamera(url: URL): boolean {
-  return readCamera(url) !== defaultCamera;
 }
 export function cameraHash(camera: Camera): string {
   return `#${camera.zoom.toFixed(3)}/${camera.center[1].toFixed(7)}/${camera.center[0].toFixed(7)}/${camera.bearing.toFixed(2)}/${camera.pitch.toFixed(2)}`;

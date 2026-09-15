@@ -55,7 +55,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           maplibre: ["maplibre-gl"],
-          clair: ["@clair-maps/style"],
         },
       },
     },

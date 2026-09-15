@@ -1,9 +1,7 @@
 node_modules/
 dist/
-public/clair/
 .env*
 !.env.example
-!.env.sample
 .DS_Store
 *.tsbuildinfo
 playwright-report/

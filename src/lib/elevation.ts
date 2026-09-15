@@ -1,23 +1,14 @@
 import type { Coordinates } from "./domain";
-
-function haversine(a: Coordinates, b: Coordinates): number {
-  const R = 6371000;
-  const dLat = ((b[1] - a[1]) * Math.PI) / 180;
-  const dLon = ((b[0] - a[0]) * Math.PI) / 180;
-  const lat1 = (a[1] * Math.PI) / 180;
-  const lat2 = (b[1] * Math.PI) / 180;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
+import { interpolateCoordinates, metersBetween } from "./geography";
 
 // Evenly-spaced sample points along the route (roughly every 100 m, capped).
 export function sampleLine(coords: Coordinates[]): Coordinates[] {
   if (coords.length < 2) return coords;
   const cumulative = [0];
   for (let i = 1; i < coords.length; i++)
-    cumulative.push(cumulative[i - 1] + haversine(coords[i - 1], coords[i]));
+    cumulative.push(
+      cumulative[i - 1] + metersBetween(coords[i - 1], coords[i]),
+    );
   const total = cumulative[cumulative.length - 1];
   if (total === 0) return [coords[0]];
   const count = Math.min(40, Math.max(2, Math.ceil(total / 100) + 1));
@@ -31,7 +22,7 @@ export function sampleLine(coords: Coordinates[]): Coordinates[] {
     const t = (target - cumulative[segment]) / span;
     const a = coords[segment];
     const b = coords[segment + 1];
-    samples.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+    samples.push(interpolateCoordinates(a, b, t));
   }
   return samples;
 }

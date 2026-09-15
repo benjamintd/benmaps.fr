@@ -1,12 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import {
-  ArrowUpLeft,
-  LoaderCircle,
-  LocateFixed,
-  MapPin,
-  Search,
-  X,
-} from "./Icons";
+import { ArrowUpLeft, Spinner, Crosshair, MapPin, Search, X } from "./Icons";
 import { errorMessage, retrieve, suggest } from "../lib/api";
 import type { Suggestion } from "../lib/api";
 import type { Coordinates, Place } from "../lib/domain";
@@ -83,6 +76,11 @@ export function SearchBox({
     };
   }, [query, center, retry]);
   useEffect(() => () => retrieval.current?.abort(), []);
+  function cancelRetrieval() {
+    retrieval.current?.abort();
+    retrieval.current = null;
+    if (status === "retrieving") setStatus("ready");
+  }
   async function select(item: Suggestion) {
     retrieval.current?.abort();
     const controller = new AbortController();
@@ -116,7 +114,7 @@ export function SearchBox({
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) {
           setOpen(false);
-          retrieval.current?.abort();
+          cancelRetrieval();
         }
       }}
     >
@@ -130,7 +128,9 @@ export function SearchBox({
           aria-expanded={expanded}
           aria-controls={hasQuery ? listId : undefined}
           aria-activedescendant={
-            active >= 0 ? `${listId}-${active}` : undefined
+            expanded && status === "ready" && active >= 0
+              ? `${listId}-${active}`
+              : undefined
           }
           autoComplete="off"
           spellCheck={false}
@@ -145,7 +145,7 @@ export function SearchBox({
           onKeyDown={(event) => {
             if (event.key === "Escape") {
               setOpen(false);
-              retrieval.current?.abort();
+              cancelRetrieval();
             }
             if (event.key === "ArrowDown") {
               event.preventDefault();
@@ -158,8 +158,9 @@ export function SearchBox({
             }
             if (
               event.key === "Enter" &&
+              expanded &&
               results.length &&
-              status !== "retrieving"
+              status === "ready"
             ) {
               event.preventDefault();
               void select(results[Math.max(0, active)]);
@@ -167,7 +168,7 @@ export function SearchBox({
           }}
         />
         {status === "retrieving" ? (
-          <LoaderCircle size={18} className="spin" />
+          <Spinner size={18} className="spin" />
         ) : (
           query && (
             <button
@@ -198,9 +199,9 @@ export function SearchBox({
             >
               <span className="result-icon location-icon">
                 {locating ? (
-                  <LoaderCircle className="spin" size={18} />
+                  <Spinner className="spin" size={18} />
                 ) : (
-                  <LocateFixed size={18} />
+                  <Crosshair size={18} />
                 )}
               </span>
               <span>
@@ -213,7 +214,7 @@ export function SearchBox({
               <div id={listId} role="listbox" aria-label="Search suggestions">
                 {(status === "loading" || status === "retrieving") && (
                   <p className="search-status" role="status">
-                    <LoaderCircle className="spin" size={16} />
+                    <Spinner className="spin" size={16} />
                     {status === "retrieving"
                       ? "Finding this place…"
                       : "Searching…"}

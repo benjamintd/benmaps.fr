@@ -1,6 +1,6 @@
 @font-face {
   font-family: Commissioner;
-  src: url("/clair/fonts/latin/Commissioner-Variable.woff2") format("woff2");
+  src: url("/fonts/commissioner/Commissioner-Variable.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -213,18 +213,6 @@ button small {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
-.clair-wordmark {
-  font-size: 25px;
-  letter-spacing: -1px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.clair-sun {
-  color: #626975;
-  font-size: 26px;
-  line-height: 1;
-}
 .category-bar {
   position: absolute;
   left: 402px;
@@ -346,10 +334,6 @@ button small {
 .layer-mini.satellite {
   color: #fff;
   background: linear-gradient(35deg, #20242c, #626975, #20242c);
-}
-.layers-toggle > svg {
-  color: #626975;
-  margin-left: 8px;
 }
 .layers-toggle.active {
   background: #f6f5f3;
@@ -952,17 +936,6 @@ button small {
   text-align: center;
   color: #626975;
 }
-.empty-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 61px;
-  height: 61px;
-  border-radius: 50%;
-  background: #f6f5f3;
-  color: #626975;
-  margin-bottom: 4px;
-}
 .route-empty h2 {
   font-weight: 500;
   font-size: 16px;
@@ -1310,12 +1283,6 @@ dialog::backdrop {
   width: 470px;
   max-width: calc(100% - 30px);
 }
-.about-dialog h1 {
-  font-size: 29px;
-  font-weight: 500;
-  letter-spacing: -0.7px;
-  margin: 30px 0 15px;
-}
 .about-dialog > p {
   font-size: 13px;
   line-height: 1.75;
@@ -1453,9 +1420,6 @@ dialog::backdrop {
     height: 30px;
     border-radius: 7px;
   }
-  .layers-toggle > svg {
-    display: none;
-  }
   .map-controls {
     right: 14px;
     bottom: 310px;
@@ -1565,9 +1529,6 @@ dialog::backdrop {
   .route-empty {
     padding: 14px 20px 20px;
   }
-  .route-empty .empty-icon {
-    display: none;
-  }
   .route-empty h2 {
     font-size: 14px;
     margin: 4px 0 6px;
@@ -1650,9 +1611,6 @@ dialog::backdrop {
   }
   .about-dialog {
     padding: 28px;
-  }
-  .about-dialog h1 {
-    font-size: 25px;
   }
   .nearby-place {
     padding: 14px 18px;
@@ -1794,9 +1752,6 @@ dialog::backdrop {
 }
 .place-description,
 .place-meta > span {
-  color: var(--muted);
-}
-.clair-sun {
   color: var(--muted);
 }
 .route-content:empty {

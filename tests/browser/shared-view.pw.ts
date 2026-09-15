@@ -1,11 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
-import type { Map as LibreMap } from "maplibre-gl";
-declare global {
-  interface Window {
-    sharedTestMap: LibreMap;
-  }
-}
+import { captureMap } from "./support/map";
 test("shared views restore buildings, layers, pin metadata, camera, categories and drafts", async ({
   page,
 }) => {
@@ -13,20 +8,7 @@ test("shared views restore buildings, layers, pin metadata, camera, categories a
     new URL("./fixtures/flat-terrain.png", import.meta.url),
   );
   const styleUrls: string[] = [];
-  await page.route(
-    /\/src\/components\/MapCanvas\.tsx(?:\?.*)?$/,
-    async (route) => {
-      const response = await route.fetch(),
-        body = await response.text();
-      await route.fulfill({
-        response,
-        body: body.replace(
-          "mapRef.current = map;",
-          "window.sharedTestMap = map; mapRef.current = map;",
-        ),
-      });
-    },
-  );
+  await captureMap(page);
   await page.route("https://clair.benmaps.fr/**", (route) => {
     styleUrls.push(route.request().url());
     const threeD =
@@ -89,14 +71,12 @@ test("shared views restore buildings, layers, pin metadata, camera, categories a
   ).toBeVisible();
   await expect
     .poll(() =>
-      page.evaluate(
-        () => !!window.sharedTestMap?.getLayer("building-extrusion"),
-      ),
+      page.evaluate(() => !!window.__map?.getLayer("building-extrusion")),
     )
     .toBe(true);
   const camera = () =>
     page.evaluate(() => {
-      const map = window.sharedTestMap;
+      const map = window.__map;
       if (!map) return null;
       const c = map.getCenter();
       return [
@@ -118,7 +98,9 @@ test("shared views restore buildings, layers, pin metadata, camera, categories a
     page.getByRole("heading", { name: "Maison", exact: true }),
   ).toBeVisible();
   await expect.poll(camera).toEqual(original);
-  expect(styleUrls.some((url) => url.endsWith("?3d=1"))).toBe(true);
+  expect(
+    styleUrls.some((url) => new URL(url).searchParams.get("3d") === "1"),
+  ).toBe(true);
   await page
     .getByRole("button", { name: "About Benmaps", exact: true })
     .click();
@@ -177,9 +159,7 @@ test("shared views restore buildings, layers, pin metadata, camera, categories a
   await expect.poll(camera).toEqual([16, 48.85, 2.35, 10, 50]);
   await expect
     .poll(() =>
-      page.evaluate(
-        () => !!window.sharedTestMap.getLayer("building-extrusion"),
-      ),
+      page.evaluate(() => !!window.__map!.getLayer("building-extrusion")),
     )
     .toBe(false);
 });

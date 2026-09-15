@@ -1,13 +1,10 @@
 import { describe, expect, it } from "vitest";
-import {
-  defaultState,
-  journeyKey,
-  pointPlace,
-  reducer,
-} from "../src/lib/domain";
+import { journeyKey, pointPlace, reducer } from "../src/lib/domain";
+import { defaultState } from "./fixtures";
 import type { AppState, Journey, Route } from "../src/lib/domain";
 import {
   cameraHash,
+  cameraOrDefault,
   defaultCamera,
   readCamera,
   readState,
@@ -105,18 +102,21 @@ describe("share links and legacy URLs", () => {
     const url = new URL(
       "https://benmaps.fr/@2.33,48.86,14/+2.35,48.85/~Notre-Dame",
     );
-    expect(readCamera(url).center).toEqual([2.33, 48.86]);
+    expect(readCamera(url)?.center).toEqual([2.33, 48.86]);
     expect(readState(url).view.kind).toBe("explore");
   });
   it("rejects malformed, impossible and non-finite camera values", () => {
     for (const hash of ["#99/48/2", "#13/91/2", "#13/48/NaN", "#13/48/2/0/99"])
-      expect(readCamera(new URL("https://benmaps.fr/" + hash))).toEqual(
-        defaultCamera,
-      );
+      expect(readCamera(new URL("https://benmaps.fr/" + hash))).toBeNull();
+    // A URL carrying no camera is distinguishable from one that happens to
+    // encode the default framing.
+    expect(readCamera(new URL("https://benmaps.fr/"))).toBeNull();
     expect(
-      readCamera(new URL("https://benmaps.fr/" + cameraHash(defaultCamera)))
-        .center,
-    ).toEqual(defaultCamera.center);
+      readCamera(new URL("https://benmaps.fr/" + cameraHash(defaultCamera))),
+    ).toEqual(defaultCamera);
+    expect(cameraOrDefault(new URL("https://benmaps.fr/"))).toEqual(
+      defaultCamera,
+    );
     expect(readState(new URL("https://benmaps.fr/?pin=181,0")).view).toEqual({
       kind: "explore",
       place: null,

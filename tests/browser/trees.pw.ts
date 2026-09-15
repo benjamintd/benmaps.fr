@@ -1,10 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
-import type { Map as LibreMap } from "maplibre-gl";
+import { captureMap } from "./support/map";
 
 declare global {
   interface Window {
-    treeTestMap: LibreMap;
     treeDraws: number;
   }
 }
@@ -12,6 +11,14 @@ declare global {
 test("3D trees load on demand, render under labels through the Clair CDN SDK, and survive style changes", async ({
   page,
 }, testInfo) => {
+  if (process.env.CLAIR_3D_BUNDLE) {
+    await page.route("https://clair.benmaps.fr/extensions/**", (route) =>
+      route.fulfill({
+        path: process.env.CLAIR_3D_BUNDLE!,
+        contentType: "text/javascript",
+      }),
+    );
+  }
   const tile = await readFile(
     new URL("./fixtures/trees-14-8298-5636.mvt", import.meta.url),
   );
@@ -22,27 +29,35 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
     errors: string[] = [];
   page.on("request", (r) => requests.push(r.url()));
   page.on("pageerror", (e) => errors.push(e.message));
-  // Expose the real map only in the test-served module, never in application builds.
-  await page.route("**/src/components/MapCanvas.tsx", async (route) => {
-    const response = await route.fetch();
-    const body = await response.text();
-    expect(body).toContain("mapRef.current = map;");
-    await route.fulfill({
-      response,
-      body: body.replace(
-        "mapRef.current = map;",
-        `window.treeTestMap = map;
-        const addLayer = map.addLayer.bind(map);
-        map.addLayer = (layer, before) => {
-          if (layer.id === "open-landmarks-trees") {
-            const render = layer.render.bind(layer);
-            layer.render = (...args) => { render(...args); window.treeDraws = (window.treeDraws || 0) + 1; };
+  // Wrap addLayer at creation time so the tree layer is instrumented before
+  // the SDK ever renders it. Runs in the page: keep self-contained.
+  await captureMap(page, (map: any) => {
+    const addLayer = map.addLayer.bind(map);
+    map.addLayer = (layer: any, before: any) => {
+      if (layer.id === "open-landmarks-trees") {
+        const render = layer.render.bind(layer);
+        // Count GPU draws, since the SDK also receives render callbacks
+        // below the tree zoom threshold and returns without drawing.
+        layer.render = (gl: any, ...args: any[]) => {
+          const methods = ["drawElementsInstanced", "drawArraysInstanced"];
+          const originals = methods.map((method) => gl[method]);
+          methods.forEach((method, i) => {
+            gl[method] = (...drawArgs: any[]) => {
+              window.treeDraws = (window.treeDraws || 0) + 1;
+              return originals[i].apply(gl, drawArgs);
+            };
+          });
+          try {
+            return render(gl, ...args);
+          } finally {
+            methods.forEach((method, i) => {
+              gl[method] = originals[i];
+            });
           }
-          return addLayer(layer, before);
         };
-        mapRef.current = map;`,
-      ),
-    });
+      }
+      return addLayer(layer, before);
+    };
   });
   await page.route("https://clair.benmaps.fr/styles/**", (r) =>
     r.fulfill({
@@ -81,16 +96,18 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
       },
     }),
   );
-  await page.route("https://open-landmarks.benmaps.fr/**", (route) =>
-    route.fulfill({
+  await page.route("https://open-landmarks.benmaps.fr/**", (route) => {
+    if (route.request().url().endsWith("/preview.json"))
+      return route.fulfill({ json: { catalogue: "./test/catalogue.json" } });
+    return route.fulfill({
       json: {
         bounds: [2.224, 48.815, 2.422, 48.903],
         maxHeightM: 0,
         index: { zoom: 12, template: "/unused/{x}/{y}.json", occupied: [] },
         assetBase: "/",
       },
-    }),
-  );
+    });
+  });
   await page.route("https://api.protomaps.com/**", (r) =>
     r.fulfill({
       body: r.request().url().includes("/14/8298/5636.mvt")
@@ -116,11 +133,14 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
   await page.goto("/#17.3/48.8606/2.3376/0/0");
   await page.locator(".maplibregl-canvas").waitFor();
   await expect
-    .poll(() => page.evaluate(() => window.treeTestMap?.isStyleLoaded()))
+    .poll(() => page.evaluate(() => window.__map?.isStyleLoaded()))
     .toBe(true);
   expect(requests.some((url) => url.includes("/extensions/0.2.3/"))).toBe(
     false,
   );
+  expect(
+    requests.some((url) => url.includes("open-landmarks.benmaps.fr")),
+  ).toBe(false);
   await page.getByRole("button", { name: "Layers", exact: true }).click();
   const toggle = page.getByRole("switch", { name: "3D", exact: true });
   await toggle.check();
@@ -129,16 +149,30 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
     .toBeGreaterThan(0);
   await expect
     .poll(() =>
+      requests.some((url) => url.endsWith("/paris/test/catalogue.json")),
+    )
+    .toBe(true);
+  await expect
+    .poll(() =>
       page.evaluate(() =>
-        window.treeTestMap.getLayoutProperty("tree-canopy", "visibility"),
+        window.__map!.getLayoutProperty("tree-canopy", "visibility") === "none"
+          ? 0
+          : window.__map!.getPaintProperty("tree-canopy", "circle-opacity"),
       ),
     )
-    .toBe("none");
-  expect(
-    await page.evaluate(() => window.treeTestMap.getProjection().type),
-  ).toBe("mercator");
+    .toBe(0);
+  if (process.env.CLAIR_3D_BUNDLE) {
+    expect(
+      await page.evaluate(() =>
+        window.__map!.getLayoutProperty("tree-canopy", "visibility"),
+      ),
+    ).not.toBe("none");
+  }
+  expect(await page.evaluate(() => window.__map!.getProjection().type)).toBe(
+    "mercator",
+  );
   const order = await page.evaluate(() =>
-    window.treeTestMap.getStyle().layers.map((l) => l.id),
+    window.__map!.getStyle().layers.map((l) => l.id),
   );
   expect(order.indexOf("open-landmarks-trees")).toBeLessThan(
     order.indexOf("labels"),
@@ -155,48 +189,46 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.treeTestMap.getLayoutProperty("tree-canopy", "visibility"),
+        window.__map!.getLayoutProperty("tree-canopy", "visibility") === "none"
+          ? 0
+          : window.__map!.getPaintProperty("tree-canopy", "circle-opacity"),
       ),
     )
-    .toBe("none");
+    .toBe(0);
   await toggle.uncheck();
   await expect
     .poll(() =>
-      page.evaluate(
-        () => !!window.treeTestMap.getLayer("open-landmarks-trees"),
-      ),
+      page.evaluate(() => !!window.__map!.getLayer("open-landmarks-trees")),
     )
     .toBe(false);
   await expect
     .poll(() =>
       page.evaluate(
         () =>
-          window.treeTestMap.getLayoutProperty("tree-canopy", "visibility") ??
-          "visible",
+          window.__map!.getPaintProperty("tree-canopy", "circle-opacity") ?? 1,
       ),
     )
-    .toBe("visible");
+    .toBe(1);
   await toggle.check();
   await expect
     .poll(() =>
-      page.evaluate(
-        () => !!window.treeTestMap.getLayer("open-landmarks-trees"),
-      ),
+      page.evaluate(() => !!window.__map!.getLayer("open-landmarks-trees")),
     )
     .toBe(true);
-  await page.evaluate(() => window.treeTestMap.jumpTo({ zoom: 3 }));
+  await page.evaluate(() => window.__map!.jumpTo({ zoom: 3 }));
   await expect
     .poll(() =>
-      page.evaluate(() =>
-        window.treeTestMap.getLayoutProperty("tree-canopy", "visibility"),
+      page.evaluate(
+        () =>
+          window.__map!.getPaintProperty("tree-canopy", "circle-opacity") ?? 1,
       ),
     )
-    .toBe("visible");
+    .toBe(1);
   const distantDraws = await page.evaluate(() => window.treeDraws);
-  await page.evaluate(() => window.treeTestMap.triggerRepaint());
+  await page.evaluate(() => window.__map!.triggerRepaint());
   await page.waitForTimeout(200);
   expect(await page.evaluate(() => window.treeDraws)).toBe(distantDraws);
-  await page.evaluate(() => window.treeTestMap.jumpTo({ zoom: 17.3 }));
+  await page.evaluate(() => window.__map!.jumpTo({ zoom: 17.3 }));
   await expect
     .poll(() => page.evaluate(() => window.treeDraws))
     .toBeGreaterThan(distantDraws);

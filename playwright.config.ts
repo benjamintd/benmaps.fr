@@ -2,6 +2,9 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/browser",
   testMatch: "**/*.pw.ts",
+  // Each case starts a real WebGL map; parallel GPU contexts make gesture and
+  // style-readiness checks compete with each other on development/CI machines.
+  workers: 1,
   use: {
     screenshot: "only-on-failure",
     trace: "retain-on-failure",

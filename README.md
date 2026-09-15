@@ -1,7 +1,7 @@
 # Benmaps
 
 A map application built with React 19, TypeScript, MapLibre GL JS 6.9, and
-[Clair](https://clair.benmaps.fr) 0.5.6. Commissioner is used for the interface
+[Clair](https://clair.benmaps.fr) hosted cartography. Commissioner is used for the interface
 and map labels. The interface uses Heroicons with matching semantic companion
 icons for transport and POI categories missing from that set.
 
@@ -22,13 +22,12 @@ For a Protomaps v4 PMTiles archive, set `VITE_PMTILES_URL` instead of using the
 hosted Protomaps API. This source must permit CORS and HTTP Range requests.
 Clair's relief still uses the attributed Mapzen Terrarium elevation service.
 
-The current local preview uses an ignored `.env.development.local` file with
-`VITE_PMTILES_URL=/__pmtiles/20260911.pmtiles`. Vite proxies range reads from that
-public Protomaps build for development; it does not download the planet. Public
-builds expire. Pick an available v4 archive from
-[the build index](https://maps.protomaps.com/builds/) if needed. This adapter is
-**development-only**, and is never selected by a production build. Host your own
-archive or use a Protomaps API key for production.
+For keyless local development, the optional `/__pmtiles/<build>.pmtiles` Vite
+proxy supports range reads from public Protomaps builds without downloading the
+planet. Choose an available v4 archive from [the build index](https://maps.protomaps.com/builds/)
+and set `VITE_PMTILES_URL` in your ignored `.env.development.local`. Public builds
+expire. This proxy is development-only; use your own archive or a Protomaps API
+key for production.
 
 ## Vercel
 
@@ -42,9 +41,9 @@ Set these environment variables in Vercel before building:
 - `VITE_PMTILES_URL` (optional): a publicly accessible, CORS-enabled Protomaps v4 archive; overrides the hosted vector source.
 
 Variables are embedded at build time; redeploy after changing them. There is no
-runtime server or database. No credentials are committed. Clair is pinned in
-`vendor/`, so the build does not need the neighboring cartography repository or
-an unpublished npm registry package.
+runtime server or database. No credentials are committed. Clair styles are fetched from its hosted `latest`
+endpoint; its 3D renderer URL is configured in `src/lib/clair-3d.ts`. The build
+needs neither a neighboring repository nor a vendored style factory.
 
 ## Features
 
@@ -70,8 +69,12 @@ requests go to the relevant providers.
   results are rejected unless their request key matches the current journey.
 - `src/lib/api.ts`: abortable Mapbox requests and Zod validation at the network boundary.
 - `src/hooks/useDirections.ts`: request lifecycle; no I/O inside reducers or map rendering.
-- `src/components/MapCanvas.tsx`: owns a single MapLibre instance, disposes listeners
-  and markers, and restores overlays after style replacement.
+- `src/components/MapCanvas.tsx`: owns the MapLibre instance, camera and style lifecycle.
+  `src/lib/map/` owns route overlays, hit testing and marker lifetime.
+- `src/hooks/useLocation.ts`: retires location callbacks after the user changes view,
+  starts a new request or leaves the app; only the current request can select or fly.
+- `src/components/MapAppearance.tsx` and `AboutDialog.tsx`: own their respective
+  controls, dismissal and dialog lifecycle; `App.tsx` composes them with app state.
 - `src/lib/wikidata.ts`: enrichment with bounded in-memory caching. Uses a valid
   Wikidata ID when present. Otherwise requires an exact normalized name/alias
   match and entity coordinates within 750 m. Uncertain matches are omitted.
@@ -80,14 +83,15 @@ requests go to the relevant providers.
   `/@lng,lat,zoom/+lng,lat` links, and serializes portable share URLs.
 
 The old CRA/Redux/Mapbox GL application and middleware are replaced. Legacy
-Mapillary v3 integration and the terrain tile-query elevation chart are not
-carried forward in this first rewrite. Returning visitors' CRA service worker
+Mapillary v3 integration is removed. Cycling elevation is implemented with bounded
+Mapbox terrain contour sampling and explicit missing-data gaps. Returning visitors' CRA service worker
 registrations are retired when the new app starts.
 
 ## Checks
 
 ```sh
 npm run check
+npm run lint
 npm test
 npm run build
 npm run format:check
@@ -103,10 +107,12 @@ production worker includes its shared dependencies.
 
 ## Licenses
 
-Application code retains its MIT license. Clair is distributed under its own
-license; fonts, map data, and imagery retain their upstream terms. The build
-copies Clair assets and notices to `/clair/`; map attribution stays visible.
-See [vendor/README.md](vendor/README.md) for the pinned dependency's provenance.
+Application code retains its MIT license. Clair's hosted cartography and SDK
+retain their own terms; the About dialog links to Clair's license and notices.
+Map attribution stays visible. Only the existing Commissioner interface font is
+self-hosted, with its OFL license and provenance in
+[public/fonts/commissioner/README.md](public/fonts/commissioner/README.md).
+Map fonts, sprites, landmark models and renderer code load from their providers.
 
 Cycling profiles use sampled Mapbox terrain contours, so ascent/descent values
 are estimates. Missing samples appear as gaps. The browser tests use provider
@@ -126,7 +132,6 @@ still need an internet connection for maps, search, and directions. To regenerat
 the committed PNG/ICO assets and social preview from the existing SVG logo:
 
 ```sh
-node scripts/prepare-assets.mjs
 node scripts/generate-brand-assets.mjs
 ```
 
@@ -135,8 +140,8 @@ additional image-generation dependencies are required by the Vercel build.
 
 ## 3D trees and landmarks
 
-The `next` application consumes Clair's versioned CDN SDK at
-`https://clair.benmaps.fr/extensions/0.2.3/clair-3d.js`. The 3D toggle loads its
+The application consumes Clair's CDN SDK at
+`https://clair.benmaps.fr/extensions/latest/clair-3d.js`. The 3D toggle loads its
 renderer and procedural trees together. Flat maps request no SDK, index or models.
 The SDK owns style reloads; the application serializes asynchronous attachment
 and removes late results when 3D is disabled or the map is destroyed.
@@ -146,22 +151,26 @@ This preview explicitly selects the draft Paris collection via `preview.json`;
 the SDK resolves and pins its release for each map session. Configure
 `VITE_OPEN_LANDMARKS_CATALOGUE_URL` to select a pinned catalogue or the approved
 `latest.json` pointer.
-`VITE_CLAIR_3D_URL` optionally overrides the pinned SDK URL.
+`VITE_CLAIR_3D_URL` optionally overrides the SDK URL. The moving alias currently
+resolves to immutable SDK 0.2.8.
 
 Models load from zoom 15; instanced trees use real Protomaps points from zoom 16.
 The SDK caps residency at three models and 1,500 trees. No model files or Three.js
 renderer are bundled into the application. Both use Mercator and terrain elevation;
 styles and traffic overlays can change without adding another renderer.
+Tree generation and landmark rendering belong to the Clair SDK; keep this repo's
+3D code limited to SDK configuration and lifecycle. Integration checks live in
+`tests/clair-3d.test.ts` and `tests/browser/trees.pw.ts`.
 
 Credits link to Open Landmarks' component licenses and editable sources alongside
 the existing map attribution. Model metadata carries per-model provenance. Basemap
 replacement uses polygon-area overlap against loaded tile geometry and filters
-matched feature IDs. Benmaps uses the default `replacementMode: "reserve"`: index
-footprints are reserved before GLB downloads, including failed or capped models.
-Each 3D style is prepared before `setStyle`, keeping extrusions transparent until
-discovery and filtering settle. Metadata failures release that initial gate;
-model failures leave a flat footprint. Snapshot-specific ID overrides remain unset
-for the live Protomaps API.
+matched feature IDs. Benmaps selects `replacementMode: "loaded"`: ordinary buildings remain until
+models are ready and return when models are unavailable. Stable fallback layers
+hide complete OSM extrusions, including their roofs. Zooming retains learned IDs
+and cached meshes; FIFO eviction occurs only under cache capacity pressure.
+The basemap loads independently of SDK/catalogue requests. Snapshot-specific ID
+overrides remain unset for the live Protomaps API.
 
 ## Shared views
 
@@ -178,4 +187,3 @@ Browser history and direct hash changes are reflected in the application.
 Routes, search results, photos and current traffic are fetched again; provider
 changes or a different screen size may change those details. Ephemeral loading
 states, notices, focus and geolocation permissions are not part of a shared view.
-

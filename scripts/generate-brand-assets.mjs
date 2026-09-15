@@ -44,7 +44,7 @@ try {
   await render(512, "public/icons/icon-512.png");
   await render(512, "public/icons/icon-maskable-512.png", true);
   const font = await readFile(
-    "public/clair/fonts/latin/Commissioner-Variable.woff2",
+    "public/fonts/commissioner/Commissioner-Variable.woff2",
   );
   await page.setViewportSize({ width: 1200, height: 630 });
   await page.setContent(`<style>
