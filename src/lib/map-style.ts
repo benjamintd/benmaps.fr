@@ -4,12 +4,14 @@ import type { MapSettings } from "./domain";
 // Clair's hosted style ships fonts, sprites and an empty Protomaps vector
 // source that we point at our own tile provider. "latest" tracks the newest
 // release; pin a versioned URL here if you need reproducible cartography.
-const STYLE_URL = "https://clair.benmaps.fr/styles/latest/light.json";
+// Local mode uses each feature's native names, with Clair's English fallback.
+const STYLE_URL =
+  "https://clair.benmaps.fr/styles/latest/light.json?lang=local";
 const baseStyles = new Map<boolean, Promise<StyleSpecification>>();
 function loadBaseStyle(threeDimensional: boolean): Promise<StyleSpecification> {
   let pending = baseStyles.get(threeDimensional);
   if (!pending) {
-    pending = fetch(`${STYLE_URL}${threeDimensional ? "?3d=1&terrain=1" : ""}`)
+    pending = fetch(`${STYLE_URL}${threeDimensional ? "&3d=1&terrain=1" : ""}`)
       .then((response) => {
         if (!response.ok)
           throw new Error(`Clair style request failed (${response.status})`);

@@ -45,6 +45,11 @@ runtime server or database. No credentials are committed. Clair styles are fetch
 endpoint; its 3D renderer URL is configured in `src/lib/clair-3d.ts`. The build
 needs neither a neighboring repository nor a vendored style factory.
 
+Both flat and 3D styles request Clair's `lang=local` mode. Map labels use each
+place's native names, including additional local names in multilingual regions,
+with English as a fallback when the primary local name is missing. Satellite
+maps retain these labels, and clicking a map label also prefers its local name.
+
 ## Features
 
 - Protomaps/PMTiles basemap, Clair cartography, 3D buildings and terrain.

@@ -6,7 +6,7 @@ import { wikidataId } from "../wikidata";
 function labelled(feature: MapGeoJSONFeature): boolean {
   return (
     feature.layer.type === "symbol" &&
-    Boolean(feature.properties?.["name:en"] || feature.properties?.name)
+    Boolean(feature.properties?.name || feature.properties?.["name:en"])
   );
 }
 
@@ -40,7 +40,7 @@ export function placeAtPoint(
     ...pointPlace(
       coordinates,
       feature
-        ? String(feature.properties["name:en"] || feature.properties.name)
+        ? String(feature.properties.name || feature.properties["name:en"])
         : undefined,
     ),
     category: feature?.properties.kind,

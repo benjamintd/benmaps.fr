@@ -7,7 +7,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.resetModules();
 });
-it("requests and caches Clair variants, preserving 3D buildings in both basemaps", async () => {
+it("requests and caches local-language Clair variants, preserving 3D buildings in both basemaps", async () => {
   const request = vi.fn(async (input: string) => ({
     ok: true,
     json: async () => ({
@@ -28,7 +28,7 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
         : {}),
       layers: [
         { id: "ground", type: "background" },
-        ...(input.endsWith("?3d=1&terrain=1")
+        ...(new URL(input).searchParams.get("3d") === "1"
           ? [
               {
                 id: "building-extrusion",
@@ -40,7 +40,7 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
             ]
           : []),
       ],
-      ...(input.endsWith("?3d=1&terrain=1")
+      ...(new URL(input).searchParams.get("3d") === "1"
         ? { light: { intensity: 0.4 } }
         : {}),
     }),
@@ -73,7 +73,7 @@ it("requests and caches Clair variants, preserving 3D buildings in both basemaps
   expect(restored.terrain).toBeUndefined();
   expect(restored.projection).toEqual({ type: "mercator" });
   expect(request.mock.calls.map(([url]) => url)).toEqual([
-    "https://clair.benmaps.fr/styles/latest/light.json",
-    "https://clair.benmaps.fr/styles/latest/light.json?3d=1&terrain=1",
+    "https://clair.benmaps.fr/styles/latest/light.json?lang=local",
+    "https://clair.benmaps.fr/styles/latest/light.json?lang=local&3d=1&terrain=1",
   ]);
 });
