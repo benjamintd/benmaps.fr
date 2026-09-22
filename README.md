@@ -191,3 +191,28 @@ Browser history and direct hash changes are reflected in the application.
 Routes, search results, photos and current traffic are fetched again; provider
 changes or a different screen size may change those details. Ephemeral loading
 states, notices, focus and geolocation permissions are not part of a shared view.
+
+## Persistent basemap cache
+
+Protomaps vector tiles and extracted PMTiles tiles/TileJSON use the page's Cache
+Storage API, without a service worker. Returning to a previously viewed area can
+reuse tiles across reloads and browser sessions. The cache uses complete source
+URLs, including archive versions and provider keys, to keep sources separate.
+
+Tiles are fresh for at most four hours (shorter provider freshness, exposed Age,
+and Expires headers are honored). Older tiles may be displayed immediately for
+up to seven days while one shared request refreshes them in the background.
+Refresh failures leave the cached tile available; refreshed data is used on the
+next tile load. `no-store`, `no-cache`, and `must-revalidate` are respected.
+
+The cache keeps the latest 128 inserted/refreshed entries, each no larger than
+512 KiB: at most 64 MiB of tile bodies, plus storage metadata. Larger tiles still
+load normally. Writes coordinate between tabs using Web Locks where supported.
+Storage denial, eviction, or quota errors fall back to ordinary network loading.
+Clearing Benmaps' site data clears the cache. Browsers may also evict it.
+
+This covers the vector basemap, not satellite, traffic, elevation, search,
+routing, styles, fonts, or models. It does not make the entire app available
+offline. Cached tile coordinates reveal previously viewed areas on this device;
+Benmaps does not collect them or store a location timeline. Prefer versioned
+PMTiles archive URLs when replacing a dataset.

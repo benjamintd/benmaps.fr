@@ -69,7 +69,8 @@ export function AboutDialog({
         <span>
           <strong>Privacy</strong>
           <small>
-            No analytics, accounts, cookies, or location history. Map tiles,
+            No analytics, accounts, or cookies. Recently viewed basemap tiles
+            are cached on your device for faster return visits. Map tiles,
             searches, and route requests go directly to their respective
             providers. Your location is requested only when you ask and never
             shared with us.

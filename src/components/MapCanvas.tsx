@@ -4,17 +4,16 @@ import {
   LngLatBounds,
   ScaleControl,
   AttributionControl,
-  addProtocol,
   setWorkerUrl,
 } from "maplibre-gl";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
-import { Protocol } from "pmtiles";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { addPlaceMarkers, addUserLocationMarker } from "../lib/map/markers";
 import { routeAtPoint, updateRoutes } from "../lib/map/routes";
 import { isPointerTarget, placeAtPoint } from "../lib/map/picking";
 import { createContextMenu } from "../lib/map/context-menu";
 import { mapStyle } from "../lib/map-style";
+import { registerTileProtocols } from "../lib/map/tile-protocols";
 import { hasBasemap } from "../lib/config";
 import { createClair3D } from "../lib/clair-3d";
 import { journeyKey } from "../lib/domain";
@@ -23,8 +22,7 @@ import { cameraHash, cameraOrDefault, readCamera } from "../lib/url";
 import type { Camera } from "../lib/url";
 import { Spinner, MapPin, TriangleAlert } from "./Icons";
 setWorkerUrl(workerUrl);
-const protocol = new Protocol();
-addProtocol("pmtiles", protocol.tile);
+registerTileProtocols();
 declare global {
   interface Window {
     __onMapCreated?: (map: Map) => void;
@@ -161,11 +159,8 @@ export default function MapCanvas(props: Props) {
           ),
         );
       setLoading(false);
-      setError(
-        /403|401/.test(message)
-          ? "The map provider denied this request. Check your key’s allowed domains."
-          : "Some map details couldn’t load. Check your connection or try again.",
-      );
+      // Individual tile failures are recoverable and common on slow networks.
+      // Keep the map usable without turning each resource error into an alert.
     });
     // Update during gestures and camera animations, not just after they end.
     const syncOrientation = () =>

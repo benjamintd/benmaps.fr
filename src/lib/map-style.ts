@@ -44,7 +44,7 @@ export async function mapStyle(
       protomaps.url = `pmtiles://${new URL(config.pmtilesUrl, window.location.origin).href}`;
     } else if (config.protomapsKey) {
       protomaps.tiles = [
-        `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${encodeURIComponent(config.protomapsKey)}`,
+        `cached-tiles://https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=${encodeURIComponent(config.protomapsKey)}`,
       ];
     }
   }
