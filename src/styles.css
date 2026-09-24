@@ -178,9 +178,12 @@ button small {
   height: 42px;
   color: #20242c;
 }
+.search-input-wrap input:focus-visible {
+  outline: none;
+}
 .search-input-wrap:focus-within {
   border-radius: 12px;
-  box-shadow: inset 0 0 0 2px #2e6ea220;
+  box-shadow: inset 0 0 0 2px #2e6ea2bf;
 }
 .search-input-wrap input::placeholder {
   color: #626975;
