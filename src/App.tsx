@@ -261,15 +261,6 @@ export default function App() {
                           <small>Latitude, longitude</small>
                         </span>
                       </div>
-                      <button
-                        className="start-here"
-                        onClick={() =>
-                          dispatch({ type: "directions", from: place })
-                        }
-                      >
-                        <span>Directions from here</span>
-                        <Directions size={22} />
-                      </button>
                     </div>
                   </>
                 )}

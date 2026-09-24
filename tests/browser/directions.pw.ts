@@ -167,9 +167,7 @@ test("select a map alternative, drag both endpoints, and show flat cycling eleva
   );
 });
 
-test("search focus has equal insets and directions CTA uses the same icon", async ({
-  page,
-}, testInfo) => {
+test("search focus has equal insets", async ({ page }, testInfo) => {
   await page.route("https://clair.benmaps.fr/**", (route) =>
     route.fulfill({ json: { version: 8, sources: {}, layers: [] } }),
   );
@@ -189,13 +187,6 @@ test("search focus has equal insets and directions CTA uses the same icon", asyn
       };
     });
     expect(geometry).toEqual({ left: 6, top: 6, bottom: 6 });
-    const searchIcon = await page.locator(".search-directions svg").innerHTML();
-    expect(await page.locator(".start-here svg").innerHTML()).toBe(searchIcon);
-    const cta = await page.locator(".start-here").evaluate((el) => ({
-      last: el.lastElementChild!.tagName,
-      count: el.querySelectorAll("svg").length,
-    }));
-    expect(cta).toEqual({ last: "svg", count: 1 });
   }
   await page.screenshot({ path: testInfo.outputPath("focus.png") });
 });

@@ -73,8 +73,6 @@ button {
 button:hover:not(:disabled) {
   background-color: #f6f5f3;
 }
-/* Link-style actions opt out of the default gray fill: tint the text instead. */
-.start-here:hover:not(:disabled),
 .location-link:hover:not(:disabled) {
   background-color: transparent;
   color: #245986;
@@ -710,20 +708,6 @@ button small {
   display: block;
   color: #626975;
   margin-top: 5px;
-}
-.start-here {
-  padding: 15px 0 0;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  font-size: 12px;
-  color: var(--blue);
-  text-align: left;
-}
-.start-here span {
-  flex: 1;
 }
 .panel-header {
   display: flex;
@@ -1468,9 +1452,6 @@ dialog::backdrop {
   .place-meta {
     padding: 14px 0;
     font-size: 11px;
-  }
-  .start-here {
-    padding-top: 13px;
   }
   .has-detail .layers-anchor,
   .has-detail .map-controls {
