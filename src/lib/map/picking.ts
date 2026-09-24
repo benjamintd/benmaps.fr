@@ -11,15 +11,22 @@ function labelled(feature: MapGeoJSONFeature): boolean {
 }
 
 /** The basemap label under the pointer, if the pointer is over one. */
-export function labelAtPoint(map: Map, point: Point) {
-  return map.queryRenderedFeatures(point).find(labelled);
+export function labelAtPoint(map: Map, point: Point, poisOnly = false) {
+  return map
+    .queryRenderedFeatures(point)
+    .find(
+      (feature) =>
+        labelled(feature) && (!poisOnly || feature.sourceLayer === "pois"),
+    );
 }
 
 /** True when the pointer is over anything the user can click through to. */
-export function isPointerTarget(map: Map, point: Point): boolean {
-  return map
-    .queryRenderedFeatures(point)
-    .some((feature) => feature.layer.type === "symbol");
+export function isPointerTarget(
+  map: Map,
+  point: Point,
+  poisOnly = false,
+): boolean {
+  return Boolean(labelAtPoint(map, point, poisOnly));
 }
 
 /**
@@ -30,8 +37,10 @@ export function placeAtPoint(
   map: Map,
   point: Point,
   lngLat: { lng: number; lat: number },
-): Place {
-  const feature = labelAtPoint(map, point);
+  poisOnly = false,
+): Place | null {
+  const feature = labelAtPoint(map, point, poisOnly);
+  if (poisOnly && !feature) return null;
   const coordinates: Coordinates =
     feature?.geometry.type === "Point"
       ? [feature.geometry.coordinates[0], feature.geometry.coordinates[1]]

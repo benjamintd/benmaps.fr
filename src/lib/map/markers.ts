@@ -44,18 +44,18 @@ export function addPlaceMarkers(
   if (selectedPlace && selectedPlace.source !== "location")
     list.push({ place: selectedPlace, kind: "selected", label: "" });
   if (view.kind === "directions") {
-    if (from)
+    if (from && from.source !== "location")
       list.push({
         place: from,
         kind: "origin",
-        label: "A",
+        label: "",
         endpoint: "from",
       });
     if (to)
       list.push({
         place: to,
         kind: "selected",
-        label: "B",
+        label: "",
         endpoint: "to",
       });
   }
@@ -66,7 +66,9 @@ export function addPlaceMarkers(
     el.className = `map-marker ${kind}${endpoint ? " draggable" : ""}`;
     el.setAttribute(
       "aria-label",
-      endpoint ? `${label}: ${place.name}` : place.name,
+      endpoint
+        ? `${endpoint === "from" ? "Starting point" : "Destination"}: ${place.name}`
+        : place.name,
     );
     el.title = endpoint ? `${place.name} — drag to move` : place.name;
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -82,11 +84,11 @@ export function addPlaceMarkers(
     svg.appendChild(path);
     const graphic = document.createElement("div");
     graphic.className = "marker-graphic";
-    graphic.appendChild(svg);
+    if (kind !== "origin") graphic.appendChild(svg);
     el.appendChild(graphic);
     const inner = document.createElement("span");
     inner.textContent = label || "•";
-    graphic.appendChild(inner);
+    if (kind !== "origin") graphic.appendChild(inner);
     let dragged = false;
     el.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -99,7 +101,7 @@ export function addPlaceMarkers(
     });
     const marker = new Marker({
       element: el,
-      anchor: "bottom",
+      anchor: kind === "origin" ? "center" : "bottom",
       draggable: Boolean(endpoint),
     })
       .setLngLat(place.coordinates)

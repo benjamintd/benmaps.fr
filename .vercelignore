@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env*
+!.env.example
+.git/
+.vercel/
+.vscode/
+.DS_Store
+*.tsbuildinfo
+playwright-report/
+test-results/
+.sites-runtime/

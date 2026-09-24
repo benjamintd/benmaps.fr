@@ -11,16 +11,17 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { addPlaceMarkers, addUserLocationMarker } from "../lib/map/markers";
 import { routeAtPoint, updateRoutes } from "../lib/map/routes";
 import { isPointerTarget, placeAtPoint } from "../lib/map/picking";
+import { installLongPress } from "../lib/map/long-press";
 import { createContextMenu } from "../lib/map/context-menu";
 import { mapStyle } from "../lib/map-style";
 import { registerTileProtocols } from "../lib/map/tile-protocols";
 import { hasBasemap } from "../lib/config";
 import { createClair3D } from "../lib/clair-3d";
-import { journeyKey } from "../lib/domain";
+import { journeyKey, pointPlace } from "../lib/domain";
 import type { AppState, Coordinates, Place } from "../lib/domain";
 import { cameraHash, cameraOrDefault, readCamera } from "../lib/url";
 import type { Camera } from "../lib/url";
-import { Spinner, MapPin, TriangleAlert } from "./Icons";
+import { MapPin } from "./Icons";
 setWorkerUrl(workerUrl);
 registerTileProtocols();
 declare global {
@@ -31,6 +32,7 @@ declare global {
 export type MapCommand =
   | { id: number; type: "camera"; camera: Camera }
   | { id: number; type: "zoom-in" | "zoom-out" | "north" }
+  | { id: number; type: "locate"; coordinates: Coordinates }
   | { id: number; type: "fly"; coordinates: Coordinates; zoom?: number };
 type Props = {
   state: AppState;
@@ -47,14 +49,36 @@ type Props = {
 function padding(kind: "explore" | "directions") {
   if (window.innerWidth > 700)
     return { top: 100, right: 85, bottom: 90, left: 420 };
+  const panel = document.querySelector<HTMLElement>(".directions-panel");
+  const snap = Number(panel?.dataset.mapInset);
+  const panelHeight = snap
+    ? snap <= 1
+      ? snap * window.innerHeight
+      : snap
+    : (panel?.getBoundingClientRect().height ?? 120);
   return kind === "directions"
-    ? { top: window.innerHeight * 0.48 + 28, right: 55, bottom: 50, left: 35 }
+    ? {
+        top: 55,
+        right: 65,
+        bottom: panelHeight + 35,
+        left: 35,
+      }
     : {
         top: 140,
         right: 55,
         bottom: window.innerHeight * 0.46 + 45,
         left: 35,
       };
+}
+function fitRoute(map: Map, coordinates: number[][]) {
+  const bounds = new LngLatBounds();
+  coordinates.forEach((c) => bounds.extend([c[0], c[1]]));
+  map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 });
+  map.fitBounds(bounds, {
+    padding: padding("directions"),
+    maxZoom: 16,
+    duration: 800,
+  });
 }
 export default function MapCanvas(props: Props) {
   const container = useRef<HTMLDivElement>(null);
@@ -64,7 +88,6 @@ export default function MapCanvas(props: Props) {
   const suppressClickUntil = useRef(0);
   const latest = useRef(props);
   latest.current = props;
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [epoch, setEpoch] = useState(0);
   const [retry, setRetry] = useState(0);
@@ -109,11 +132,10 @@ export default function MapCanvas(props: Props) {
     // out of production builds, where import.meta.env.DEV is statically false.
     if (import.meta.env.DEV) window.__onMapCreated?.(map);
     threeD.current = createClair3D(map, {
-      onError: () => latest.current.onNotice("Some 3D details couldn’t load."),
+      onError: () => {},
     });
     const initialStyleKey = JSON.stringify(latest.current.state.settings);
     appliedStyle.current = initialStyleKey;
-    setLoading(true);
     setError(null);
     // Clair's style is fetched over the network, so apply it once it arrives.
     mapStyle(latest.current.state.settings)
@@ -145,7 +167,6 @@ export default function MapCanvas(props: Props) {
       styleReady.current = true;
       setEpoch((n) => n + 1);
     });
-    map.on("idle", () => setLoading(false));
     map.on("error", (event) => {
       const message = event.error?.message ?? "";
       if (/abort/i.test(message)) return;
@@ -158,7 +179,6 @@ export default function MapCanvas(props: Props) {
             "$1[redacted]",
           ),
         );
-      setLoading(false);
       // Individual tile failures are recoverable and common on slow networks.
       // Keep the map usable without turning each resource error into an alert.
     });
@@ -200,23 +220,57 @@ export default function MapCanvas(props: Props) {
         latest.current.onSelectRoute(index);
         return;
       }
-      latest.current.onPick(placeAtPoint(map, event.point, event.lngLat));
+      const touch =
+        "touches" in event.originalEvent ||
+        ("pointerType" in event.originalEvent &&
+          event.originalEvent.pointerType === "touch") ||
+        window.matchMedia("(max-width: 700px), (pointer: coarse)").matches;
+      const place = placeAtPoint(map, event.point, event.lngLat, touch);
+      if (place) latest.current.onPick(place);
     });
     map.on("mousemove", (event) => {
       map.getCanvas().style.cursor =
         routeAtPoint(map, event.point) !== undefined ||
-        isPointerTarget(map, event.point)
+        isPointerTarget(
+          map,
+          event.point,
+          window.matchMedia("(max-width: 700px), (pointer: coarse)").matches,
+        )
           ? "pointer"
           : "";
     });
+    const longPress = installLongPress(map.getCanvas(), {
+      enabled: (event) =>
+        event.pointerType === "touch" ||
+        window.matchMedia("(max-width: 700px), (pointer: coarse)").matches,
+      suppressClick: () => {
+        suppressClickUntil.current = performance.now() + 1000;
+      },
+      onPress: (point) => {
+        const { lng, lat } = map.unproject(point);
+        latest.current.onPick(pointPlace([lng, lat]));
+      },
+    });
+    map.on("movestart", longPress.cancel);
     // Right-click drops a popup pinned to the point with copyable coordinates.
     contextMenu.current = createContextMenu(map, {
       onCopied: (message) => latest.current.onNotice(message),
     });
-    map.on("contextmenu", (event) => contextMenu.current?.openAt(event.lngLat));
+    map.on("contextmenu", (event) => {
+      if (
+        event.originalEvent.defaultPrevented ||
+        window.matchMedia("(max-width: 700px), (pointer: coarse)").matches ||
+        performance.now() < suppressClickUntil.current
+      ) {
+        event.originalEvent.preventDefault();
+        return;
+      }
+      contextMenu.current?.openAt(event.lngLat);
+    });
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
     return () => {
+      longPress.remove();
       resize.disconnect();
       contextMenu.current?.remove();
       contextMenu.current = null;
@@ -238,6 +292,7 @@ export default function MapCanvas(props: Props) {
     const restoringCamera =
       props.command?.type === "camera" &&
       props.command.id !== appliedCameraCommand.current;
+    const hadStyle = styleReady.current;
     setError(null);
     styleReady.current = false;
     let cancelled = false;
@@ -252,10 +307,14 @@ export default function MapCanvas(props: Props) {
           });
       })
       .catch(() => {
-        if (!cancelled)
-          setError(
-            "Some map details couldn’t load. Check your connection or try again.",
-          );
+        if (!cancelled) {
+          styleReady.current = hadStyle;
+          if (hadStyle) setEpoch((n) => n + 1);
+          else
+            setError(
+              "Some map details couldn’t load. Check your connection or try again.",
+            );
+        }
       });
     return () => {
       cancelled = true;
@@ -303,9 +362,18 @@ export default function MapCanvas(props: Props) {
     props.state.view.journey.routes.status === "ready"
       ? props.state.view.journey.routes.data[props.state.view.journey.selected]
       : null;
+  const liveRevision =
+    props.state.view.kind === "directions"
+      ? (props.state.view.journey.liveRevision ?? 0)
+      : 0;
+  const previousRevision = useRef(liveRevision);
   useEffect(() => {
+    const refreshed =
+      liveRevision !== previousRevision.current && liveRevision > 0;
+    previousRevision.current = liveRevision;
     const map = mapRef.current;
     if (!map || !route) return;
+    if (refreshed) return;
     const key =
       latest.current.state.view.kind === "directions"
         ? journeyKey(latest.current.state.view.journey)
@@ -315,16 +383,8 @@ export default function MapCanvas(props: Props) {
       return;
     }
     preserveRouteCamera.current = null;
-    const bounds = new LngLatBounds();
-    route.geometry.coordinates.forEach((c) => bounds.extend([c[0], c[1]]));
-    // fitBounds adds its padding to any existing camera padding.
-    map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 });
-    map.fitBounds(bounds, {
-      padding: padding("directions"),
-      maxZoom: 16,
-      duration: 800,
-    });
-  }, [route]);
+    fitRoute(map, route.geometry.coordinates);
+  }, [route, liveRevision]);
   useEffect(() => {
     const map = mapRef.current,
       command = props.command;
@@ -340,18 +400,22 @@ export default function MapCanvas(props: Props) {
     } else if (command.type === "zoom-in") map.zoomIn();
     else if (command.type === "zoom-out") map.zoomOut();
     else if (command.type === "north") map.easeTo({ bearing: 0, pitch: 0 });
-    else if (command.type === "fly") {
+    else if (command.type === "locate" || command.type === "fly") {
       const inset = padding(latest.current.state.view.kind);
       map.setPadding({ top: 0, right: 0, bottom: 0, left: 0 });
-      map.flyTo({
-        center: command.coordinates,
-        zoom: command.zoom ?? Math.max(15, map.getZoom()),
-        offset: [
-          (inset.left - inset.right) / 2,
-          (inset.top - inset.bottom) / 2,
-        ],
-        duration: 900,
-      });
+      const offset: [number, number] = [
+        (inset.left - inset.right) / 2,
+        (inset.top - inset.bottom) / 2,
+      ];
+      if (command.type === "locate")
+        map.easeTo({ center: command.coordinates, offset, duration: 600 });
+      else
+        map.flyTo({
+          center: command.coordinates,
+          zoom: command.zoom ?? Math.max(15, map.getZoom()),
+          offset,
+          duration: 900,
+        });
     }
   }, [props.command]);
   return (
@@ -370,9 +434,8 @@ export default function MapCanvas(props: Props) {
           <small>See the project README for Vercel setup.</small>
         </div>
       ) : error ? (
-        <div className="map-notice" role="alert">
-          <TriangleAlert size={16} />
-          <span>{error}</span>
+        <div className="map-fallback" role="alert">
+          <p>{error}</p>
           <button
             onClick={() => {
               setError(null);
@@ -381,14 +444,6 @@ export default function MapCanvas(props: Props) {
           >
             Retry
           </button>
-          <button aria-label="Dismiss map error" onClick={() => setError(null)}>
-            ×
-          </button>
-        </div>
-      ) : loading ? (
-        <div className="map-loading" role="status">
-          <Spinner size={15} className="spin" />
-          Loading map…
         </div>
       ) : null}
     </>

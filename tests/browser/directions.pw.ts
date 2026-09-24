@@ -131,7 +131,7 @@ test("select a map alternative, drag both endpoints, and show flat cycling eleva
             ?.getAttribute("aria-label"),
         { x: box.x + box.width / 2, y: box.y + 15 },
       ),
-    ).toContain(endpoint === "from" ? "A:" : "B:");
+    ).toContain(endpoint === "from" ? "Starting point:" : "Destination:");
     await page.mouse.move(box.x + box.width / 2, box.y + 15);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width / 2 + 45, box.y + 45, {

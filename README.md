@@ -55,8 +55,19 @@ maps retain these labels, and clicking a map label also prefers its local name.
 - Protomaps/PMTiles basemap, Clair cartography, 3D buildings and terrain.
 - Mapbox Search Box autocomplete with per-field sessions and nearby categories.
 - Driving with traffic, walking, and cycling directions, alternatives, and steps.
+- Directions default to your location and show a live blue dot. These routes
+  refresh after 50 m of displacement, at most once every 20 seconds, using fresh
+  fixes with accuracy within 100 m. Refreshes retain the route during failures
+  and preserve the camera and the selected corridor where possible.
+- Mobile Vaul drawers move between heights by dragging, with no expand buttons.
+  Directions have a compact summary, Recenter, and pinch-to-zoom navigation. Background map loading and partial-resource failures
+  do not show status pills.
 - Mapbox satellite imagery and traffic overlays; route overlays survive map switches.
-- Map click selection, geolocation on request, shared pins/routes/cameras.
+- Destination pins, blue dots for live origins, and white dots for fixed origins.
+- Map selection and shared pins/routes/cameras.
+- On mobile, taps select POIs or route alternatives; hold the map for 550 ms
+  to drop a pin. Panning and pinching cancel the hold. Desktop click behavior
+  is unchanged.
 - Wikidata descriptions, official websites, telephone numbers, and Wikipedia links.
   Commons photos include creator and license credits when image metadata is available.
 - Responsive panels, keyboard search navigation, focus styles, reduced-motion support,
@@ -77,7 +88,11 @@ requests go to the relevant providers.
 - `src/components/MapCanvas.tsx`: owns the MapLibre instance, camera and style lifecycle.
   `src/lib/map/` owns route overlays, hit testing and marker lifetime.
 - `src/hooks/useLocation.ts`: retires location callbacks after the user changes view,
-  starts a new request or leaves the app; only the current request can select or fly.
+  or starts a new request; only the current request can select or fly. A separate
+  foreground watch updates the blue dot without changing the camera. It pauses
+  while the page is hidden and resumes when visible; locked-screen navigation
+  is not supported. Shared/reloaded route origins remain fixed until the user
+  explicitly chooses their location again.
 - `src/components/MapAppearance.tsx` and `AboutDialog.tsx`: own their respective
   controls, dismissal and dialog lifecycle; `App.tsx` composes them with app state.
 - `src/lib/wikidata.ts`: enrichment with bounded in-memory caching. Uses a valid
@@ -216,3 +231,8 @@ routing, styles, fonts, or models. It does not make the entire app available
 offline. Cached tile coordinates reveal previously viewed areas on this device;
 Benmaps does not collect them or store a location timeline. Prefer versioned
 PMTiles archive URLs when replacing a dataset.
+
+Vaul 1.1.2 is patched at install time to forward `modal={false}` to Radix
+([upstream issue](https://github.com/emilkowalski/vaul/issues/496)), keeping the map
+and search accessible while a mobile drawer is open. Remove the patch when a
+release includes the upstream fix.

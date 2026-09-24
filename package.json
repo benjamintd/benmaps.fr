@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "format": "prettier --write src tests scripts *.ts *.json *.md *.html",
     "format:check": "prettier --check src tests scripts *.ts *.json *.md *.html",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -21,6 +22,7 @@
     "pmtiles": "^4.3.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "vaul": "1.1.2",
     "zod": "^4.1.5"
   },
   "devDependencies": {
@@ -34,6 +36,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.12.0",
+    "patch-package": "^8.0.1",
     "prettier": "^3.9.6",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.70.0",

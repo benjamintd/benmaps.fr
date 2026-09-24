@@ -1,6 +1,7 @@
 import type * as GeoJSON from "geojson";
 import { z } from "zod";
 import type { CategoryId } from "./categories";
+import { matchingRoute } from "./live-location";
 
 export const coordinatesSchema = z.tuple([
   z.number().finite().min(-180).max(180),
@@ -45,6 +46,7 @@ export type Journey = {
   travelMode: TravelMode;
   routes: Resource<Route[]>;
   selected: number;
+  liveRevision?: number;
 };
 export type View =
   | { kind: "explore"; place: Place | null }
@@ -76,6 +78,7 @@ export type Action =
   | { type: "route-loading"; key: string }
   | { type: "route-result"; key: string; routes: Route[] }
   | { type: "route-error"; key: string; message: string }
+  | { type: "route-refresh"; key: string; from: Place; routes: Route[] }
   | { type: "route-select"; index: number }
   | { type: "settings"; settings: Partial<MapSettings> }
   | { type: "ui"; ui: Partial<UiState> }
@@ -136,12 +139,14 @@ export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case "endpoint":
       return update({
+        liveRevision: 0,
         [action.endpoint]: action.place,
         routes: emptyRoutes,
         selected: 0,
       });
     case "swap":
       return update({
+        liveRevision: 0,
         from: journey.to,
         to: journey.from,
         routes: emptyRoutes,
@@ -149,6 +154,7 @@ export function reducer(state: AppState, action: Action): AppState {
       });
     case "travel-mode":
       return update({
+        liveRevision: 0,
         travelMode: action.mode,
         routes: emptyRoutes,
         selected: 0,
@@ -190,6 +196,29 @@ export function reducer(state: AppState, action: Action): AppState {
             },
           })
         : state;
+    case "route-refresh": {
+      if (
+        journey.from?.source !== "location" ||
+        journeyKey(journey) !== action.key ||
+        journey.routes.status !== "ready" ||
+        !action.routes.length
+      )
+        return state;
+      const selected = matchingRoute(
+        journey.routes.data[journey.selected],
+        action.routes,
+      );
+      return update({
+        from: action.from,
+        routes: {
+          status: "ready",
+          key: journeyKey({ ...journey, from: action.from })!,
+          data: action.routes,
+        },
+        selected,
+        liveRevision: (journey.liveRevision ?? 0) + 1,
+      });
+    }
     case "route-select":
       return journey.routes.status === "ready" &&
         Number.isInteger(action.index) &&

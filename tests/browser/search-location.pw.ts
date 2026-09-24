@@ -4,6 +4,7 @@ import { captureMap } from "./support/map";
 declare global {
   interface Window {
     completeLocation: PositionCallback;
+    previousLocation: PositionCallback;
   }
 }
 
@@ -25,7 +26,9 @@ test("a delayed location result cannot change a new view or move its camera", as
     };
   });
   await page.goto("/?mode=walking#13/48.86/2.34/0/0");
-  await page.getByRole("button", { name: "My location", exact: true }).click();
+  await page.evaluate(() => {
+    window.previousLocation = window.completeLocation;
+  });
   await expect(
     page.getByRole("button", { name: "My location", exact: true }),
   ).toBeDisabled();
@@ -33,7 +36,7 @@ test("a delayed location result cannot change a new view or move its camera", as
   await page.getByRole("button", { name: "Plan a route" }).click();
   const before = page.url();
   await page.evaluate(() =>
-    window.completeLocation({
+    window.previousLocation({
       coords: {
         longitude: 4,
         latitude: 45,
@@ -55,7 +58,7 @@ test("a delayed location result cannot change a new view or move its camera", as
   expect(camera(page.url())).toEqual(camera(before));
   await expect(
     page.getByRole("button", { name: "My location", exact: true }),
-  ).toBeEnabled();
+  ).toBeDisabled();
   await expect(page.getByRole("img", { name: "Your location" })).toHaveCount(0);
 });
 

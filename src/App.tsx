@@ -1,3 +1,4 @@
+import { MapDrawer } from "./components/MapDrawer";
 import { lazy, Suspense, useEffect, useReducer, useRef, useState } from "react";
 import {
   Check,
@@ -23,6 +24,7 @@ import { cameraOrDefault, readState, writeState } from "./lib/url";
 import { categorySearch, errorMessage } from "./lib/api";
 import { useLocation } from "./hooks/useLocation";
 import { useDirections } from "./hooks/useDirections";
+import type { LocationFix } from "./lib/live-location";
 import { SearchBox } from "./components/SearchBox";
 import { PlaceEnrichment } from "./components/PlaceEnrichment";
 import { DirectionsPanel } from "./components/DirectionsPanel";
@@ -46,7 +48,9 @@ export default function App() {
   const [center, setCenter] = useState<Coordinates>(
     () => cameraOrDefault(initialUrl).center,
   );
-  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+  const [position, setPosition] = useState<LocationFix | null>(null);
+  const userLocation = position?.coordinates ?? null;
+  const [directionsExpanded, setDirectionsExpanded] = useState(false);
   const searchCenter = userLocation ?? center;
   const [orientation, setOrientation] = useState<{
     bearing: number;
@@ -61,7 +65,7 @@ export default function App() {
   const [shareUrl, setShareUrl] = useState("");
   const shareDialog = useRef<HTMLDialogElement>(null);
   const { category, categoryCenter, search } = state.ui;
-  useDirections(state.view, dispatch, routeRetry);
+  useDirections(state.view, dispatch, routeRetry, position);
   const setUi = (ui: Partial<AppState["ui"]>) => dispatch({ type: "ui", ui });
   useEffect(() => {
     function restore() {
@@ -141,8 +145,8 @@ export default function App() {
   const { locating, locate } = useLocation({
     view: state.view,
     onNotice: setNotice,
+    onPosition: setPosition,
     onLocated: (place, endpoint) => {
-      setUserLocation(place.coordinates);
       if (category) setUi({ categoryCenter: place.coordinates });
       if (endpoint) dispatch({ type: "endpoint", endpoint, place });
       else dispatch({ type: "select-place", place });
@@ -150,6 +154,13 @@ export default function App() {
     },
   });
   const place = state.view.kind === "explore" ? state.view.place : null;
+  const routeReady =
+    state.view.kind === "directions" &&
+    state.view.journey.routes.status === "ready";
+  const sheetExpanded = !routeReady || directionsExpanded;
+  useEffect(() => {
+    setDirectionsExpanded(false);
+  }, [routeReady]);
   const categoryLabel = categories.find((c) => c.id === category)?.label;
   const places =
     nearby.status === "ready" && state.view.kind === "explore"
@@ -157,16 +168,9 @@ export default function App() {
       : noPlaces;
   return (
     <main
-      className={`app ${state.view.kind === "directions" ? "routing" : ""} ${place || category ? "has-detail" : ""}`}
+      className={`app ${state.view.kind === "directions" ? `routing ${sheetExpanded ? "directions-expanded" : "directions-collapsed"}` : ""} ${place || category ? "has-detail" : ""}`}
     >
-      <Suspense
-        fallback={
-          <div className="map-loading">
-            <Spinner size={16} className="spin" />
-            Loading map…
-          </div>
-        }
-      >
+      <Suspense fallback={null}>
         <MapCanvas
           state={state}
           places={places}
@@ -206,132 +210,147 @@ export default function App() {
               </button>
             </div>
             {place ? (
-              <section className="panel place-panel" aria-label="Place details">
-                <div className="place-body">
-                  <button
-                    className="icon-button place-close"
-                    aria-label="Close place"
-                    onClick={() => dispatch({ type: "explore" })}
-                  >
-                    <X size={19} />
-                  </button>
-                  <span className="eyebrow">
-                    {place.category?.replaceAll("_", " ") ||
-                      (place.source === "map" || place.source === "link"
-                        ? "On the map"
-                        : "Place")}
-                  </span>
-                  <h1>{place.name}</h1>
-                  <p>{place.address}</p>
-                  <div className="place-actions">
-                    <button
-                      className="primary-button"
-                      onClick={() =>
-                        dispatch({ type: "directions", to: place })
-                      }
-                    >
-                      <Directions size={18} />
-                      Directions
-                    </button>
-                    <button
-                      className="secondary-button"
-                      onClick={() => void share()}
-                    >
-                      <Share size={17} />
-                      Share
-                    </button>
-                  </div>
-                  <PlaceEnrichment key={place.id} place={place} />
-                  <div className="place-meta">
-                    <MapPin size={18} />
-                    <span>
-                      {place.coordinates[1].toFixed(5)},{" "}
-                      {place.coordinates[0].toFixed(5)}
-                      <small>Latitude, longitude</small>
-                    </span>
-                  </div>
-                  <button
-                    className="start-here"
-                    onClick={() =>
-                      dispatch({ type: "directions", from: place })
-                    }
-                  >
-                    <span>Directions from here</span>
-                    <Directions size={22} />
-                  </button>
-                </div>
-              </section>
-            ) : category ? (
-              <section
-                className="panel nearby-panel"
-                aria-label="Nearby places"
+              <MapDrawer
+                key={place.id}
+                className="panel place-panel"
+                label="Place details"
+                onClose={() => dispatch({ type: "explore" })}
               >
-                <header className="panel-header">
-                  <div>
-                    <span className="eyebrow">
-                      {userLocation ? "Around you" : "Around this area"}
-                    </span>
-                    <h1>{categoryLabel}</h1>
-                  </div>
-                  <button
-                    className="icon-button"
-                    aria-label="Close nearby search"
-                    onClick={() => setUi({ category: null })}
-                  >
-                    <X size={20} />
-                  </button>
-                </header>
-                <button
-                  className="search-area"
-                  onClick={() => {
-                    setUi({ categoryCenter: searchCenter });
-                    setCategoryRetry((n) => n + 1);
-                  }}
-                >
-                  <Crosshair size={16} />
-                  {userLocation ? "Search near me" : "Search this area"}
-                </button>
-                {nearby.status === "loading" && (
-                  <p className="search-status">
-                    <Spinner className="spin" size={17} />
-                    Finding nearby places…
-                  </p>
-                )}
-                {nearby.status === "error" && (
-                  <p className="search-status error" role="alert">
-                    {nearby.message}
-                  </p>
-                )}
-                {nearby.status === "ready" && (
+                {(close) => (
                   <>
-                    {!nearby.data.length && (
-                      <p className="search-status">
-                        {userLocation
-                          ? "No places found near you. Try another category."
-                          : "No places found here. Move the map and try another area."}
-                      </p>
-                    )}
-                    <div className="nearby-list">
-                      {nearby.data.map((p, i) => (
+                    <div className="place-body">
+                      <button
+                        className="icon-button place-close"
+                        aria-label="Close place"
+                        onClick={close}
+                      >
+                        <X size={19} />
+                      </button>
+                      <span className="eyebrow">
+                        {place.category?.replaceAll("_", " ") ||
+                          (place.source === "map" || place.source === "link"
+                            ? "On the map"
+                            : "Place")}
+                      </span>
+                      <h1>{place.name}</h1>
+                      <p>{place.address}</p>
+                      <div className="place-actions">
                         <button
-                          className="nearby-place"
-                          key={p.id}
-                          onClick={() => select(p)}
+                          className="primary-button"
+                          onClick={() =>
+                            dispatch({ type: "directions", to: place })
+                          }
                         >
-                          <span className="nearby-number">{i + 1}</span>
-                          <span>
-                            <strong>{p.name}</strong>
-                            <small>{p.address}</small>
-                            <em>{p.category?.replaceAll("_", " ")}</em>
-                          </span>
-                          <ChevronRight size={17} />
+                          <Directions size={18} />
+                          Directions
                         </button>
-                      ))}
+                        <button
+                          className="secondary-button"
+                          onClick={() => void share()}
+                        >
+                          <Share size={17} />
+                          Share
+                        </button>
+                      </div>
+                      <PlaceEnrichment key={place.id} place={place} />
+                      <div className="place-meta">
+                        <MapPin size={18} />
+                        <span>
+                          {place.coordinates[1].toFixed(5)},{" "}
+                          {place.coordinates[0].toFixed(5)}
+                          <small>Latitude, longitude</small>
+                        </span>
+                      </div>
+                      <button
+                        className="start-here"
+                        onClick={() =>
+                          dispatch({ type: "directions", from: place })
+                        }
+                      >
+                        <span>Directions from here</span>
+                        <Directions size={22} />
+                      </button>
                     </div>
-                    <p className="search-credit">Search results © Mapbox</p>
                   </>
                 )}
-              </section>
+              </MapDrawer>
+            ) : category ? (
+              <MapDrawer
+                key={category}
+                className="panel nearby-panel"
+                label="Nearby places"
+                onClose={() => setUi({ category: null })}
+              >
+                {(close) => (
+                  <>
+                    <header className="panel-header">
+                      <div>
+                        <span className="eyebrow">
+                          {userLocation ? "Around you" : "Around this area"}
+                        </span>
+                        <h1>{categoryLabel}</h1>
+                      </div>
+                      <button
+                        className="icon-button"
+                        aria-label="Close nearby search"
+                        onClick={close}
+                      >
+                        <X size={20} />
+                      </button>
+                    </header>
+                    <button
+                      className="search-area"
+                      onClick={() => {
+                        setUi({ categoryCenter: searchCenter });
+                        setCategoryRetry((n) => n + 1);
+                      }}
+                    >
+                      <Crosshair size={16} />
+                      {userLocation ? "Search near me" : "Search this area"}
+                    </button>
+                    {nearby.status === "loading" && (
+                      <p className="search-status">
+                        <Spinner className="spin" size={17} />
+                        Finding nearby places…
+                      </p>
+                    )}
+                    {nearby.status === "error" && (
+                      <p className="search-status error" role="alert">
+                        {nearby.message}
+                      </p>
+                    )}
+                    {nearby.status === "ready" && (
+                      <>
+                        {!nearby.data.length && (
+                          <p className="search-status">
+                            {userLocation
+                              ? "No places found near you. Try another category."
+                              : "No places found here. Move the map and try another area."}
+                          </p>
+                        )}
+                        <div className="nearby-list">
+                          {nearby.data.map((p, i) => (
+                            <button
+                              className="nearby-place"
+                              key={p.id}
+                              onClick={() => select(p)}
+                            >
+                              <span className="nearby-number">{i + 1}</span>
+                              <span>
+                                <strong>{p.name}</strong>
+                                <small>{p.address}</small>
+                                <em>{p.category?.replaceAll("_", " ")}</em>
+                              </span>
+                              <ChevronRight size={17} />
+                            </button>
+                          ))}
+                        </div>
+                        <p className="search-credit">Search results © Mapbox</p>
+                      </>
+                    )}
+                  </>
+                )}
+              </MapDrawer>
             ) : null}
           </div>
           <div
@@ -357,6 +376,8 @@ export default function App() {
         </>
       ) : (
         <DirectionsPanel
+          expanded={sheetExpanded}
+          onExpandedChange={setDirectionsExpanded}
           journey={state.view.journey}
           center={searchCenter}
           dispatch={dispatch}
@@ -402,10 +423,26 @@ export default function App() {
         </button>
         <button
           className="map-control"
-          aria-label="My location"
-          title="My location"
+          aria-label={
+            userLocation && state.view.kind === "directions"
+              ? "Recenter"
+              : "My location"
+          }
+          title={
+            userLocation && state.view.kind === "directions"
+              ? "Recenter"
+              : "My location"
+          }
           disabled={locating}
-          onClick={() => locate()}
+          onClick={() =>
+            userLocation && state.view.kind === "directions"
+              ? setCommand({
+                  id: ++commandId.current,
+                  type: "locate",
+                  coordinates: userLocation,
+                })
+              : locate()
+          }
         >
           {locating ? (
             <Spinner className="spin" size={21} />

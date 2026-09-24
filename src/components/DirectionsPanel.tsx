@@ -1,3 +1,4 @@
+import { MapDrawer } from "./MapDrawer";
 import type { Dispatch } from "react";
 import {
   ArrowsUpDown,
@@ -26,6 +27,8 @@ const modes: { value: TravelMode; label: string; icon: typeof Car }[] = [
   { value: "cycling", label: "Cycle", icon: Bike },
 ];
 type Props = {
+  expanded: boolean;
+  onExpandedChange: (expanded: boolean) => void;
   journey: Journey;
   center: Coordinates;
   dispatch: Dispatch<Action>;
@@ -37,6 +40,8 @@ type Props = {
   onSearchChange: (endpoint: "from" | "to", value: string) => void;
 };
 export function DirectionsPanel({
+  expanded,
+  onExpandedChange,
   journey,
   center,
   dispatch,
@@ -53,9 +58,7 @@ export function DirectionsPanel({
       : null;
   const endpoint = (key: "from" | "to", place: Place | null) => (
     <div className="endpoint-row">
-      <span className={`endpoint-dot ${key}`}>
-        {key === "from" ? "A" : "B"}
-      </span>
+      <span className={`endpoint-dot ${key}`} aria-hidden="true" />
       {place ? (
         <div className="chosen-endpoint">
           <button onClick={() => fly(place.coordinates)} title={place.address}>
@@ -92,146 +95,189 @@ export function DirectionsPanel({
     </div>
   );
   return (
-    <section className="panel directions-panel" aria-label="Route planner">
-      <header className="panel-header">
-        <h1>Directions</h1>
-        <button
-          className="icon-button"
-          aria-label="Close directions"
-          onClick={() => dispatch({ type: "explore" })}
-        >
-          <X size={21} />
-        </button>
-      </header>
-      <div className="travel-modes" role="group" aria-label="Travel mode">
-        {modes.map(({ value, label, icon: Icon }) => (
-          <button
-            key={value}
-            aria-pressed={journey.travelMode === value}
-            className={journey.travelMode === value ? "active" : ""}
-            onClick={() => dispatch({ type: "travel-mode", mode: value })}
-          >
-            <Icon size={21} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
-      <div className="endpoints">
-        <div className="endpoint-fields">
-          {endpoint("from", journey.from)}
-          {endpoint("to", journey.to)}
-        </div>
-        <button
-          className="icon-button swap"
-          aria-label="Swap starting point and destination"
-          onClick={() => dispatch({ type: "swap" })}
-        >
-          <ArrowsUpDown size={20} />
-        </button>
-      </div>
-      {!journey.from && (
-        <button
-          className="location-link"
-          onClick={() => locate()}
-          disabled={locating}
-        >
-          {locating ? (
-            <Spinner className="spin" size={17} />
-          ) : (
-            <Crosshair size={17} />
+    <MapDrawer
+      className={`panel directions-panel ${expanded ? "expanded" : "collapsed"}`}
+      label="Route planner"
+      onClose={() => dispatch({ type: "explore" })}
+      expanded={expanded}
+      onExpandedChange={onExpandedChange}
+      compact={Boolean(selected)}
+    >
+      {(close, mobile) => (
+        <>
+          {selected && (
+            <div className="mobile-route-summary">
+              <div className="route-sheet-summary">
+                <span className="mobile-route-title">{journey.to?.name}</span>
+                <span className="mobile-route-metrics">
+                  <strong>{duration(selected.duration)}</strong>
+                  <span>{distance(selected.distance)}</span>
+                  <span className="mobile-route-via">
+                    via {selected.summary}
+                  </span>
+                </span>
+              </div>
+              <button
+                className="icon-button"
+                aria-label="Close directions"
+                onClick={close}
+              >
+                <X size={21} />
+              </button>
+            </div>
           )}
-          Use my location
-        </button>
-      )}
-      <div className="route-content" aria-live="polite">
-        {journey.routes.status === "loading" && (
-          <div className="route-empty">
-            <Spinner className="spin" size={28} />
-            <h2>Finding a route…</h2>
-          </div>
-        )}
-        {journey.routes.status === "error" && (
-          <div className="route-empty error">
-            <MapPin size={28} />
-            <h2>Route unavailable</h2>
-            <p>{journey.routes.message}</p>
-            <button className="secondary-button" onClick={retry}>
-              Try again
-            </button>
-          </div>
-        )}
-        {journey.routes.status === "ready" && (
-          <>
-            <div className="route-list">
-              {journey.routes.data.map((route, i) => (
+          <div
+            id="directions-details"
+            className="directions-details"
+            inert={mobile && !expanded}
+            aria-hidden={(mobile && !expanded) || undefined}
+          >
+            <header className="panel-header">
+              <h1>Directions</h1>
+              <button
+                className="icon-button"
+                aria-label="Close directions"
+                onClick={close}
+              >
+                <X size={21} />
+              </button>
+            </header>
+            <div className="travel-modes" role="group" aria-label="Travel mode">
+              {modes.map(({ value, label, icon: Icon }) => (
                 <button
-                  className={`route-option ${i === journey.selected ? "active" : ""}`}
-                  aria-pressed={i === journey.selected}
-                  key={route.id}
-                  onClick={() => dispatch({ type: "route-select", index: i })}
+                  key={value}
+                  aria-pressed={journey.travelMode === value}
+                  className={journey.travelMode === value ? "active" : ""}
+                  onClick={() => dispatch({ type: "travel-mode", mode: value })}
                 >
-                  <span className="route-option-top">
-                    <strong>{duration(route.duration)}</strong>
-                    <span>{distance(route.distance)}</span>
-                  </span>
-                  <span className="route-summary">via {route.summary}</span>
-                  <span className="route-caption">
-                    {i === 0 ? "Recommended" : "Alternative route"}
-                    {journey.travelMode === "driving-traffic"
-                      ? " · Current traffic"
-                      : ""}
-                  </span>
+                  <Icon size={21} />
+                  <span>{label}</span>
                 </button>
               ))}
             </div>
-            {selected && journey.travelMode === "cycling" && (
-              <RouteElevation key={selected.id} route={selected} />
+            <div className="endpoints">
+              <div className="endpoint-fields">
+                {endpoint("from", journey.from)}
+                {endpoint("to", journey.to)}
+              </div>
+              <button
+                className="icon-button swap"
+                aria-label="Swap starting point and destination"
+                onClick={() => dispatch({ type: "swap" })}
+              >
+                <ArrowsUpDown size={20} />
+              </button>
+            </div>
+            {!journey.from && (
+              <button
+                className="location-link"
+                onClick={() => locate()}
+                disabled={locating}
+              >
+                {locating ? (
+                  <Spinner className="spin" size={17} />
+                ) : (
+                  <Crosshair size={17} />
+                )}
+                Use my location
+              </button>
             )}
-            {selected && (
-              <div className="steps">
-                <h2>
-                  Step by step <span>{selected.steps.length} steps</span>
-                </h2>
-                <ol>
-                  {selected.steps.map((step, i) => (
-                    <li key={i}>
-                      <button onClick={() => fly(step.coordinates)}>
-                        <span className="step-symbol">
-                          {i === selected.steps.length - 1 ? (
-                            <MapPin size={18} />
-                          ) : (
-                            <ArrowRight
-                              size={18}
-                              style={{
-                                transform: step.modifier?.includes("left")
-                                  ? "rotate(180deg)"
-                                  : step.modifier?.includes("right")
-                                    ? undefined
-                                    : "rotate(-90deg)",
-                              }}
-                            />
-                          )}
+            <div className="route-content" aria-live="polite">
+              {journey.routes.status === "loading" && (
+                <div className="route-empty">
+                  <Spinner className="spin" size={28} />
+                  <h2>Finding a route…</h2>
+                </div>
+              )}
+              {journey.routes.status === "error" && (
+                <div className="route-empty error">
+                  <MapPin size={28} />
+                  <h2>Route unavailable</h2>
+                  <p>{journey.routes.message}</p>
+                  <button className="secondary-button" onClick={retry}>
+                    Try again
+                  </button>
+                </div>
+              )}
+              {journey.routes.status === "ready" && (
+                <>
+                  <div className="route-list">
+                    {journey.routes.data.map((route, i) => (
+                      <button
+                        className={`route-option ${i === journey.selected ? "active" : ""}`}
+                        aria-pressed={i === journey.selected}
+                        key={route.id}
+                        onClick={() =>
+                          dispatch({ type: "route-select", index: i })
+                        }
+                      >
+                        <span className="route-option-top">
+                          <strong>{duration(route.duration)}</strong>
+                          <span>{distance(route.distance)}</span>
                         </span>
-                        <span>
-                          {step.instruction}
-                          <small>
-                            {step.distance > 0
-                              ? distance(step.distance)
-                              : "You’ve arrived"}
-                          </small>
+                        <span className="route-summary">
+                          via {route.summary}
+                        </span>
+                        <span className="route-caption">
+                          {i === 0 ? "Recommended" : "Alternative route"}
+                          {journey.travelMode === "driving-traffic"
+                            ? " · Current traffic"
+                            : ""}
                         </span>
                       </button>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-            <p className="route-disclaimer">
-              Directions by Mapbox · Follow local signs and conditions.
-            </p>
-          </>
-        )}
-      </div>
-    </section>
+                    ))}
+                  </div>
+                  {selected && journey.travelMode === "cycling" && (
+                    <RouteElevation key={selected.id} route={selected} />
+                  )}
+                  {selected && (
+                    <div className="steps">
+                      <h2>
+                        Step by step <span>{selected.steps.length} steps</span>
+                      </h2>
+                      <ol>
+                        {selected.steps.map((step, i) => (
+                          <li key={i}>
+                            <button onClick={() => fly(step.coordinates)}>
+                              <span className="step-symbol">
+                                {i === selected.steps.length - 1 ? (
+                                  <MapPin size={18} />
+                                ) : (
+                                  <ArrowRight
+                                    size={18}
+                                    style={{
+                                      transform: step.modifier?.includes("left")
+                                        ? "rotate(180deg)"
+                                        : step.modifier?.includes("right")
+                                          ? undefined
+                                          : "rotate(-90deg)",
+                                    }}
+                                  />
+                                )}
+                              </span>
+                              <span>
+                                {step.instruction}
+                                <small>
+                                  {step.distance > 0
+                                    ? distance(step.distance)
+                                    : "You’ve arrived"}
+                                </small>
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                  <p className="route-disclaimer">
+                    Directions by Mapbox · Follow local signs and conditions.
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </MapDrawer>
   );
 }

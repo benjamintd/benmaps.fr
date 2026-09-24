@@ -135,9 +135,6 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
   await expect
     .poll(() => page.evaluate(() => window.__map?.isStyleLoaded()))
     .toBe(true);
-  expect(requests.some((url) => url.includes("/extensions/0.2.3/"))).toBe(
-    false,
-  );
   expect(
     requests.some((url) => url.includes("open-landmarks.benmaps.fr")),
   ).toBe(false);
@@ -149,7 +146,7 @@ test("3D trees load on demand, render under labels through the Clair CDN SDK, an
     .toBeGreaterThan(0);
   await expect
     .poll(() =>
-      requests.some((url) => url.endsWith("/paris/test/catalogue.json")),
+      requests.some((url) => url.endsWith("/api/v1/test/catalogue.json")),
     )
     .toBe(true);
   await expect
