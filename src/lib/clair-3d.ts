@@ -56,6 +56,7 @@ export function createClair3D(
             maxCacheBytes: 16 * 1024 * 1024,
             maxTrees: 1500,
             replacementLayerIds: ["building-extrusion"],
+            labelOcclusion: true,
             onError: (error: unknown) => {
               if (!disposed && run === generation) onError(error);
             },

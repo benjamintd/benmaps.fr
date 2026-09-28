@@ -53,6 +53,8 @@ maps retain these labels, and clicking a map label also prefers its local name.
 ## Features
 
 - Protomaps/PMTiles basemap, Clair cartography, 3D buildings and terrain.
+- Point-of-interest and address labels fade behind 3D buildings and landmarks
+  when the optional Clair 3D layer is enabled.
 - Mapbox Search Box autocomplete with per-field sessions and nearby categories.
 - Driving with traffic, walking, and cycling directions, alternatives, and steps.
 - Directions default to your location and show a live blue dot. These routes
