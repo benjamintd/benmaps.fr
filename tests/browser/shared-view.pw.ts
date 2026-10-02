@@ -74,6 +74,25 @@ test("shared views restore buildings, layers, pin metadata, camera, categories a
       page.evaluate(() => !!window.__map?.getLayer("building-extrusion")),
     )
     .toBe(true);
+  await page.evaluate(() => document.fonts.ready);
+  expect(
+    await page.evaluate(() => ({
+      loaded: document.fonts.check('400 14px "Cal Sans"', "Élysée"),
+      root: getComputedStyle(document.documentElement).fontFamily,
+      map: getComputedStyle(document.querySelector(".maplibregl-map")!)
+        .fontFamily,
+      input: getComputedStyle(document.querySelector("input")!).fontFamily,
+      attribution: getComputedStyle(
+        document.querySelector(".maplibregl-ctrl-attrib")!,
+      ).fontFamily,
+    })),
+  ).toEqual({
+    loaded: true,
+    root: '"Cal Sans", Arial, sans-serif',
+    map: '"Cal Sans", Arial, sans-serif',
+    input: '"Cal Sans", Arial, sans-serif',
+    attribution: '"Cal Sans", sans-serif',
+  });
   const camera = () =>
     page.evaluate(() => {
       const map = window.__map;
@@ -100,6 +119,11 @@ test("shared views restore buildings, layers, pin metadata, camera, categories a
   await expect.poll(camera).toEqual(original);
   expect(
     styleUrls.some((url) => new URL(url).searchParams.get("3d") === "1"),
+  ).toBe(true);
+  expect(
+    styleUrls
+      .filter((url) => new URL(url).pathname.startsWith("/styles/"))
+      .every((url) => new URL(url).searchParams.get("font") === "cal-sans"),
   ).toBe(true);
   await page
     .getByRole("button", { name: "About Benmaps", exact: true })

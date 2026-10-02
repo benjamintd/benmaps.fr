@@ -7,7 +7,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.resetModules();
 });
-it("requests and caches local-language Clair variants, preserving 3D buildings in both basemaps", async () => {
+it("requests and caches Cal Sans local-language Clair variants, preserving 3D buildings in both basemaps", async () => {
   const request = vi.fn(async (input: string) => ({
     ok: true,
     json: async () => ({
@@ -73,7 +73,7 @@ it("requests and caches local-language Clair variants, preserving 3D buildings i
   expect(restored.terrain).toBeUndefined();
   expect(restored.projection).toEqual({ type: "mercator" });
   expect(request.mock.calls.map(([url]) => url)).toEqual([
-    "https://clair.benmaps.fr/styles/latest/light.json?lang=local",
-    "https://clair.benmaps.fr/styles/latest/light.json?lang=local&3d=1&terrain=1",
+    "https://clair.benmaps.fr/styles/latest/light.json?lang=local&font=cal-sans",
+    "https://clair.benmaps.fr/styles/latest/light.json?lang=local&font=cal-sans&3d=1&terrain=1",
   ]);
 });

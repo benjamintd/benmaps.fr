@@ -1,12 +1,20 @@
 @font-face {
-  font-family: Commissioner;
-  src: url("/fonts/commissioner/Commissioner-Variable.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: "Cal Sans";
+  src: url("/fonts/cal-sans/CalSansVF.woff2") format("woff2");
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "Cal Sans";
+  src: url("/fonts/cal-sans/CalSansVF-Italic.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+}
 :root {
-  font-family: Commissioner, Arial, sans-serif;
+  font-family: "Cal Sans", Arial, sans-serif;
+  font-optical-sizing: auto;
   color-scheme: light;
   color: var(--ink);
   background: var(--wash);
@@ -28,13 +36,21 @@
 body {
   margin: 0;
 }
+body .maplibregl-map,
+body .maplibregl-popup,
+code,
+pre {
+  font-family: inherit;
+}
 button,
 input,
 a {
   -webkit-tap-highlight-color: transparent;
 }
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 button {
@@ -351,7 +367,7 @@ button small {
   border-color: #626975 !important;
   background: #ffffffb3 !important;
   font:
-    9px Commissioner,
+    9px "Cal Sans",
     sans-serif !important;
   padding: 0 5px !important;
   height: 15px !important;
@@ -359,7 +375,7 @@ button small {
 }
 .maplibregl-ctrl-attrib {
   font:
-    9px Commissioner,
+    9px "Cal Sans",
     sans-serif !important;
   background: #ffffffd9 !important;
   color: #626975 !important;
@@ -1119,7 +1135,7 @@ button small {
   text-align: center;
   color: white;
   font:
-    500 12px Commissioner,
+    500 12px "Cal Sans",
     sans-serif;
   z-index: 1;
   line-height: 19px;

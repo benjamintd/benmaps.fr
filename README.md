@@ -1,7 +1,7 @@
 # Benmaps
 
 A map application built with React 19, TypeScript, MapLibre GL JS 6.9, and
-[Clair](https://clair.benmaps.fr) hosted cartography. Commissioner is used for the interface
+[Clair](https://clair.benmaps.fr) hosted cartography. Cal Sans is used for the interface
 and map labels. The interface uses Heroicons with matching semantic companion
 icons for transport and POI categories missing from that set.
 
@@ -131,9 +131,11 @@ production worker includes its shared dependencies.
 
 Application code retains its MIT license. Clair's hosted cartography and SDK
 retain their own terms; the About dialog links to Clair's license and notices.
-Map attribution stays visible. Only the existing Commissioner interface font is
-self-hosted, with its OFL license and provenance in
-[public/fonts/commissioner/README.md](public/fonts/commissioner/README.md).
+Map attribution stays visible. Cal Sans v2's interface fonts are self-hosted,
+with their OFL license and provenance in
+[public/fonts/cal-sans/README.md](public/fonts/cal-sans/README.md).
+The map requests Clair's `font=cal-sans` option (available since 0.5.18),
+with Noto fallbacks for other scripts.
 Map fonts, sprites, landmark models and renderer code load from their providers.
 
 Cycling profiles use sampled Mapbox terrain contours, so ascent/descent values

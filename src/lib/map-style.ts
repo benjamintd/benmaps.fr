@@ -5,8 +5,9 @@ import type { MapSettings } from "./domain";
 // source that we point at our own tile provider. "latest" tracks the newest
 // release; pin a versioned URL here if you need reproducible cartography.
 // Local mode uses each feature's native names, with Clair's English fallback.
+// Cal Sans matches the interface; Clair supplies Noto for other scripts.
 const STYLE_URL =
-  "https://clair.benmaps.fr/styles/latest/light.json?lang=local";
+  "https://clair.benmaps.fr/styles/latest/light.json?lang=local&font=cal-sans";
 const baseStyles = new Map<boolean, Promise<StyleSpecification>>();
 function loadBaseStyle(threeDimensional: boolean): Promise<StyleSpecification> {
   let pending = baseStyles.get(threeDimensional);

@@ -43,13 +43,11 @@ try {
   await render(192, "public/icons/icon-192.png");
   await render(512, "public/icons/icon-512.png");
   await render(512, "public/icons/icon-maskable-512.png", true);
-  const font = await readFile(
-    "public/fonts/commissioner/Commissioner-Variable.woff2",
-  );
+  const font = await readFile("public/fonts/cal-sans/CalSansVF.woff2");
   await page.setViewportSize({ width: 1200, height: 630 });
   await page.setContent(`<style>
-    @font-face{font-family:Commissioner;src:url(data:font/woff2;base64,${font.toString("base64")})}
-    *{box-sizing:border-box}body{margin:0;background:#fff;color:#20242c;font-family:Commissioner,Arial,sans-serif}
+    @font-face{font-family:"Cal Sans";font-weight:400 700;src:url(data:font/woff2;base64,${font.toString("base64")})}
+    *{box-sizing:border-box}body{margin:0;background:#fff;color:#20242c;font-family:"Cal Sans",Arial,sans-serif;font-optical-sizing:auto}
     main{height:630px;display:flex;flex-direction:column;justify-content:center;padding:100px}
     .brand{display:flex;align-items:center;gap:28px;font-size:92px;font-weight:500;letter-spacing:-4px}
     svg{width:110px;height:110px}b{color:#2e6ea2;font-weight:500}p{margin:38px 0 0;font-size:34px;color:#626975;letter-spacing:-.5px}
