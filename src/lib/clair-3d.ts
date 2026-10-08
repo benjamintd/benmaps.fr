@@ -3,7 +3,7 @@ import type { Map } from "maplibre-gl";
 const CLAIR_3D_URL =
   import.meta.env.VITE_CLAIR_3D_URL ||
   "https://clair.benmaps.fr/extensions/latest/clair-3d.js";
-// Follow the global preview dataset; the approved channel currently has no models.
+// Follow the global preview dataset, including the latest landmark drafts.
 export const LANDMARKS_CATALOGUE_URL =
   import.meta.env.VITE_OPEN_LANDMARKS_CATALOGUE_URL ||
   "https://open-landmarks.benmaps.fr/api/v1/preview.json";
@@ -52,6 +52,8 @@ export function createClair3D(
             maxResident: 3,
             // Keep basemap buildings until a replacement actually exists.
             replacementMode: "loaded",
+            // Match bridge road identities while a supported model is resident.
+            bridgeReplacement: true,
             maxCached: 6,
             maxCacheBytes: 16 * 1024 * 1024,
             maxTrees: 1500,

@@ -57,6 +57,7 @@ it("rapid toggles remove a late attachment before starting the next one", async 
       landmarks: true,
       maxResident: 3,
       replacementMode: "loaded",
+      bridgeReplacement: true,
       labelOcclusion: true,
       maxCached: 6,
       catalogueUrl: LANDMARKS_CATALOGUE_URL,

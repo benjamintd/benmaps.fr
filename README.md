@@ -171,13 +171,14 @@ The SDK owns style reloads; the application serializes asynchronous attachment
 and removes late results when 3D is disabled or the map is destroyed.
 
 Open Landmarks independently hosts the index, model files and editable sources.
-This preview explicitly selects the draft Paris collection via `preview.json`;
+This preview explicitly selects the global draft catalogue via `preview.json`;
 the SDK resolves and pins its release for each map session. Configure
 `VITE_OPEN_LANDMARKS_CATALOGUE_URL` to select a pinned catalogue or the approved
 `latest.json` pointer.
 `VITE_CLAIR_3D_URL` optionally overrides the SDK URL. The moving alias resolves to an immutable versioned SDK.
 
-Models load from zoom 15; instanced trees use real Protomaps points from zoom 16.
+Ordinary buildings load from zoom 15; Golden Gate Bridge starts at zoom 13.
+Instanced trees use real Protomaps points from zoom 16.
 The SDK caps residency at three models and 1,500 trees. No model files or Three.js
 renderer are bundled into the application. Both use Mercator and terrain elevation;
 styles and traffic overlays can change without adding another renderer.
@@ -194,6 +195,13 @@ hide complete OSM extrusions, including their roofs. Zooming retains learned IDs
 and cached meshes; FIFO eviction occurs only under cache capacity pressure.
 The basemap loads independently of SDK/catalogue requests. Snapshot-specific ID
 overrides remain unset for the live Protomaps API.
+
+Bridge replacement matches exact named road features within the authored bridge
+corridor, hiding native casing, fill and markings only while a supported model is
+resident. The SDK keeps the span at its explicit sea-level height and adjusts
+bounded shore transitions and footing bottoms to terrain. Missing or unsupported
+terrain restores the native bridge. Road continuations and buildings beneath the
+span remain visible.
 
 ## Shared views
 
