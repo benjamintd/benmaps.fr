@@ -154,7 +154,8 @@ export default function MapCanvas(props: Props) {
         compact: true,
         customAttribution: [
           '<a href="https://clair.benmaps.fr" target="_blank" rel="noopener">Clair</a>',
-          '<a href="https://open-landmarks.benmaps.fr/licenses/" target="_blank" rel="noopener">Open Landmarks contributors · CC BY 4.0</a>',
+          '<a href="https://open-landmarks.benmaps.fr/licenses/" target="_blank" rel="noopener">Open Landmarks contributors · licences</a>',
+          '<a href="https://open-landmarks.benmaps.fr/landmarks/eiffel-tower/" target="_blank" rel="noopener">Eiffel Tower · Newcandle · CC BY-SA 3.0</a>',
         ],
       }),
       "bottom-right",
