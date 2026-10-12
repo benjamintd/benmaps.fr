@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { maplibreTerrainCompatibility } from "./scripts/maplibre-terrain-compat";
 // Preview URLs stay shareable but must not compete with the production site.
 const production = process.env.VERCEL_ENV === "production";
 const previewHost =
@@ -10,6 +11,7 @@ const siteOrigin = production ? "https://benmaps.fr" : `https://${previewHost}`;
 export default defineConfig({
   plugins: [
     react(),
+    maplibreTerrainCompatibility(),
     {
       name: "site-metadata",
       transformIndexHtml(html) {
@@ -39,6 +41,8 @@ export default defineConfig({
       },
     },
   ],
+  // Let the same terrain compatibility transform run in development and builds.
+  optimizeDeps: { exclude: ["maplibre-gl"] },
   // The public build archive supports byte ranges but not browser CORS. This
   // local-only adapter makes development possible without a hosted API key.
   server: {

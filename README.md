@@ -5,6 +5,15 @@ A map application built with React 19, TypeScript, MapLibre GL JS 6.9, and
 and map labels. The interface uses Heroicons with matching semantic companion
 icons for transport and POI categories missing from that set.
 
+MapLibre 6.9.1 supplies the navigation performance fixes. Its build retains
+the 6.9.0 DEM sampling alignment on both CPU and GPU because Golden Gate
+Bridge's authored footings use that calibration. The half-cell shift in
+[upstream #8420](https://github.com/maplibre/maplibre-gl-js/pull/8420) exceeds
+their permitted terrain adjustment and hides the whole model. The guarded
+transform in `scripts/maplibre-terrain-compat.ts` leaves other 6.9.1 fixes intact
+and fails if the pinned distribution changes. Remove it when the bridge's
+footings are recalibrated, and review it before upgrading MapLibre again.
+
 ## Development
 
 ```sh
