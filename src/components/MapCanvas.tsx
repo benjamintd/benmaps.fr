@@ -10,7 +10,8 @@ import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { addPlaceMarkers, addUserLocationMarker } from "../lib/map/markers";
 import { routeAtPoint, updateRoutes } from "../lib/map/routes";
-import { isPointerTarget, placeAtPoint } from "../lib/map/picking";
+import { placeAtPoint } from "../lib/map/picking";
+import { installMapHover } from "../lib/map/hover";
 import { installLongPress } from "../lib/map/long-press";
 import { createContextMenu } from "../lib/map/context-menu";
 import { mapStyle } from "../lib/map-style";
@@ -229,17 +230,7 @@ export default function MapCanvas(props: Props) {
       const place = placeAtPoint(map, event.point, event.lngLat, touch);
       if (place) latest.current.onPick(place);
     });
-    map.on("mousemove", (event) => {
-      map.getCanvas().style.cursor =
-        routeAtPoint(map, event.point) !== undefined ||
-        isPointerTarget(
-          map,
-          event.point,
-          window.matchMedia("(max-width: 700px), (pointer: coarse)").matches,
-        )
-          ? "pointer"
-          : "";
-    });
+    const removeHover = installMapHover(map);
     const longPress = installLongPress(map.getCanvas(), {
       enabled: (event) =>
         event.pointerType === "touch" ||
@@ -271,6 +262,7 @@ export default function MapCanvas(props: Props) {
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
     return () => {
+      removeHover();
       longPress.remove();
       resize.disconnect();
       contextMenu.current?.remove();

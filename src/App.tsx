@@ -52,10 +52,8 @@ export default function App() {
   const userLocation = position?.coordinates ?? null;
   const [directionsExpanded, setDirectionsExpanded] = useState(false);
   const searchCenter = userLocation ?? center;
-  const [orientation, setOrientation] = useState<{
-    bearing: number;
-    pitch: number;
-  }>(() => cameraOrDefault(initialUrl));
+  // Camera frames update just this icon, without rendering the whole app.
+  const compassNeedle = useRef<SVGSVGElement>(null);
   const [command, setCommand] = useState<MapCommand | null>(null);
   const commandId = useRef(0);
   const [nearby, setNearby] = useState<Resource<Place[]>>({ status: "idle" });
@@ -186,7 +184,10 @@ export default function App() {
             })
           }
           onCenter={setCenter}
-          onOrientation={setOrientation}
+          onOrientation={({ bearing, pitch }) => {
+            if (compassNeedle.current)
+              compassNeedle.current.style.transform = `rotateX(${pitch}deg) rotateZ(${-bearing}deg)`;
+          }}
           onNotice={setNotice}
         />
       </Suspense>
@@ -391,13 +392,7 @@ export default function App() {
           title="Reset bearing and tilt"
           onClick={() => setCommand({ id: ++commandId.current, type: "north" })}
         >
-          <svg
-            viewBox="0 0 32 32"
-            aria-hidden="true"
-            style={{
-              transform: `rotateX(${orientation.pitch}deg) rotateZ(${-orientation.bearing}deg)`,
-            }}
-          >
+          <svg ref={compassNeedle} viewBox="0 0 32 32" aria-hidden="true">
             <circle
               cx="16"
               cy="16"

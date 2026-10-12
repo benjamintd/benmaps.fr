@@ -3,6 +3,32 @@ import { pointPlace } from "../domain";
 import type { Coordinates, Place } from "../domain";
 import { wikidataId } from "../wikidata";
 
+const labelLayers = new WeakMap<Map, { all: string[]; pois: string[] }>();
+const observedMaps = new WeakSet<Map>();
+
+function layersForLabels(map: Map, poisOnly: boolean): string[] {
+  if (!observedMaps.has(map)) {
+    const invalidate = () => labelLayers.delete(map);
+    map.on("styledata", invalidate);
+    map.on("remove", invalidate);
+    observedMaps.add(map);
+  }
+  let cached = labelLayers.get(map);
+  if (!cached) {
+    const symbols = (map.getStyle()?.layers ?? []).filter(
+      (layer) => layer.type === "symbol",
+    );
+    cached = {
+      all: symbols.map((layer) => layer.id),
+      pois: symbols
+        .filter((layer) => layer["source-layer"] === "pois")
+        .map((layer) => layer.id),
+    };
+    labelLayers.set(map, cached);
+  }
+  return poisOnly ? cached.pois : cached.all;
+}
+
 function labelled(feature: MapGeoJSONFeature): boolean {
   return (
     feature.layer.type === "symbol" &&
@@ -12,8 +38,10 @@ function labelled(feature: MapGeoJSONFeature): boolean {
 
 /** The basemap label under the pointer, if the pointer is over one. */
 export function labelAtPoint(map: Map, point: Point, poisOnly = false) {
+  const layers = layersForLabels(map, poisOnly);
+  if (!layers.length) return undefined;
   return map
-    .queryRenderedFeatures(point)
+    .queryRenderedFeatures(point, { layers })
     .find(
       (feature) =>
         labelled(feature) && (!poisOnly || feature.sourceLayer === "pois"),
