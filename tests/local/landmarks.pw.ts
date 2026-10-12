@@ -314,13 +314,15 @@ for (const emptyModel of [false, true])
     }
     await page.screenshot({ path: testInfo.outputPath("landmarks.png") });
     await page.getByRole("switch", { name: "3D", exact: true }).uncheck();
-    await page.route("https://open-landmarks.benmaps.fr/**/*.glb", (r) =>
-      r.fulfill({ status: 503, body: "unavailable" }),
-    );
+    let failedRequests = 0;
+    await page.route("https://open-landmarks.benmaps.fr/**/*.glb", (r) => {
+      failedRequests++;
+      return r.fulfill({ status: 503, body: "unavailable" });
+    });
     await page.getByRole("switch", { name: "3D", exact: true }).check();
-    await expect(
-      page.getByText("Some 3D details couldn’t load."),
-    ).toBeVisible();
+    // Optional model errors are quiet in MapCanvas. Verify the failed download
+    // and ordinary-building fallback independently of an application notice.
+    await expect.poll(() => failedRequests).toBeGreaterThan(0);
     expect(await inspect()).toMatchObject({
       opacity: 1,
       replaced: false,

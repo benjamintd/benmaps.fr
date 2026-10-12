@@ -18,7 +18,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "lucide-react": "^1.45.0",
-    "maplibre-gl": "6.9.0",
+    "maplibre-gl": "6.9.1",
     "pmtiles": "^4.3.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
